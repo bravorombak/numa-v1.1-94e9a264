@@ -6,6 +6,7 @@ import { PromptEditorHeader } from '@/components/prompt-editor/PromptEditorHeade
 import { PromptEditorTabs } from '@/components/prompt-editor/PromptEditorTabs';
 import { AboutTab } from '@/components/prompt-editor/AboutTab';
 import { PromptTab } from '@/components/prompt-editor/PromptTab';
+import { VariablesTab } from '@/components/prompt-editor/VariablesTab';
 import { extractVariables } from '@/lib/variableDetection';
 
 const PromptEditorPage = () => {
@@ -53,11 +54,7 @@ const PromptEditorPage = () => {
       <div className="flex-1 overflow-auto">
         {activeTab === 'about' && <AboutTab />}
         {activeTab === 'prompt' && <PromptTab />}
-        {activeTab === 'variables' && (
-          <div className="p-6 text-center text-muted-foreground">
-            Variables tab coming soon
-          </div>
-        )}
+        {activeTab === 'variables' && <VariablesTab />}
         {activeTab === 'model' && (
           <div className="p-6 text-center text-muted-foreground">
             Model tab coming soon
