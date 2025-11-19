@@ -5,20 +5,25 @@ import { usePromptEditorStore } from '@/stores/promptEditorStore';
 import { PromptEditorHeader } from '@/components/prompt-editor/PromptEditorHeader';
 import { PromptEditorTabs } from '@/components/prompt-editor/PromptEditorTabs';
 import { AboutTab } from '@/components/prompt-editor/AboutTab';
+import { PromptTab } from '@/components/prompt-editor/PromptTab';
+import { extractVariables } from '@/lib/variableDetection';
 
 const PromptEditorPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: draft, isLoading, error } = usePromptDraft(id || '');
-  const { setDraft, activeTab, reset } = usePromptEditorStore();
+  const { setDraft, setDetectedVariables, activeTab, reset } = usePromptEditorStore();
 
   useEffect(() => {
     if (draft) {
       setDraft(draft);
+      // Initialize detected variables from the loaded prompt
+      const detected = extractVariables(draft.prompt_text || '');
+      setDetectedVariables(detected);
     }
     return () => {
       reset();
     };
-  }, [draft, setDraft, reset]);
+  }, [draft, setDraft, setDetectedVariables, reset]);
 
   if (isLoading) {
     return (
@@ -47,11 +52,7 @@ const PromptEditorPage = () => {
       <PromptEditorTabs />
       <div className="flex-1 overflow-auto">
         {activeTab === 'about' && <AboutTab />}
-        {activeTab === 'prompt' && (
-          <div className="p-6 text-center text-muted-foreground">
-            Prompt tab coming soon
-          </div>
-        )}
+        {activeTab === 'prompt' && <PromptTab />}
         {activeTab === 'variables' && (
           <div className="p-6 text-center text-muted-foreground">
             Variables tab coming soon
