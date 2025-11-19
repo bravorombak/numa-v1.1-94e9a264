@@ -30,7 +30,7 @@ export async function callOpenAI(
       body: JSON.stringify({
         model: params.model,
         messages: params.messages,
-        max_tokens: params.maxTokens,
+        max_completion_tokens: params.maxTokens,
         temperature: params.temperature,
       }),
       signal: controller.signal,
