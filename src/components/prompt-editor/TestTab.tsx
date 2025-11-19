@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { usePromptEditorStore } from '@/stores/promptEditorStore';
 import { useModels } from '@/hooks/useModels';
+import { useGenerate } from '@/hooks/useGenerate';
 import type { PromptVariable } from '@/lib/variableDetection';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,9 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Info, Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Info, Loader2, AlertCircle } from 'lucide-react';
 
 const providerNames: Record<string, string> = {
   openai: 'OpenAI',
@@ -28,10 +30,10 @@ const providerNames: Record<string, string> = {
 export const TestTab = () => {
   const { draftData } = usePromptEditorStore();
   const { data: models } = useModels();
+  const generateMutation = useGenerate();
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isRunning, setIsRunning] = useState(false);
-  const [output, setOutput] = useState<string | null>(null);
+  const isRunning = generateMutation.isPending;
 
   if (!draftData) {
     return (
@@ -75,47 +77,49 @@ export const TestTab = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const generateMockResponse = (): string => {
-    const modelInfo = selectedModel
-      ? `${selectedModel.provider_model} (${providerNames[selectedModel.provider]})`
-      : '(no model selected)';
-    
-    const filledVars = variables
-      .map(v => `- ${v.label || v.name}: ${formValues[v.name] || '(empty)'}`)
-      .join('\n');
-    
-    return `Mock response for "${draftData.title || 'Untitled'}"
-
-Model: ${modelInfo}
-
-Filled variables:
-${filledVars}
-
----
-
-This is a simulated response. In a future version, this will call the real /generate endpoint with your prompt and variables.
-
-[The AI would process your prompt: "${draftData.prompt_text?.substring(0, 100)}..." and generate a real response based on the model and variables you provided.]`;
+  const getErrorTitle = (code?: string): string => {
+    const mapping: Record<string, string> = {
+      RATE_LIMITED: 'Rate Limit Exceeded',
+      MODEL_NOT_FOUND: 'Model Not Found',
+      MODEL_DISABLED: 'Model Disabled',
+      MODEL_AUTH_ERROR: 'Model Authentication Error',
+      MODEL_RATE_LIMITED: 'Model Provider Rate Limited',
+      MODEL_TIMEOUT: 'Request Timeout',
+      MODEL_UNAVAILABLE: 'Model Unavailable',
+      INVALID_VARIABLES: 'Invalid Variables',
+      PROMPT_NOT_FOUND: 'Prompt Not Found',
+      PROVIDER_ERROR: 'Provider Error',
+      INTERNAL_ERROR: 'Internal Error',
+      NETWORK_ERROR: 'Network Error',
+    };
+    return mapping[code || ''] || 'Generation Error';
   };
 
   const handleRunTest = async () => {
-    // Clear previous output
-    setOutput(null);
-    
-    // Validate form
+    generateMutation.reset();
+    if (!draftData) return;
+
     if (!validateForm()) {
       return;
     }
-    
-    // Start loading
-    setIsRunning(true);
-    
-    // Simulate API call with setTimeout
-    setTimeout(() => {
-      const mockOutput = generateMockResponse();
-      setOutput(mockOutput);
-      setIsRunning(false);
-    }, 1500);
+
+    // If no model selected, bail early
+    if (!draftData.model_id) return;
+
+    try {
+      await generateMutation.mutateAsync({
+        // Canonical contract
+        prompt: draftData.prompt_text,
+        variables: formValues,
+        model_id: draftData.model_id,
+        files: [],
+
+        // Convenience: include draft reference for logging/context
+        prompt_draft_id: draftData.id,
+      });
+    } catch {
+      // Error is handled via mutation + UI, no rethrow needed
+    }
   };
 
   const renderVariableInput = (variable: PromptVariable, index: number) => {
@@ -242,16 +246,16 @@ This is a simulated response. In a future version, this will call the real /gene
       <div className="space-y-2 mb-6">
         <h2 className="text-2xl font-semibold">Test Prompt</h2>
         <p className="text-sm text-muted-foreground">
-          Fill in variables and run a mock test. In this phase, the response is simulated; later it will call the real /generate endpoint.
+          Test your prompt with the real AI model. Fill in the variables and click "Run Test" to generate output.
         </p>
       </div>
 
       {/* Model Status */}
       {!draftData.model_id ? (
-        <Alert variant="default" className="mb-6">
-          <Info className="h-4 w-4" />
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            No model selected. Go to the Model tab to choose a model. You can still run a mock test, but the model name will be shown as "(no model selected)".
+            No model selected. Please choose a model in the Model tab before running a test.
           </AlertDescription>
         </Alert>
       ) : (
@@ -295,25 +299,53 @@ This is a simulated response. In a future version, this will call the real /gene
           {/* Run Test Button */}
           <Button 
             onClick={handleRunTest} 
-            disabled={isRunning}
+            disabled={isRunning || !draftData.model_id || variables.length === 0}
             className="w-full"
             size="lg"
           >
             {isRunning && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isRunning ? 'Running Test...' : 'Run Test'}
+            {isRunning ? 'Generating...' : 'Run Test'}
           </Button>
         </div>
       )}
 
-      {/* Output Panel */}
-      {output && (
+      {/* Error Display */}
+      {generateMutation.isError && (
+        <Alert variant="destructive" className="mt-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>{getErrorTitle(generateMutation.error.code)}</AlertTitle>
+          <AlertDescription>
+            {generateMutation.error.message}
+          </AlertDescription>
+
+          {generateMutation.error.code === 'RATE_LIMITED' && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              You have reached the limit of 30 generations per 10 minutes. Please wait a bit before trying again.
+            </p>
+          )}
+
+          {['MODEL_DISABLED', 'MODEL_NOT_FOUND', 'MODEL_AUTH_ERROR'].includes(
+            generateMutation.error.code
+          ) && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Please check your model configuration in the Model tab or contact an administrator.
+            </p>
+          )}
+        </Alert>
+      )}
+
+      {/* Success Output */}
+      {generateMutation.isSuccess && (
         <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Test Output</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Output</CardTitle>
+            <Badge variant="outline">
+              {generateMutation.data.usage.tokens} tokens
+            </Badge>
           </CardHeader>
           <CardContent>
-            <pre className="whitespace-pre-wrap text-sm bg-muted p-4 rounded-md font-mono">
-              {output}
+            <pre className="whitespace-pre-wrap text-sm">
+              {generateMutation.data.output}
             </pre>
           </CardContent>
         </Card>
