@@ -53,6 +53,54 @@ export type Database = {
         }
         Relationships: []
       }
+      generation_logs: {
+        Row: {
+          created_at: string
+          id: string
+          input_tokens: number | null
+          model_id: string | null
+          output_tokens: number | null
+          prompt_draft_id: string | null
+          total_tokens: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          input_tokens?: number | null
+          model_id?: string | null
+          output_tokens?: number | null
+          prompt_draft_id?: string | null
+          total_tokens?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          input_tokens?: number | null
+          model_id?: string | null
+          output_tokens?: number | null
+          prompt_draft_id?: string | null
+          total_tokens?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_logs_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generation_logs_prompt_draft_id_fkey"
+            columns: ["prompt_draft_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guide_pages: {
         Row: {
           content_md: string | null
