@@ -10,11 +10,13 @@ interface PromptEditorState {
   draftData: PromptDraft | null;
   isDirty: boolean;
   isSaving: boolean;
+  detectedVariables: string[];
   setActiveTab: (tab: TabType) => void;
   setDraft: (draft: PromptDraft | null) => void;
   updateDraftField: (field: keyof PromptDraft, value: any) => void;
   setDirty: (isDirty: boolean) => void;
   setSaving: (isSaving: boolean) => void;
+  setDetectedVariables: (vars: string[]) => void;
   reset: () => void;
 }
 
@@ -23,6 +25,7 @@ export const usePromptEditorStore = create<PromptEditorState>((set) => ({
   draftData: null,
   isDirty: false,
   isSaving: false,
+  detectedVariables: [],
   setActiveTab: (tab) => set({ activeTab: tab }),
   setDraft: (draft) => set({ draftData: draft, isDirty: false }),
   updateDraftField: (field, value) =>
@@ -34,11 +37,13 @@ export const usePromptEditorStore = create<PromptEditorState>((set) => ({
     })),
   setDirty: (isDirty) => set({ isDirty }),
   setSaving: (isSaving) => set({ isSaving }),
+  setDetectedVariables: (vars) => set({ detectedVariables: vars }),
   reset: () =>
     set({
       activeTab: 'about',
       draftData: null,
       isDirty: false,
       isSaving: false,
+      detectedVariables: [],
     }),
 }));
