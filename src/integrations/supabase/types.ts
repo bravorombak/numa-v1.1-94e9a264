@@ -14,6 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_archived: boolean | null
+          name: string
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_archived?: boolean | null
+          name: string
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_archived?: boolean | null
+          name?: string
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      guide_pages: {
+        Row: {
+          content_md: string | null
+          created_at: string | null
+          id: string
+          is_published: boolean | null
+          parent_id: string | null
+          slug: string
+          sort_order: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content_md?: string | null
+          created_at?: string | null
+          id?: string
+          is_published?: boolean | null
+          parent_id?: string | null
+          slug: string
+          sort_order?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content_md?: string | null
+          created_at?: string | null
+          id?: string
+          is_published?: boolean | null
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_pages_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "guide_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["message_role"]
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["message_role"]
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["message_role"]
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      models: {
+        Row: {
+          api_key: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          max_tokens: number | null
+          name: string
+          provider: Database["public"]["Enums"]["model_provider"]
+          provider_model: string
+          status: Database["public"]["Enums"]["model_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          max_tokens?: number | null
+          name: string
+          provider: Database["public"]["Enums"]["model_provider"]
+          provider_model: string
+          status?: Database["public"]["Enums"]["model_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          max_tokens?: number | null
+          name?: string
+          provider?: Database["public"]["Enums"]["model_provider"]
+          provider_model?: string
+          status?: Database["public"]["Enums"]["model_status"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -35,6 +189,214 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      prompt_drafts: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          emoji: string | null
+          id: string
+          image_url: string | null
+          model_id: string | null
+          prompt_text: string
+          title: string
+          updated_at: string | null
+          user_id: string | null
+          variables: Json | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          image_url?: string | null
+          model_id?: string | null
+          prompt_text: string
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          image_url?: string | null
+          model_id?: string | null
+          prompt_text?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+          variables?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_drafts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_drafts_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompt_versions: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          emoji: string | null
+          id: string
+          image_url: string | null
+          model_id: string | null
+          prompt_draft_id: string
+          prompt_text: string
+          published_at: string | null
+          published_by: string | null
+          title: string
+          variables: Json | null
+          version_number: number
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          image_url?: string | null
+          model_id?: string | null
+          prompt_draft_id: string
+          prompt_text: string
+          published_at?: string | null
+          published_by?: string | null
+          title: string
+          variables?: Json | null
+          version_number: number
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          image_url?: string | null
+          model_id?: string | null
+          prompt_draft_id?: string
+          prompt_text?: string
+          published_at?: string | null
+          published_by?: string | null
+          title?: string
+          variables?: Json | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_versions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_versions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_versions_prompt_draft_id_fkey"
+            columns: ["prompt_draft_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions: {
+        Row: {
+          created_at: string | null
+          id: string
+          model_id: string | null
+          prompt_version_id: string | null
+          user_id: string
+          variable_inputs: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          model_id?: string | null
+          prompt_version_id?: string | null
+          user_id: string
+          variable_inputs?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          model_id?: string | null
+          prompt_version_id?: string | null
+          user_id?: string
+          variable_inputs?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_prompt_version_id_fkey"
+            columns: ["prompt_version_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      storage_logs: {
+        Row: {
+          bucket: string
+          content_type: string | null
+          created_at: string | null
+          deleted_at: string | null
+          id: string
+          path: string
+          size_bytes: number | null
+          user_id: string | null
+        }
+        Insert: {
+          bucket: string
+          content_type?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          path: string
+          size_bytes?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          bucket?: string
+          content_type?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          path?: string
+          size_bytes?: number | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -74,6 +436,9 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor" | "user"
+      message_role: "user" | "assistant" | "system"
+      model_provider: "openai" | "anthropic" | "google" | "perplexity"
+      model_status: "active" | "deprecated" | "disabled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -202,6 +567,9 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor", "user"],
+      message_role: ["user", "assistant", "system"],
+      model_provider: ["openai", "anthropic", "google", "perplexity"],
+      model_status: ["active", "deprecated", "disabled"],
     },
   },
 } as const
