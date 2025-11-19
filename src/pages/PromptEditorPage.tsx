@@ -9,6 +9,7 @@ import { PromptTab } from '@/components/prompt-editor/PromptTab';
 import { VariablesTab } from '@/components/prompt-editor/VariablesTab';
 import { ModelTab } from '@/components/prompt-editor/ModelTab';
 import { TestTab } from '@/components/prompt-editor/TestTab';
+import { VersionTab } from '@/components/prompt-editor/VersionTab';
 import { extractVariables } from '@/lib/variableDetection';
 
 const PromptEditorPage = () => {
@@ -59,11 +60,7 @@ const PromptEditorPage = () => {
         {activeTab === 'variables' && <VariablesTab />}
         {activeTab === 'model' && <ModelTab />}
         {activeTab === 'test' && <TestTab />}
-        {activeTab === 'version' && (
-          <div className="p-6 text-center text-muted-foreground">
-            Version tab coming soon
-          </div>
-        )}
+        {activeTab === 'version' && <VersionTab />}
       </div>
     </div>
   );
