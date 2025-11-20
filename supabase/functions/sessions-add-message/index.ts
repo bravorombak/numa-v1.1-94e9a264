@@ -8,6 +8,7 @@ const corsHeaders = {
 interface AddMessageRequest {
   session_id: string;
   content: string;
+  role?: 'user' | 'assistant';
 }
 
 Deno.serve(async (req) => {
@@ -42,7 +43,7 @@ Deno.serve(async (req) => {
 
     // Parse request body
     const body: AddMessageRequest = await req.json();
-    const { session_id, content } = body;
+    const { session_id, content, role = 'user' } = body;
 
     if (!session_id || !content) {
       console.error('[sessions-add-message] Missing required fields');
@@ -80,7 +81,7 @@ Deno.serve(async (req) => {
       .from('messages')
       .insert({
         session_id: session_id,
-        role: 'user',
+        role: role,
         content: content,
       })
       .select()

@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSessions";
-import { useAddMessage } from "@/hooks/useMessages";
+import { useAddMessage, useGenerateAssistantReply } from "@/hooks/useMessages";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatBody } from "@/components/chat/ChatBody";
 import { ChatComposer } from "@/components/chat/ChatComposer";
@@ -11,6 +11,9 @@ const ChatPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { data: session, isLoading, error } = useSession(sessionId || "");
   const addMessage = useAddMessage();
+  const generateAssistant = useGenerateAssistantReply();
+
+  const isBusy = isLoading || addMessage.isPending || generateAssistant.isPending;
 
   if (isLoading) {
     return (
@@ -48,13 +51,26 @@ const ChatPage = () => {
       />
       <ChatBody sessionId={sessionId || ""} />
       <ChatComposer 
-        disabled={isLoading || addMessage.isPending}
+        disabled={isBusy}
         onSend={async (message) => {
-          if (!sessionId) return;
-          await addMessage.mutateAsync({
-            sessionId,
-            content: message,
-          });
+          if (!sessionId || !session) return;
+          
+          try {
+            // Step 1: Save the user's message
+            await addMessage.mutateAsync({
+              sessionId,
+              content: message,
+            });
+            
+            // Step 2: Generate and save the assistant's reply
+            await generateAssistant.mutateAsync({
+              session,
+              userMessage: message,
+            });
+          } catch (error) {
+            // Errors are already handled by the mutation hooks
+            console.error('[ChatPage] Error in message flow:', error);
+          }
         }}
       />
     </div>
