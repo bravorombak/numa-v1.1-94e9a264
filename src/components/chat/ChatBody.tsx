@@ -37,7 +37,7 @@ export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
     if (isNearBottom()) {
       scrollToBottom();
     }
-  }, [messages, isAssistantLoading]);
+  }, [messages.length, isAssistantLoading]);
 
   if (isLoading) {
     return (
@@ -69,7 +69,7 @@ export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 overflow-auto bg-background">
+      <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
         <div className="flex items-center justify-center h-full">
           <p className="text-sm text-muted-foreground">
             No messages yet. Start the conversation below.
@@ -80,7 +80,7 @@ export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
   }
 
   return (
-    <div className="flex-1 overflow-auto bg-background">
+    <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
       <div className="max-w-4xl mx-auto p-4">
         {/* Pagination controls at top */}
         {(hasPrevious || hasMore) && (
