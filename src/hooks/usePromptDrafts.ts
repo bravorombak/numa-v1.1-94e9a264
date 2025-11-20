@@ -82,6 +82,23 @@ export const usePromptVersions = (promptDraftId: string) => {
   });
 };
 
+export const usePromptVersion = (id: string) => {
+  return useQuery({
+    queryKey: ['prompt-version', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('prompt_versions')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return data as PromptVersion;
+    },
+    enabled: !!id,
+  });
+};
+
 export const usePublishPromptVersion = () => {
   const queryClient = useQueryClient();
 
