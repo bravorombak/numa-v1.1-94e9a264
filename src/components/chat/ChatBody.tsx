@@ -7,9 +7,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ChatBodyProps {
   sessionId: string;
+  isAssistantLoading?: boolean;
 }
 
-export const ChatBody = ({ sessionId }: ChatBodyProps) => {
+export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
   const [page, setPage] = useState(0);
   const pageSize = 30;
 
@@ -96,6 +97,22 @@ export const ChatBody = ({ sessionId }: ChatBodyProps) => {
               createdAt={message.created_at}
             />
           ))}
+          
+          {/* Assistant thinking indicator */}
+          {isAssistantLoading && (
+            <div className="flex justify-start mb-4">
+              <div className="max-w-[70%] rounded-lg px-4 py-3 bg-muted/50 text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <span className="inline-block h-2 w-2 rounded-full bg-muted-foreground/60 animate-pulse" style={{ animationDelay: '0ms' }} />
+                    <span className="inline-block h-2 w-2 rounded-full bg-muted-foreground/60 animate-pulse" style={{ animationDelay: '150ms' }} />
+                    <span className="inline-block h-2 w-2 rounded-full bg-muted-foreground/60 animate-pulse" style={{ animationDelay: '300ms' }} />
+                  </div>
+                  <span className="text-sm">Assistant is thinking...</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Pagination controls at bottom */}
