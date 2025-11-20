@@ -2,6 +2,7 @@ import React from "react";
 import { useForm, SubmitErrorHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,6 +28,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import type { PromptVariable } from "@/lib/variableDetection";
+import { useCreateSession } from "@/hooks/useSessions";
 
 function buildValidationSchema(variables: PromptVariable[]) {
   const shape: Record<string, z.ZodTypeAny> = {};
@@ -155,6 +157,10 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
     (a, b) => (a.order ?? 0) - (b.order ?? 0)
   );
 
+  // Initialize hooks
+  const navigate = useNavigate();
+  const createSession = useCreateSession();
+
   // Build validation schema from variables
   const validationSchema = React.useMemo(
     () => buildValidationSchema(sortedVariables),
@@ -179,12 +185,17 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
     mode: "onSubmit",
   });
 
-  const onSubmit = (values: Record<string, any>) => {
-    console.log("Form submitted (Phase 7.3 validation passed):", values);
-    toast({
-      title: "Form submitted",
-      description: "Phase 7.3: Session creation will be added in Phase 7.4",
-    });
+  const onSubmit = async (values: Record<string, any>) => {
+    try {
+      const session = await createSession.mutateAsync({
+        promptVersionId: promptVersion.id,
+        variables: values,
+      });
+
+      navigate(`/chat/${session.id}`);
+    } catch (error) {
+      console.error("Failed to create session:", error);
+    }
   };
 
   const onError: SubmitErrorHandler<Record<string, any>> = (errors) => {
@@ -305,16 +316,21 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
         </p>
         <div className="flex justify-end">
           <Button
-            onClick={() => {
-              console.log("No variables, direct session creation");
-              toast({
-                title: "Ready to start",
-                description: "Session creation will be added in Phase 7.4",
-              });
-            }}
             size="lg"
+            onClick={async () => {
+              try {
+                const session = await createSession.mutateAsync({
+                  promptVersionId: promptVersion.id,
+                  variables: {},
+                });
+                navigate(`/chat/${session.id}`);
+              } catch (error) {
+                console.error("Failed to create session:", error);
+              }
+            }}
+            disabled={createSession.isPending}
           >
-            Start Session
+            {createSession.isPending ? "Starting session..." : "Start Session"}
           </Button>
         </div>
       </div>
@@ -360,9 +376,9 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
           <Button 
             type="submit" 
             size="lg"
-            disabled={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting || createSession.isPending}
           >
-            {form.formState.isSubmitting ? "Validating..." : "Start Session"}
+            {createSession.isPending ? "Starting session..." : "Start Session"}
           </Button>
         </div>
       </form>
