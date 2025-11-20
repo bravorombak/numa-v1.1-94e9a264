@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSessions";
+import { useAddMessage } from "@/hooks/useMessages";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatBody } from "@/components/chat/ChatBody";
 import { ChatComposer } from "@/components/chat/ChatComposer";
@@ -9,6 +10,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 const ChatPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { data: session, isLoading, error } = useSession(sessionId || "");
+  const addMessage = useAddMessage();
 
   if (isLoading) {
     return (
@@ -46,9 +48,13 @@ const ChatPage = () => {
       />
       <ChatBody sessionId={sessionId || ""} />
       <ChatComposer 
-        disabled={false}
-        onSend={(message) => {
-          console.log("[Phase 8.3] Message sent:", message);
+        disabled={isLoading || addMessage.isPending}
+        onSend={async (message) => {
+          if (!sessionId) return;
+          await addMessage.mutateAsync({
+            sessionId,
+            content: message,
+          });
         }}
       />
     </div>

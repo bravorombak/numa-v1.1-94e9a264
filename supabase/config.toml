@@ -3,3 +3,6 @@ project_id = "mfsxmxbtaunnxstfcjlp"
 # Edge Functions configuration
 [functions.generate]
 verify_jwt = true
+
+[functions.sessions-add-message]
+verify_jwt = true
