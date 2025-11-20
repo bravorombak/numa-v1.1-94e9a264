@@ -162,3 +162,47 @@ export const useRenameSession = () => {
     },
   });
 };
+
+export const useDeleteSession = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ sessionId }: { sessionId: string }) => {
+      const { error } = await supabase
+        .from("sessions")
+        .delete()
+        .eq("id", sessionId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_data, variables) => {
+      const { sessionId } = variables;
+
+      // Invalidate the deleted session query
+      queryClient.invalidateQueries({
+        queryKey: ["session", sessionId],
+      });
+
+      // Invalidate all session lists (any prompt version)
+      queryClient.invalidateQueries({
+        queryKey: ["sessions", "byPromptVersion"],
+        exact: false,
+      });
+
+      // Success toast
+      toast({
+        title: "Session deleted",
+        description: "This chat session has been removed.",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Delete session error:", error);
+      toast({
+        title: "Failed to delete session",
+        description: error.message ?? "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    },
+  });
+};
