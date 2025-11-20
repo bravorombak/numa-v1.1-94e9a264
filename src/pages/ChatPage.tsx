@@ -14,6 +14,7 @@ const ChatPage = () => {
   const generateAssistant = useGenerateAssistantReply();
 
   const isBusy = isLoading || addMessage.isPending || generateAssistant.isPending;
+  const isAssistantLoading = generateAssistant.isPending;
 
   if (isLoading) {
     return (
@@ -49,7 +50,7 @@ const ChatPage = () => {
         modelName={session.models?.name || "Unknown model"}
         createdAt={session.created_at}
       />
-      <ChatBody sessionId={sessionId || ""} />
+      <ChatBody sessionId={sessionId || ""} isAssistantLoading={isAssistantLoading} />
       <ChatComposer 
         disabled={isBusy}
         onSend={async (message) => {
