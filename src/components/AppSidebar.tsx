@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, AlertCircle, Loader2, MoreVertical, Edit2 } from "lucide-react";
+import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, AlertCircle, Loader2, MoreVertical, Edit2, Trash2 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useMatch, useNavigate } from "react-router-dom";
-import { useSession, useSessionList, useRenameSession } from "@/hooks/useSessions";
+import { useSession, useSessionList, useRenameSession, useDeleteSession } from "@/hooks/useSessions";
+import type { SessionListItem } from "@/hooks/useSessions";
 import { formatDistanceToNow, format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +28,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,7 +65,9 @@ export function AppSidebar() {
   
   const [renameTargetId, setRenameTargetId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [deleteTargetSession, setDeleteTargetSession] = useState<SessionListItem | null>(null);
   const renameSession = useRenameSession();
+  const deleteSession = useDeleteSession();
 
   // Fetch current session and session list (only when on chat route)
   const { data: currentSession } = useSession(sessionId);
@@ -95,6 +108,44 @@ export function AppSidebar() {
   const handleRenameCancel = () => {
     setRenameTargetId(null);
     setRenameValue("");
+  };
+
+  const handleDeleteClick = (session: SessionListItem) => {
+    setDeleteTargetSession(session);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTargetSession) return;
+
+    const deletingId = deleteTargetSession.id;
+    const isDeletingActive = deletingId === sessionId;
+
+    // Pre-compute the "next" session for redirect, if any
+    const nextSession = sessionList?.find((s) => s.id !== deletingId);
+
+    deleteSession.mutate(
+      { sessionId: deletingId },
+      {
+        onSuccess: () => {
+          setDeleteTargetSession(null);
+
+          // Handle redirect if we deleted the active session
+          if (isDeletingActive) {
+            if (nextSession) {
+              // Go to another session of the same prompt version
+              navigate(`/chat/${nextSession.id}`);
+            } else {
+              // No more sessions: go back to home as safe fallback
+              navigate("/");
+            }
+          }
+        },
+      }
+    );
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteTargetSession(null);
   };
 
   return (
@@ -206,6 +257,13 @@ export function AppSidebar() {
                                     <Edit2 className="h-4 w-4 mr-2" />
                                     Rename
                                   </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => handleDeleteClick(session)}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             )}
@@ -269,6 +327,47 @@ export function AppSidebar() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!deleteTargetSession}
+        onOpenChange={(open) => {
+          if (!open) handleDeleteCancel();
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this chat and all of its messages. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {deleteTargetSession && (
+            <div className="mt-2 rounded-md bg-muted px-3 py-2 text-sm">
+              <span className="font-medium">
+                {getSessionTitle(deleteTargetSession)}
+              </span>
+            </div>
+          )}
+
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={handleDeleteCancel}
+              disabled={deleteSession.isPending}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleDeleteConfirm}
+              disabled={deleteSession.isPending}
+            >
+              {deleteSession.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sidebar>
   );
 }
