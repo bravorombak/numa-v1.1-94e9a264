@@ -65,10 +65,12 @@ export const useCreateSession = () => {
   });
 };
 
-export const useSession = (sessionId: string) => {
-  return useQuery<SessionWithRelations>({
+export const useSession = (sessionId?: string) => {
+  return useQuery<SessionWithRelations | null>({
     queryKey: ["session", sessionId],
     queryFn: async () => {
+      if (!sessionId) return null;
+      
       const { data, error } = await supabase
         .from("sessions")
         .select(`
@@ -92,7 +94,7 @@ export interface SessionListItem {
   prompt_version_id: string;
 }
 
-export const useSessionList = (promptVersionId: string | null | undefined) => {
+export const useSessionList = (promptVersionId?: string | null) => {
   return useQuery<SessionListItem[]>({
     queryKey: ['sessions', 'byPromptVersion', promptVersionId],
     queryFn: async () => {
