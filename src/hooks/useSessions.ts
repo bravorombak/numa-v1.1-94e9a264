@@ -85,3 +85,29 @@ export const useSession = (sessionId: string) => {
     enabled: !!sessionId,
   });
 };
+
+export interface SessionListItem {
+  id: string;
+  created_at: string;
+  prompt_version_id: string;
+}
+
+export const useSessionList = (promptVersionId: string | null | undefined) => {
+  return useQuery<SessionListItem[]>({
+    queryKey: ['sessions', 'byPromptVersion', promptVersionId],
+    queryFn: async () => {
+      if (!promptVersionId) return [];
+
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('id, created_at, prompt_version_id')
+        .eq('prompt_version_id', promptVersionId)
+        .order('created_at', { ascending: false })
+        .limit(30);
+
+      if (error) throw error;
+      return (data as SessionListItem[]) || [];
+    },
+    enabled: !!promptVersionId,
+  });
+};
