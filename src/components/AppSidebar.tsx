@@ -1,4 +1,4 @@
-import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, Clock, AlertCircle, Loader2 } from "lucide-react";
+import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, AlertCircle, Loader2 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useMatch, useNavigate } from "react-router-dom";
 import { useSession, useSessionList } from "@/hooks/useSessions";
@@ -115,30 +115,23 @@ export function AppSidebar() {
 
                       return (
                         <SidebarMenuItem key={session.id}>
-                          <SidebarMenuButton
+                          <button
+                            type="button"
                             onClick={() => navigate(`/chat/${session.id}`)}
                             className={cn(
-                              "w-full px-3 py-3 rounded-lg transition-colors hover:bg-muted",
-                              isActive && "bg-accent text-accent-foreground font-medium border border-border"
+                              "w-full flex items-start gap-2 rounded-md px-3 py-2.5 text-left text-sm transition-colors",
+                              "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring",
+                              isActive && "bg-accent/80 text-accent-foreground font-medium border border-border"
                             )}
                           >
-                            <div className="flex items-start gap-2 w-full">
-                              <MessageSquare className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                              {open && (
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm truncate">
-                                    {getSessionTitle(session.created_at)}
-                                  </p>
-                                  <div className="flex items-center gap-1 mt-0.5">
-                                    <Clock className="h-3 w-3" />
-                                    <span className="text-xs opacity-70">
-                                      {relativeTime}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </SidebarMenuButton>
+                            <MessageSquare className="mt-0.5 h-4 w-4 shrink-0" />
+                            {open && (
+                              <div className="flex flex-col gap-0.5 min-w-0">
+                                <span className="truncate">{getSessionTitle(session.created_at)}</span>
+                                <span className="text-xs text-muted-foreground">{relativeTime}</span>
+                              </div>
+                            )}
+                          </button>
                         </SidebarMenuItem>
                       );
                     })}
