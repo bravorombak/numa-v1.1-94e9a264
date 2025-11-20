@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
@@ -92,6 +92,7 @@ export interface SessionListItem {
   id: string;
   created_at: string;
   prompt_version_id: string;
+  title: string | null;
 }
 
 export const useSessionList = (promptVersionId?: string | null) => {
@@ -102,7 +103,7 @@ export const useSessionList = (promptVersionId?: string | null) => {
 
       const { data, error } = await supabase
         .from('sessions')
-        .select('id, created_at, prompt_version_id')
+        .select('id, created_at, prompt_version_id, title')
         .eq('prompt_version_id', promptVersionId)
         .order('created_at', { ascending: false })
         .limit(30);
@@ -111,5 +112,52 @@ export const useSessionList = (promptVersionId?: string | null) => {
       return (data as SessionListItem[]) || [];
     },
     enabled: !!promptVersionId,
+  });
+};
+
+export const useRenameSession = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (params: { sessionId: string; title: string }) => {
+      const { sessionId, title } = params;
+
+      const { error } = await supabase
+        .from("sessions")
+        .update({
+          title: title.trim() === "" ? null : title.trim(),
+        })
+        .eq("id", sessionId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_data, variables) => {
+      const { sessionId, title } = variables;
+      
+      // Invalidate session queries
+      queryClient.invalidateQueries({
+        queryKey: ["session", sessionId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["sessions", "byPromptVersion"],
+      });
+
+      // Success toast
+      toast({
+        title: "Session renamed",
+        description: title.trim() === "" 
+          ? "Session title reset to default" 
+          : "Session title updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Rename session error:", error);
+      toast({
+        title: "Failed to rename session",
+        description: error.message ?? "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    },
   });
 };

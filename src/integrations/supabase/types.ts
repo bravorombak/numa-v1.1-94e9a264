@@ -379,6 +379,7 @@ export type Database = {
           id: string
           model_id: string | null
           prompt_version_id: string | null
+          title: string | null
           user_id: string
           variable_inputs: Json | null
         }
@@ -387,6 +388,7 @@ export type Database = {
           id?: string
           model_id?: string | null
           prompt_version_id?: string | null
+          title?: string | null
           user_id: string
           variable_inputs?: Json | null
         }
@@ -395,6 +397,7 @@ export type Database = {
           id?: string
           model_id?: string | null
           prompt_version_id?: string | null
+          title?: string | null
           user_id?: string
           variable_inputs?: Json | null
         }

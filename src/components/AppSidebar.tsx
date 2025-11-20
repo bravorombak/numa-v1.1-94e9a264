@@ -1,7 +1,8 @@
-import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, AlertCircle, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, AlertCircle, Loader2, MoreVertical, Edit2 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useMatch, useNavigate } from "react-router-dom";
-import { useSession, useSessionList } from "@/hooks/useSessions";
+import { useSession, useSessionList, useRenameSession } from "@/hooks/useSessions";
 import { formatDistanceToNow, format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +19,23 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { title: "Home", url: "/", icon: Home },
@@ -33,6 +51,10 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const match = useMatch("/chat/:sessionId");
   const sessionId = match?.params.sessionId;
+  
+  const [renameTargetId, setRenameTargetId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+  const renameSession = useRenameSession();
 
   // Fetch current session and session list (only when on chat route)
   const { data: currentSession } = useSession(sessionId);
@@ -44,8 +66,35 @@ export function AppSidebar() {
   } = useSessionList(promptVersionId);
 
   // Helper function for session titles
-  const getSessionTitle = (createdAt: string) => {
-    return `Session on ${format(new Date(createdAt), "dd MMM, HH:mm")}`;
+  const getSessionTitle = (session: { title: string | null; created_at: string }) => {
+    if (session.title && session.title.trim().length > 0) {
+      return session.title.trim();
+    }
+    return `Session on ${format(new Date(session.created_at), "dd MMM, HH:mm")}`;
+  };
+
+  const handleRenameClick = (session: { id: string; title: string | null; created_at: string }) => {
+    setRenameTargetId(session.id);
+    setRenameValue(session.title ?? getSessionTitle(session));
+  };
+
+  const handleRenameSave = () => {
+    if (!renameTargetId) return;
+    
+    renameSession.mutate(
+      { sessionId: renameTargetId, title: renameValue },
+      {
+        onSuccess: () => {
+          setRenameTargetId(null);
+          setRenameValue("");
+        },
+      }
+    );
+  };
+
+  const handleRenameCancel = () => {
+    setRenameTargetId(null);
+    setRenameValue("");
   };
 
   return (
@@ -115,23 +164,52 @@ export function AppSidebar() {
 
                       return (
                         <SidebarMenuItem key={session.id}>
-                          <button
-                            type="button"
-                            onClick={() => navigate(`/chat/${session.id}`)}
-                            className={cn(
-                              "w-full flex items-start gap-2 rounded-md px-3 py-2.5 text-left text-sm transition-colors",
-                              "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring",
-                              isActive && "bg-accent/80 text-accent-foreground font-medium border border-border"
-                            )}
-                          >
-                            <MessageSquare className="mt-0.5 h-4 w-4 shrink-0" />
+                          <div className="flex items-start gap-1 w-full group">
+                            {/* Main session button */}
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/chat/${session.id}`)}
+                              className={cn(
+                                "flex-1 flex items-start gap-2 rounded-md px-3 py-2.5 text-left text-sm transition-colors min-w-0",
+                                "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring",
+                                isActive && "bg-accent/80 text-accent-foreground font-medium border border-border"
+                              )}
+                            >
+                              <MessageSquare className="mt-0.5 h-4 w-4 shrink-0" />
+                              {open && (
+                                <div className="flex flex-col gap-0.5 min-w-0">
+                                  <span className="truncate">{getSessionTitle(session)}</span>
+                                  <span className="text-xs text-muted-foreground">{relativeTime}</span>
+                                </div>
+                              )}
+                            </button>
+
+                            {/* Dropdown menu for actions (visible on hover or when active) */}
                             {open && (
-                              <div className="flex flex-col gap-0.5 min-w-0">
-                                <span className="truncate">{getSessionTitle(session.created_at)}</span>
-                                <span className="text-xs text-muted-foreground">{relativeTime}</span>
-                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className={cn(
+                                      "shrink-0 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-muted transition-opacity",
+                                      "focus:outline-none focus:ring-2 focus:ring-ring",
+                                      isActive && "opacity-100"
+                                    )}
+                                    aria-label="Session actions"
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                  <DropdownMenuItem onClick={() => handleRenameClick(session)}>
+                                    <Edit2 className="h-4 w-4 mr-2" />
+                                    Rename
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             )}
-                          </button>
+                          </div>
                         </SidebarMenuItem>
                       );
                     })}
@@ -142,6 +220,55 @@ export function AppSidebar() {
           </SidebarGroup>
         )}
       </SidebarContent>
+
+      {/* Rename Dialog */}
+      <Dialog open={!!renameTargetId} onOpenChange={(open) => {
+        if (!open) handleRenameCancel();
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename session</DialogTitle>
+            <DialogDescription>
+              Give this chat session a more descriptive name.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <Label htmlFor="session-title">Session title</Label>
+            <Input
+              id="session-title"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              placeholder="e.g. Campaign ideas for Brand X"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !renameSession.isPending) {
+                  handleRenameSave();
+                }
+              }}
+            />
+            <p className="text-xs text-muted-foreground">
+              Leave it blank to reset to the default date-based name.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleRenameCancel}
+              disabled={renameSession.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRenameSave}
+              disabled={renameSession.isPending}
+            >
+              {renameSession.isPending ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Sidebar>
   );
 }
