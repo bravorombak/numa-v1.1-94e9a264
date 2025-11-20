@@ -141,6 +141,7 @@ export const useRenameSession = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ["sessions", "byPromptVersion"],
+        exact: false,
       });
 
       // Success toast
