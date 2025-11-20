@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSessions";
 import { useAddMessage, useGenerateAssistantReply } from "@/hooks/useMessages";
@@ -13,8 +14,27 @@ const ChatPage = () => {
   const addMessage = useAddMessage();
   const generateAssistant = useGenerateAssistantReply();
 
+  const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
+  const [assistantError, setAssistantError] = useState<string | null>(null);
+
   const isBusy = isLoading || addMessage.isPending || generateAssistant.isPending;
   const isAssistantLoading = generateAssistant.isPending;
+  const canRetryAssistant = !!session && !!lastUserMessage && !!assistantError && !generateAssistant.isPending;
+
+  const handleRetryAssistant = async () => {
+    if (!session || !lastUserMessage) return;
+    try {
+      setAssistantError(null);
+      await generateAssistant.mutateAsync({
+        session,
+        userMessage: lastUserMessage,
+      });
+    } catch (error) {
+      setAssistantError(
+        error instanceof Error ? error.message : "Failed to generate response"
+      );
+    }
+  };
 
   if (isLoading) {
     return (
@@ -50,27 +70,38 @@ const ChatPage = () => {
         modelName={session.models?.name || "Unknown model"}
         createdAt={session.created_at}
       />
-      <ChatBody sessionId={sessionId || ""} isAssistantLoading={isAssistantLoading} />
+      <ChatBody 
+        sessionId={sessionId || ""} 
+        isAssistantLoading={isAssistantLoading}
+        assistantError={assistantError}
+        onRetryAssistant={canRetryAssistant ? handleRetryAssistant : undefined}
+      />
       <ChatComposer 
         disabled={isBusy}
         onSend={async (message) => {
           if (!sessionId || !session) return;
           
+          // Step 1: Save the user's message
+          await addMessage.mutateAsync({
+            sessionId,
+            content: message,
+          });
+          
+          // Step 2: Track last user message for retry
+          setLastUserMessage(message);
+          setAssistantError(null);
+          
+          // Step 3: Trigger assistant generation
           try {
-            // Step 1: Save the user's message
-            await addMessage.mutateAsync({
-              sessionId,
-              content: message,
-            });
-            
-            // Step 2: Generate and save the assistant's reply
             await generateAssistant.mutateAsync({
               session,
               userMessage: message,
             });
           } catch (error) {
-            // Errors are already handled by the mutation hooks
-            console.error('[ChatPage] Error in message flow:', error);
+            console.error('[ChatPage] Assistant generation error:', error);
+            setAssistantError(
+              error instanceof Error ? error.message : "Failed to generate response"
+            );
           }
         }}
       />

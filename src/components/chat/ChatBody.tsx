@@ -8,9 +8,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 interface ChatBodyProps {
   sessionId: string;
   isAssistantLoading?: boolean;
+  assistantError?: string | null;
+  onRetryAssistant?: () => void;
 }
 
-export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
+export const ChatBody = ({ sessionId, isAssistantLoading, assistantError, onRetryAssistant }: ChatBodyProps) => {
   const [page, setPage] = useState(0);
   const pageSize = 30;
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -37,7 +39,7 @@ export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
     if (isNearBottom()) {
       scrollToBottom();
     }
-  }, [messages.length, isAssistantLoading]);
+  }, [messages.length, isAssistantLoading, assistantError]);
 
   if (isLoading) {
     return (
@@ -128,6 +130,31 @@ export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
                     <span className="inline-block h-2 w-2 rounded-full bg-muted-foreground/60 animate-pulse" style={{ animationDelay: '300ms' }} />
                   </div>
                   <span className="text-sm">Assistant is thinking...</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Assistant error indicator with retry */}
+          {!isAssistantLoading && assistantError && (
+            <div className="flex justify-start mb-4">
+              <div className="max-w-[70%] rounded-lg px-4 py-3 bg-destructive/10 text-destructive text-sm flex flex-col gap-2">
+                <span>Failed to generate a response.</span>
+                <div className="flex items-center gap-2">
+                  {onRetryAssistant && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2 text-xs"
+                      onClick={onRetryAssistant}
+                    >
+                      Retry
+                    </Button>
+                  )}
+                  <span className="text-[11px] text-muted-foreground truncate">
+                    {assistantError}
+                  </span>
                 </div>
               </div>
             </div>
