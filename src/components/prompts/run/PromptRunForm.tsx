@@ -1,4 +1,7 @@
-import { useForm } from "react-hook-form";
+import React from "react";
+import { useForm, SubmitErrorHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,8 +23,120 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import type { PromptVariable } from "@/lib/variableDetection";
+
+function buildValidationSchema(variables: PromptVariable[]) {
+  const shape: Record<string, z.ZodTypeAny> = {};
+
+  for (const variable of variables) {
+    let field: z.ZodTypeAny;
+
+    switch (variable.type) {
+      case "email": {
+        if (variable.required) {
+          field = z
+            .string()
+            .trim()
+            .min(1, "This field is required.")
+            .email("Please enter a valid email address.");
+        } else {
+          field = z
+            .string()
+            .trim()
+            .email("Please enter a valid email address.")
+            .or(z.literal(""))
+            .optional();
+        }
+        break;
+      }
+
+      case "url": {
+        if (variable.required) {
+          field = z
+            .string()
+            .trim()
+            .min(1, "This field is required.")
+            .url("Please enter a valid URL.");
+        } else {
+          field = z
+            .string()
+            .trim()
+            .url("Please enter a valid URL.")
+            .or(z.literal(""))
+            .optional();
+        }
+        break;
+      }
+
+      case "number": {
+        if (variable.required) {
+          field = z
+            .string()
+            .min(1, "This field is required.")
+            .refine(
+              (val) => !Number.isNaN(Number(val)) && val.trim() !== "",
+              "Please enter a valid number."
+            );
+        } else {
+          field = z.string().refine(
+            (val) =>
+              val === "" || (!Number.isNaN(Number(val)) && val.trim() !== ""),
+            "Please enter a valid number."
+          );
+        }
+        break;
+      }
+
+      case "text":
+      case "long_text":
+      case "date":
+      case "dropdown": {
+        if (variable.required) {
+          field = z.string().trim().min(1, "This field is required.");
+        } else {
+          field = z.string().trim().optional().or(z.literal(""));
+        }
+        break;
+      }
+
+      case "checkboxes": {
+        field = z.string();
+        if (variable.required) {
+          field = field.refine(
+            (val) => val && val.split(",").filter(Boolean).length > 0,
+            "Please select at least one option."
+          );
+        } else {
+          field = field.optional().or(z.literal(""));
+        }
+        break;
+      }
+
+      case "file": {
+        field = z.any();
+        if (variable.required) {
+          field = field.refine(
+            (val) => val && String(val).trim() !== "",
+            "Please select a file."
+          );
+        } else {
+          field = field.optional();
+        }
+        break;
+      }
+
+      default:
+        field = z.any().optional();
+    }
+
+    shape[variable.name] = field;
+  }
+
+  return z.object(shape);
+}
 
 interface PromptRunFormProps {
   promptVersion: {
@@ -40,6 +155,12 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
     (a, b) => (a.order ?? 0) - (b.order ?? 0)
   );
 
+  // Build validation schema from variables
+  const validationSchema = React.useMemo(
+    () => buildValidationSchema(sortedVariables),
+    [sortedVariables]
+  );
+
   // Initialize form with default values
   const defaultValues: Record<string, any> = {};
   sortedVariables.forEach((variable) => {
@@ -53,15 +174,26 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
   });
 
   const form = useForm<Record<string, any>>({
+    resolver: zodResolver(validationSchema),
     defaultValues,
+    mode: "onSubmit",
   });
 
   const onSubmit = (values: Record<string, any>) => {
-    console.log("Form submitted (Phase 7.2 stub):", values);
+    console.log("Form submitted (Phase 7.3 validation passed):", values);
     toast({
       title: "Form submitted",
-      description: "Phase 7.2: Session creation will be added in Phase 7.4",
+      description: "Phase 7.3: Session creation will be added in Phase 7.4",
     });
+  };
+
+  const onError: SubmitErrorHandler<Record<string, any>> = (errors) => {
+    console.log("Validation errors:", errors);
+    // Focus on first error field
+    const firstErrorKey = Object.keys(errors)[0];
+    if (firstErrorKey) {
+      form.setFocus(firstErrorKey);
+    }
   };
 
   const renderInput = (variable: PromptVariable, field: any) => {
@@ -191,7 +323,16 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
+        {Object.keys(form.formState.errors).length > 0 && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Some fields need your attention. Please fix the highlighted fields and try again.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {sortedVariables.map((variable) => (
           <FormField
             key={variable.name}
@@ -216,8 +357,12 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
         ))}
 
         <div className="flex justify-end pt-4">
-          <Button type="submit" size="lg">
-            Start Session
+          <Button 
+            type="submit" 
+            size="lg"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? "Validating..." : "Start Session"}
           </Button>
         </div>
       </form>
