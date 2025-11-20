@@ -1,14 +1,126 @@
+import { useState } from "react";
+import { useMessages } from "@/hooks/useMessages";
+import { ChatMessage } from "./ChatMessage";
+import { Button } from "@/components/ui/button";
+import { Loader2, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
 interface ChatBodyProps {
   sessionId: string;
 }
 
 export const ChatBody = ({ sessionId }: ChatBodyProps) => {
+  const [page, setPage] = useState(0);
+  const pageSize = 30;
+
+  const { data, isLoading, isError } = useMessages(sessionId, page, pageSize);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 overflow-auto bg-background">
+        <div className="flex items-center justify-center h-full">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Loading messages...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex-1 overflow-auto bg-background">
+        <div className="flex items-center justify-center h-full p-4">
+          <Alert variant="destructive" className="max-w-md">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Failed to load messages. Please try again.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
+  const messages = data?.messages ?? [];
+  const hasMore = data?.hasMore ?? false;
+  const hasPrevious = data?.hasPrevious ?? false;
+
+  if (messages.length === 0) {
+    return (
+      <div className="flex-1 overflow-auto bg-background">
+        <div className="flex items-center justify-center h-full">
+          <p className="text-sm text-muted-foreground">
+            No messages yet. Start the conversation below.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-auto bg-background">
-      <div className="flex items-center justify-center h-full">
-        <p className="text-sm text-muted-foreground">
-          No messages yet. Start the conversation below.
-        </p>
+      <div className="max-w-4xl mx-auto p-4">
+        {/* Pagination controls at top */}
+        {(hasPrevious || hasMore) && (
+          <div className="flex justify-center gap-2 mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p - 1)}
+              disabled={!hasPrevious}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!hasMore}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        )}
+
+        {/* Message list */}
+        <div className="space-y-2">
+          {messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              role={message.role}
+              content={message.content}
+              createdAt={message.created_at}
+            />
+          ))}
+        </div>
+
+        {/* Pagination controls at bottom */}
+        {(hasPrevious || hasMore) && (
+          <div className="flex justify-center gap-2 mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p - 1)}
+              disabled={!hasPrevious}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!hasMore}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
