@@ -45,7 +45,12 @@ const ChatPage = () => {
         createdAt={session.created_at}
       />
       <ChatBody sessionId={sessionId || ""} />
-      <ChatComposer disabled={true} />
+      <ChatComposer 
+        disabled={false}
+        onSend={(message) => {
+          console.log("[Phase 8.3] Message sent:", message);
+        }}
+      />
     </div>
   );
 };
