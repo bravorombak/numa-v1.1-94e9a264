@@ -118,24 +118,26 @@ export function AppSidebar() {
                           <SidebarMenuButton
                             onClick={() => navigate(`/chat/${session.id}`)}
                             className={cn(
-                              "w-full",
-                              isActive && "bg-accent text-accent-foreground font-medium"
+                              "w-full px-3 py-3 rounded-lg transition-colors hover:bg-muted",
+                              isActive && "bg-accent text-accent-foreground font-medium border border-border"
                             )}
                           >
-                            <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                            {open && (
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm truncate">
-                                  {getSessionTitle(session.created_at)}
-                                </p>
-                                <div className="flex items-center gap-1 mt-0.5">
-                                  <Clock className="h-3 w-3" />
-                                  <span className="text-xs opacity-70">
-                                    {relativeTime}
-                                  </span>
+                            <div className="flex items-start gap-2 w-full">
+                              <MessageSquare className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                              {open && (
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm truncate">
+                                    {getSessionTitle(session.created_at)}
+                                  </p>
+                                  <div className="flex items-center gap-1 mt-0.5">
+                                    <Clock className="h-3 w-3" />
+                                    <span className="text-xs opacity-70">
+                                      {relativeTime}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       );
