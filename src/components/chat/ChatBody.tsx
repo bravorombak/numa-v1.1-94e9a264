@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMessages } from "@/hooks/useMessages";
 import { ChatMessage } from "./ChatMessage";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,31 @@ interface ChatBodyProps {
 export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
   const [page, setPage] = useState(0);
   const pageSize = 30;
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const { data, isLoading, isError } = useMessages(sessionId, page, pageSize);
+
+  const messages = data?.messages ?? [];
+  const hasMore = data?.hasMore ?? false;
+  const hasPrevious = data?.hasPrevious ?? false;
+
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  };
+
+  const isNearBottom = () => {
+    if (!scrollRef.current) return true;
+    const el = scrollRef.current;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  };
+
+  useEffect(() => {
+    if (isNearBottom()) {
+      scrollToBottom();
+    }
+  }, [messages, isAssistantLoading]);
 
   if (isLoading) {
     return (
@@ -30,8 +53,8 @@ export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
   }
 
   if (isError) {
-    return (
-      <div className="flex-1 overflow-auto bg-background">
+  return (
+    <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
         <div className="flex items-center justify-center h-full p-4">
           <Alert variant="destructive" className="max-w-md">
             <AlertCircle className="h-4 w-4" />
@@ -43,10 +66,6 @@ export const ChatBody = ({ sessionId, isAssistantLoading }: ChatBodyProps) => {
       </div>
     );
   }
-
-  const messages = data?.messages ?? [];
-  const hasMore = data?.hasMore ?? false;
-  const hasPrevious = data?.hasPrevious ?? false;
 
   if (messages.length === 0) {
     return (
