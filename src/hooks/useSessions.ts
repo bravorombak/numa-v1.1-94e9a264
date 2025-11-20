@@ -1,10 +1,15 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 
 type Session = Tables<"sessions">;
 type SessionInsert = TablesInsert<"sessions">;
+
+export interface SessionWithRelations extends Tables<"sessions"> {
+  prompt_versions: Tables<"prompt_versions"> | null;
+  models: Tables<"models"> | null;
+}
 
 export interface CreateSessionInput {
   promptVersionId: string;
@@ -57,5 +62,26 @@ export const useCreateSession = () => {
         variant: "destructive",
       });
     },
+  });
+};
+
+export const useSession = (sessionId: string) => {
+  return useQuery<SessionWithRelations>({
+    queryKey: ["session", sessionId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sessions")
+        .select(`
+          *,
+          prompt_versions(*),
+          models(*)
+        `)
+        .eq("id", sessionId)
+        .single();
+
+      if (error) throw error;
+      return data as SessionWithRelations;
+    },
+    enabled: !!sessionId,
   });
 };
