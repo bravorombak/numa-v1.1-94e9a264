@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { usePromptVersion } from "@/hooks/usePromptDrafts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { PromptRunForm } from "@/components/prompts/run/PromptRunForm";
 
 const PromptRunPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,18 +62,9 @@ const PromptRunPage = () => {
           <CardTitle>Inputs</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Variable inputs will appear here once configured.
-          </p>
+          <PromptRunForm promptVersion={promptVersion} />
         </CardContent>
       </Card>
-
-      {/* Action Area */}
-      <div className="flex justify-end">
-        <Button size="lg" disabled>
-          Start Session
-        </Button>
-      </div>
     </div>
   );
 };
