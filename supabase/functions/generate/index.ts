@@ -67,6 +67,7 @@ serve(async (req) => {
       files = [],
       prompt_draft_id,
       model_override_id,
+      conversation = [],
     } = body;
 
     let draftData: any = null;
@@ -207,18 +208,31 @@ serve(async (req) => {
     const finalPrompt = interpolateVariables(prompt, variables);
 
     // ========================================
-    // 10. BUILD NORMALIZED MESSAGES
+    // 10. BUILD NORMALIZED MESSAGES WITH CONVERSATION HISTORY
     // ========================================
+    // Start with system message containing the interpolated prompt template
     const messages = [
       {
         role: 'system',
-        content: 'You are Numa Assistant. Follow the prompt exactly and do not change its intent.',
-      },
-      {
-        role: 'user',
         content: finalPrompt,
       },
     ];
+
+    // Add conversation history (prior user/assistant messages)
+    for (const msg of conversation) {
+      messages.push({
+        role: msg.role,
+        content: msg.content,
+      });
+    }
+
+    // Add current user message (if not empty, e.g., for auto-start)
+    if (variables.chat_message && String(variables.chat_message).trim() !== '') {
+      messages.push({
+        role: 'user',
+        content: String(variables.chat_message),
+      });
+    }
 
     const maxTokens = Math.min(model.max_tokens || 2048, 2048);
     const temperature = 0.7;
