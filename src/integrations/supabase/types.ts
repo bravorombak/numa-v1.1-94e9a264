@@ -16,39 +16,45 @@ export type Database = {
     Tables: {
       categories: {
         Row: {
-          color: string | null
+          bg_color: string | null
+          border_color: string | null
           created_at: string | null
           description: string | null
           icon: string | null
           id: string
           is_archived: boolean | null
           name: string
-          slug: string
+          slug: string | null
           sort_order: number | null
+          text_color: string | null
           updated_at: string | null
         }
         Insert: {
-          color?: string | null
+          bg_color?: string | null
+          border_color?: string | null
           created_at?: string | null
           description?: string | null
           icon?: string | null
           id?: string
           is_archived?: boolean | null
           name: string
-          slug: string
+          slug?: string | null
           sort_order?: number | null
+          text_color?: string | null
           updated_at?: string | null
         }
         Update: {
-          color?: string | null
+          bg_color?: string | null
+          border_color?: string | null
           created_at?: string | null
           description?: string | null
           icon?: string | null
           id?: string
           is_archived?: boolean | null
           name?: string
-          slug?: string
+          slug?: string | null
           sort_order?: number | null
+          text_color?: string | null
           updated_at?: string | null
         }
         Relationships: []

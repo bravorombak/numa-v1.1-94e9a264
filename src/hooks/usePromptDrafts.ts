@@ -167,3 +167,40 @@ export const usePublishPromptVersion = () => {
     },
   });
 };
+
+// Fetch all published prompt versions for Home page
+export const usePublishedPrompts = () => {
+  return useQuery({
+    queryKey: ['published-prompts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('prompt_versions')
+        .select(`
+          id,
+          title,
+          description,
+          emoji,
+          image_url,
+          category_id,
+          model_id,
+          created_at,
+          published_at,
+          categories:category_id (
+            id,
+            name,
+            bg_color,
+            text_color,
+            border_color
+          ),
+          models:model_id (
+            id,
+            name
+          )
+        `)
+        .order('published_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+};
