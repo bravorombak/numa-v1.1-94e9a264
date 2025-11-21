@@ -219,10 +219,34 @@ export const usePublishedPrompts = () => {
             name
           )
         `)
-        .order('published_at', { ascending: false });
+        .not('published_at', 'is', null)
+        .order('prompt_draft_id', { ascending: true })
+        .order('version_number', { ascending: false });
 
       if (error) throw error;
-      return data;
+
+      // Deduplicate: keep only the latest version per prompt_draft_id
+      const latestByDraft = new Map<string, any>();
+
+      (data ?? []).forEach((row) => {
+        const existing = latestByDraft.get(row.prompt_draft_id);
+        // Explicitly compare version_number to ensure we keep the highest
+        if (!existing || row.version_number > existing.version_number) {
+          latestByDraft.set(row.prompt_draft_id, row);
+        }
+      });
+
+      // Convert back to array
+      const latestList = Array.from(latestByDraft.values());
+
+      // Sort by published_at descending (newest first)
+      latestList.sort((a, b) => {
+        const aTime = a.published_at ? new Date(a.published_at).getTime() : 0;
+        const bTime = b.published_at ? new Date(b.published_at).getTime() : 0;
+        return bTime - aTime;
+      });
+
+      return latestList;
     },
   });
 };
