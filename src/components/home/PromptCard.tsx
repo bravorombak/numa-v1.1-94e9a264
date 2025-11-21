@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { CategoryBadge } from '@/components/categories/CategoryBadge';
 import { Settings } from 'lucide-react';
 
@@ -46,32 +47,41 @@ export const PromptCard = ({
       onClick={handleClick}
     >
       <CardHeader className="space-y-3 pb-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2 flex-1">
-            {emoji && <span className="text-2xl">{emoji}</span>}
-            <h3 className="line-clamp-2 text-lg font-semibold leading-tight flex-1">
-              {title}
-            </h3>
-            <Badge variant="secondary" className="text-xs px-2 py-0.5 ml-2">
+        {/* Line 1: Emoji + Title only */}
+        <div className="flex items-center gap-2">
+          {emoji && <span className="text-2xl">{emoji}</span>}
+          <h3 className="line-clamp-2 text-lg font-semibold leading-tight flex-1">
+            {title}
+          </h3>
+        </div>
+
+        {/* Line 2: Metadata row - Category + Version + Gear */}
+        <div className="flex items-center gap-2">
+          {category && (
+            <CategoryBadge
+              name={category.name}
+              bg_color={category.bg_color}
+              text_color={category.text_color}
+              border_color={category.border_color}
+            />
+          )}
+
+          {typeof version_number === 'number' && (
+            <Badge variant="outline" className="text-xs">
               v{version_number}
             </Badge>
-          </div>
-          <button
+          )}
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="ml-auto h-6 w-6"
             onClick={handleEditClick}
-            className="text-muted-foreground hover:text-foreground transition-colors p-1"
-            aria-label="Edit prompt"
           >
             <Settings className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
-        {category && (
-          <CategoryBadge
-            name={category.name}
-            bg_color={category.bg_color}
-            text_color={category.text_color}
-            border_color={category.border_color}
-          />
-        )}
       </CardHeader>
 
       <CardContent className="flex-1 pb-4">
