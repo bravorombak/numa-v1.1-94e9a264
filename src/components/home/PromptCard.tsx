@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { CategoryBadge } from '@/components/categories/CategoryBadge';
-import { ArrowRight } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 interface PromptCardProps {
   id: string;
@@ -17,11 +16,8 @@ interface PromptCardProps {
     text_color: string;
     border_color: string;
   } | null;
-  model: {
-    id: string;
-    name: string;
-  } | null;
-  published_at: string;
+  version_number: number;
+  prompt_draft_id: string;
 }
 
 export const PromptCard = ({
@@ -30,8 +26,8 @@ export const PromptCard = ({
   description,
   emoji,
   category,
-  model,
-  published_at,
+  version_number,
+  prompt_draft_id,
 }: PromptCardProps) => {
   const navigate = useNavigate();
 
@@ -39,19 +35,34 @@ export const PromptCard = ({
     navigate(`/prompts/${id}/run`);
   };
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/prompts/${prompt_draft_id}/edit`);
+  };
+
   return (
     <Card
-      className="flex h-full cursor-pointer flex-col transition-shadow hover:shadow-md"
+      className="relative flex h-full cursor-pointer flex-col transition-shadow hover:shadow-md"
       onClick={handleClick}
     >
       <CardHeader className="space-y-3 pb-4">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-1">
             {emoji && <span className="text-2xl">{emoji}</span>}
-            <h3 className="line-clamp-2 text-lg font-semibold leading-tight">
+            <h3 className="line-clamp-2 text-lg font-semibold leading-tight flex-1">
               {title}
             </h3>
+            <Badge variant="secondary" className="text-xs px-2 py-0.5 ml-2">
+              v{version_number}
+            </Badge>
           </div>
+          <button
+            onClick={handleEditClick}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1"
+            aria-label="Edit prompt"
+          >
+            <Settings className="h-4 w-4" />
+          </button>
         </div>
         {category && (
           <CategoryBadge
@@ -68,19 +79,6 @@ export const PromptCard = ({
           {description || 'No description provided.'}
         </p>
       </CardContent>
-
-      <CardFooter className="flex items-center justify-between border-t pt-4">
-        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-          {model && <span className="font-medium">{model.name}</span>}
-          <span>
-            {formatDistanceToNow(new Date(published_at), { addSuffix: true })}
-          </span>
-        </div>
-        <Button size="sm" variant="ghost">
-          Open
-          <ArrowRight className="ml-1 h-3 w-3" />
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

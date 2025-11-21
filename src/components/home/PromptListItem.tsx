@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
 import { TableCell, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { CategoryBadge } from '@/components/categories/CategoryBadge';
+import { Settings } from 'lucide-react';
 
 interface PromptListItemProps {
   id: string;
@@ -14,11 +15,8 @@ interface PromptListItemProps {
     text_color: string;
     border_color: string;
   } | null;
-  model: {
-    id: string;
-    name: string;
-  } | null;
-  published_at: string;
+  version_number: number;
+  prompt_draft_id: string;
 }
 
 export const PromptListItem = ({
@@ -26,13 +24,18 @@ export const PromptListItem = ({
   title,
   emoji,
   category,
-  model,
-  published_at,
+  version_number,
+  prompt_draft_id,
 }: PromptListItemProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/prompts/${id}/run`);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/prompts/${prompt_draft_id}/edit`);
   };
 
   return (
@@ -59,14 +62,18 @@ export const PromptListItem = ({
         )}
       </TableCell>
       <TableCell>
-        <span className="text-sm text-muted-foreground">
-          {model?.name || '—'}
-        </span>
+        <Badge variant="secondary" className="text-xs px-2 py-0.5">
+          v{version_number}
+        </Badge>
       </TableCell>
       <TableCell>
-        <span className="text-sm text-muted-foreground">
-          {formatDistanceToNow(new Date(published_at), { addSuffix: true })}
-        </span>
+        <button
+          onClick={handleEditClick}
+          className="text-muted-foreground hover:text-foreground transition-colors p-1"
+          aria-label="Edit prompt"
+        >
+          <Settings className="h-4 w-4" />
+        </button>
       </TableCell>
     </TableRow>
   );
