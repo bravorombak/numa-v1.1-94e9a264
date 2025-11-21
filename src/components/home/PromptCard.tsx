@@ -55,8 +55,14 @@ export const PromptCard = ({
           </h3>
         </div>
 
-        {/* Line 2: Metadata row - Category + Version + Gear */}
+        {/* Line 2: Metadata row - Version + Category + Gear */}
         <div className="flex items-center gap-2">
+          {typeof version_number === 'number' && (
+            <Badge variant="outline" className="text-xs">
+              v{version_number}
+            </Badge>
+          )}
+
           {category && (
             <CategoryBadge
               name={category.name}
@@ -66,17 +72,11 @@ export const PromptCard = ({
             />
           )}
 
-          {typeof version_number === 'number' && (
-            <Badge variant="outline" className="text-xs">
-              v{version_number}
-            </Badge>
-          )}
-
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="ml-auto h-6 w-6"
+            className="h-6 w-6"
             onClick={handleEditClick}
           >
             <Settings className="h-4 w-4" />
