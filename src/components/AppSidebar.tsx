@@ -165,7 +165,7 @@ export function AppSidebar() {
             >
               <Plus className="h-4 w-4" />
               {open && (
-                <span className="ml-2">
+                <span className="ml-1">
                   {createPrompt.isPending ? 'Creating...' : 'New Prompt'}
                 </span>
               )}
