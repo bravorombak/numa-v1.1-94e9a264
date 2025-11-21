@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, AlertCircle, Loader2, MoreVertical, Edit2, Trash2 } from "lucide-react";
+import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, AlertCircle, Loader2, MoreVertical, Edit2, Trash2, Plus } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useMatch, useNavigate } from "react-router-dom";
 import { useSession, useSessionList, useRenameSession, useDeleteSession } from "@/hooks/useSessions";
+import { useCreatePromptDraft } from "@/hooks/usePromptDrafts";
 import type { SessionListItem } from "@/hooks/useSessions";
 import { formatDistanceToNow, format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -62,6 +63,8 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const match = useMatch("/chat/:sessionId");
   const sessionId = match?.params.sessionId;
+  
+  const createPrompt = useCreatePromptDraft();
   
   const [renameTargetId, setRenameTargetId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
@@ -151,6 +154,25 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
+        {/* New Prompt Button */}
+        <SidebarGroup>
+          <div className="px-2 pt-2 pb-2">
+            <Button
+              className="w-full justify-start"
+              size="default"
+              onClick={() => createPrompt.mutate()}
+              disabled={createPrompt.isPending}
+            >
+              <Plus className="h-4 w-4" />
+              {open && (
+                <span className="ml-2">
+                  {createPrompt.isPending ? 'Creating...' : 'New Prompt'}
+                </span>
+              )}
+            </Button>
+          </div>
+        </SidebarGroup>
+
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>

@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables, TablesInsert, TablesUpdate, Json } from '@/integrations/supabase/types';
-import { toast } from '@/hooks/use-toast';
+import { useToast, toast } from '@/hooks/use-toast';
 
 type PromptDraft = Tables<'prompt_drafts'>;
 type PromptVersion = Tables<'prompt_versions'>;
@@ -47,20 +48,39 @@ export const useSavePromptDraft = () => {
 
 export const useCreatePromptDraft = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (draft: TablesInsert<'prompt_drafts'>) => {
+    mutationFn: async () => {
       const { data, error } = await supabase
         .from('prompt_drafts')
-        .insert(draft)
+        .insert({
+          title: 'Untitled Prompt',
+          prompt_text: '',
+          description: '',
+          variables: [],
+        })
         .select()
         .single();
 
       if (error) throw error;
       return data as PromptDraft;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['prompt-drafts'] });
+      navigate(`/prompts/${data.id}/edit`);
+      toast({
+        title: 'Prompt created',
+        description: 'Your new prompt draft is ready to edit.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error creating prompt',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
   });
 };
