@@ -124,8 +124,8 @@ const HomePage = () => {
                 description={prompt.description}
                 emoji={prompt.emoji}
                 category={prompt.categories}
-                model={prompt.models}
-                published_at={prompt.published_at}
+                version_number={prompt.version_number}
+                prompt_draft_id={prompt.prompt_draft_id}
               />
             ))}
           </div>
@@ -143,8 +143,8 @@ const HomePage = () => {
                 <TableRow>
                   <TableHead>Title</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Model</TableHead>
-                  <TableHead>Last Updated</TableHead>
+                  <TableHead>Version</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -155,8 +155,8 @@ const HomePage = () => {
                     title={prompt.title}
                     emoji={prompt.emoji}
                     category={prompt.categories}
-                    model={prompt.models}
-                    published_at={prompt.published_at}
+                    version_number={prompt.version_number}
+                    prompt_draft_id={prompt.prompt_draft_id}
                   />
                 ))}
               </TableBody>

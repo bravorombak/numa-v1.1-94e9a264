@@ -185,6 +185,8 @@ export const usePublishedPrompts = () => {
           model_id,
           created_at,
           published_at,
+          version_number,
+          prompt_draft_id,
           categories:category_id (
             id,
             name,
