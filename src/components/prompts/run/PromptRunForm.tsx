@@ -186,10 +186,21 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
   });
 
   const onSubmit = async (values: Record<string, any>) => {
+    // Block if no model selected
+    if (!promptVersion.model_id) {
+      toast({
+        title: "Model required",
+        description: "This prompt has no AI model configured. Please edit the prompt and select a model in the Model tab.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const session = await createSession.mutateAsync({
         promptVersionId: promptVersion.id,
         variables: values,
+        modelId: promptVersion.model_id,
       });
 
       navigate(`/chat/${session.id}`);
@@ -318,10 +329,20 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
           <Button
             size="lg"
             onClick={async () => {
+              if (!promptVersion.model_id) {
+                toast({
+                  title: "Model required",
+                  description: "Please edit the prompt and select a model first.",
+                  variant: "destructive",
+                });
+                return;
+              }
+
               try {
                 const session = await createSession.mutateAsync({
                   promptVersionId: promptVersion.id,
                   variables: {},
+                  modelId: promptVersion.model_id,
                 });
                 navigate(`/chat/${session.id}`);
               } catch (error) {
