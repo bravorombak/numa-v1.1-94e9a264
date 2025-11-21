@@ -74,8 +74,8 @@ export const VariablesTab = () => {
       {variables.map((variable, index) => (
         <Card key={`${variable.name}-${index}`}>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Badge variant="secondary" className="font-mono">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Badge variant="secondary" className="font-mono text-base px-3 py-1">
                 {`{{${variable.name}}}`}
               </Badge>
             </CardTitle>
