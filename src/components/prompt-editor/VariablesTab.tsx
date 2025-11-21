@@ -7,18 +7,37 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+import {
+  Type as TextIcon,
+  FileText,
+  Hash,
+  AtSign,
+  Link2,
+  ListFilter,
+  CheckSquare,
+  UploadCloud,
+  Calendar,
+} from 'lucide-react';
 
-const variableTypes = [
-  { value: 'text', label: 'Text (short)' },
-  { value: 'long_text', label: 'Text (long)' },
-  { value: 'number', label: 'Number' },
-  { value: 'email', label: 'Email' },
-  { value: 'url', label: 'URL' },
-  { value: 'dropdown', label: 'Dropdown' },
-  { value: 'checkboxes', label: 'Checkboxes' },
-  { value: 'file', label: 'File Upload' },
-  { value: 'date', label: 'Date' },
+const VARIABLE_TYPE_OPTIONS: Array<{
+  value: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}> = [
+  { value: 'text', label: 'Short Text', icon: TextIcon },
+  { value: 'long_text', label: 'Long Text', icon: FileText },
+  { value: 'number', label: 'Number', icon: Hash },
+  { value: 'email', label: 'Email', icon: AtSign },
+  { value: 'url', label: 'URL', icon: Link2 },
+  { value: 'dropdown', label: 'Dropdown', icon: ListFilter },
+  { value: 'checkboxes', label: 'Checkboxes', icon: CheckSquare },
+  { value: 'file', label: 'File Upload', icon: UploadCloud },
+  { value: 'date', label: 'Date', icon: Calendar },
 ];
+
+const getVariableTypeOption = (value: string) => {
+  return VARIABLE_TYPE_OPTIONS.find(opt => opt.value === value);
+};
 
 const parseOptions = (optionsString: string): string[] => {
   if (!optionsString) return [];
@@ -103,12 +122,25 @@ export const VariablesTab = () => {
                 onValueChange={(value) => handleVariableChange(index, { type: value })}
               >
                 <SelectTrigger id={`type-${index}`}>
-                  <SelectValue />
+                  {(() => {
+                    const selectedOption = getVariableTypeOption(variable.type);
+                    return selectedOption ? (
+                      <div className="flex items-center gap-2">
+                        <selectedOption.icon className="h-4 w-4 text-muted-foreground" />
+                        <span>{selectedOption.label}</span>
+                      </div>
+                    ) : (
+                      <span>{variable.type}</span>
+                    );
+                  })()}
                 </SelectTrigger>
                 <SelectContent>
-                  {variableTypes.map((type) => (
+                  {VARIABLE_TYPE_OPTIONS.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
-                      {type.label}
+                      <div className="flex items-center gap-2">
+                        <type.icon className="h-4 w-4 text-muted-foreground" />
+                        <span>{type.label}</span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
