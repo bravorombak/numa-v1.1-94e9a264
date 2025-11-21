@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { usePromptEditorStore } from '@/stores/promptEditorStore';
 import type { PromptVariable } from '@/lib/variableDetection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,6 +55,24 @@ const formatOptions = (options: string[] | undefined): string => {
 
 export const VariablesTab = () => {
   const { draftData, updateDraftField } = usePromptEditorStore();
+  
+  // Local state for raw options input (preserves user typing)
+  const [optionsInputs, setOptionsInputs] = useState<Record<string, string>>({});
+
+  // Initialize options inputs when variables change
+  useEffect(() => {
+    if (!draftData?.variables) return;
+    const variables = Array.isArray(draftData.variables)
+      ? (draftData.variables as unknown as PromptVariable[])
+      : [];
+    
+    const inputs: Record<string, string> = {};
+    variables.forEach((variable, index) => {
+      const key = `${variable.name}-${index}`;
+      inputs[key] = formatOptions(variable.options);
+    });
+    setOptionsInputs(inputs);
+  }, [draftData?.variables]);
 
   const handleVariableChange = (index: number, partial: Partial<PromptVariable>) => {
     if (!draftData?.variables) return;
@@ -63,6 +82,22 @@ export const VariablesTab = () => {
     const updated = [...currentVars];
     updated[index] = { ...updated[index], ...partial };
     updateDraftField('variables', updated);
+  };
+
+  // Update local raw input text without parsing
+  const handleOptionsChange = (index: number, varName: string, value: string) => {
+    const key = `${varName}-${index}`;
+    setOptionsInputs(prev => ({ ...prev, [key]: value }));
+  };
+
+  // Parse and save on blur
+  const handleOptionsBlur = (index: number, varName: string, value: string) => {
+    const opts = parseOptions(value);
+    handleVariableChange(index, { options: opts });
+    
+    // Update local input to show clean formatted version
+    const key = `${varName}-${index}`;
+    setOptionsInputs(prev => ({ ...prev, [key]: formatOptions(opts) }));
   };
 
   if (!draftData) {
@@ -203,12 +238,10 @@ export const VariablesTab = () => {
                 </Label>
                 <Input
                   id={`options-${index}`}
-                  value={formatOptions(variable.options)}
-                  onChange={(e) => {
-                    const opts = parseOptions(e.target.value);
-                    handleVariableChange(index, { options: opts });
-                  }}
-                  placeholder="Red, Blue, Green"
+                  value={optionsInputs[`${variable.name}-${index}`] ?? formatOptions(variable.options)}
+                  onChange={(e) => handleOptionsChange(index, variable.name, e.target.value)}
+                  onBlur={(e) => handleOptionsBlur(index, variable.name, e.target.value)}
+                  placeholder="Blog, Landing page, Ad copy"
                 />
               </div>
             )}
