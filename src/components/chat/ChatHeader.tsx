@@ -6,6 +6,7 @@ interface ChatHeaderProps {
   promptEmoji?: string | null;
   promptImageUrl?: string | null;
   modelName?: string;
+  versionNumber?: number;
   createdAt?: string;
 }
 
@@ -14,6 +15,7 @@ export const ChatHeader = ({
   promptEmoji,
   promptImageUrl,
   modelName,
+  versionNumber,
   createdAt,
 }: ChatHeaderProps) => {
   const relativeTime = createdAt
@@ -41,17 +43,26 @@ export const ChatHeader = ({
           </div>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
-          {modelName && (
-            <Badge 
-              variant={modelName === "No model configured" ? "destructive" : "secondary"} 
-              className="text-xs"
-            >
-              {modelName}
-            </Badge>
-          )}
-          {relativeTime && (
-            <span className="text-xs text-muted-foreground">{relativeTime}</span>
-          )}
+          <Badge 
+            variant={modelName === "No model configured" ? "destructive" : "secondary"} 
+            className="text-xs flex items-center gap-1"
+          >
+            {versionNumber && (
+              <span>v{versionNumber}</span>
+            )}
+            {modelName && (
+              <>
+                {versionNumber && <span className="mx-1">·</span>}
+                <span>{modelName}</span>
+              </>
+            )}
+            {relativeTime && (
+              <>
+                <span className="mx-1">·</span>
+                <span>{relativeTime}</span>
+              </>
+            )}
+          </Badge>
         </div>
       </div>
     </div>
