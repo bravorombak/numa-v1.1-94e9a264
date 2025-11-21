@@ -102,6 +102,7 @@ const ChatPage = () => {
           session.models?.name || 
           (session.model_id ? "Model not found" : "No model configured")
         }
+        versionNumber={session.prompt_versions?.version_number}
         createdAt={session.created_at}
       />
       
