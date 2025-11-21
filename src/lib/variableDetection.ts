@@ -35,27 +35,33 @@ export function extractVariables(promptText: string): string[] {
 
 /**
  * Sync detected variables with existing variable configurations.
- * - Keeps all existing variable configs intact (even if no longer detected)
+ * - Only includes variables currently detected in the prompt
+ * - Preserves existing configs for variables that still exist
  * - Creates default configs for newly detected variables
- * - Does not delete orphaned variables
+ * - Removes configs for variables no longer in the prompt
  */
 export function syncVariablesFromDetected(
   detected: string[],
   existing: PromptVariable[] | null | undefined
 ): PromptVariable[] {
   const existingVars = existing || [];
-  const existingNames = new Set(existingVars.map(v => v.name));
-  const result = [...existingVars];
+  const result: PromptVariable[] = [];
   
-  // Add new variables with default config
+  // For each detected variable, use existing config or create default
   detected.forEach((varName, index) => {
-    if (!existingNames.has(varName)) {
+    const existingVar = existingVars.find(v => v.name === varName);
+    
+    if (existingVar) {
+      // Variable existed before - keep its configuration
+      result.push(existingVar);
+    } else {
+      // New variable - create default configuration
       result.push({
         name: varName,
         type: 'text',
         label: capitalizeFirst(varName),
         required: false,
-        order: existingVars.length + index,
+        order: index,
       });
     }
   });
