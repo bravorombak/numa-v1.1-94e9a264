@@ -67,9 +67,24 @@ const ChatPage = () => {
         promptTitle={session.prompt_versions?.title}
         promptEmoji={session.prompt_versions?.emoji}
         promptImageUrl={session.prompt_versions?.image_url}
-        modelName={session.models?.name || "Unknown model"}
+        modelName={
+          session.models?.name || 
+          (session.model_id ? "Model not found" : "No model configured")
+        }
         createdAt={session.created_at}
       />
+      
+      {/* Warning banner for missing model */}
+      {!session.model_id && (
+        <Alert variant="destructive" className="mx-4 mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No AI model configured</AlertTitle>
+          <AlertDescription>
+            This session was created without an AI model. Please go back to the prompt editor, select a model in the Model tab, and run the prompt again.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <ChatBody 
         sessionId={sessionId || ""} 
         isAssistantLoading={isAssistantLoading}
@@ -77,9 +92,9 @@ const ChatPage = () => {
         onRetryAssistant={canRetryAssistant ? handleRetryAssistant : undefined}
       />
       <ChatComposer 
-        disabled={isBusy}
+        disabled={isBusy || !session.model_id}
         onSend={async (message) => {
-          if (!sessionId || !session) return;
+          if (!sessionId || !session || !session.model_id) return;
           
           // Step 1: Save the user's message
           await addMessage.mutateAsync({

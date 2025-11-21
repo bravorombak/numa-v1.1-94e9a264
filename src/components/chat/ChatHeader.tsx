@@ -42,7 +42,10 @@ export const ChatHeader = ({
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           {modelName && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge 
+              variant={modelName === "No model configured" ? "destructive" : "secondary"} 
+              className="text-xs"
+            >
               {modelName}
             </Badge>
           )}

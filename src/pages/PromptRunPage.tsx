@@ -103,6 +103,16 @@ const PromptRunPage = () => {
         )}
       </div>
 
+      {/* Model warning banner */}
+      {!promptVersion.model_id && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>No AI model selected.</strong> Please edit this prompt and select a model in the Model tab before running it.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Inputs Card */}
       <Card>
         <CardHeader>

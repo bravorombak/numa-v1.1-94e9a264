@@ -90,6 +90,13 @@ export const useGenerateAssistantReply = () => {
 
   return useMutation<MessageRow, Error, GenerateAssistantReplyArgs>({
     mutationFn: async ({ session, userMessage }) => {
+      // Early validation: prevent calling generate without model_id
+      if (!session.model_id) {
+        throw new Error(
+          'This session has no AI model configured. Please start a new session from a prompt with a model selected.'
+        );
+      }
+
       // Step 1: Construct the generate request with chat_message variable
       const promptTemplate = session.prompt_versions?.prompt_text || '';
       const baseVariables = (session.variable_inputs as Record<string, any>) || {};
@@ -100,7 +107,7 @@ export const useGenerateAssistantReply = () => {
           ...baseVariables,
           chat_message: userMessage,
         },
-        model_id: session.model_id || session.models?.id || '',
+        model_id: session.model_id,
       };
 
       // Step 2: Call the generate edge function
