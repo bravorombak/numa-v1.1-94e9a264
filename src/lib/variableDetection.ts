@@ -60,7 +60,7 @@ export function syncVariablesFromDetected(
         name: varName,
         type: 'text',
         label: capitalizeFirst(varName),
-        required: false,
+        required: true,
         order: index,
       });
     }
