@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSessions";
-import { useAddMessage, useGenerateAssistantReply } from "@/hooks/useMessages";
+import { useAddMessage, useGenerateAssistantReply, useMessages } from "@/hooks/useMessages";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatBody } from "@/components/chat/ChatBody";
 import { ChatComposer } from "@/components/chat/ChatComposer";
@@ -13,13 +13,43 @@ const ChatPage = () => {
   const { data: session, isLoading, error } = useSession(sessionId);
   const addMessage = useAddMessage();
   const generateAssistant = useGenerateAssistantReply();
+  
+  // Fetch messages at page level to share with both ChatBody and auto-start logic
+  const { data: messagesData, isLoading: messagesLoading, error: messagesError } = useMessages(sessionId || "", 0, 30);
+  const messages = messagesData?.messages ?? [];
 
   const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
   const [assistantError, setAssistantError] = useState<string | null>(null);
+  const autoStartTriggered = useRef(false);
 
   const isBusy = isLoading || addMessage.isPending || generateAssistant.isPending;
   const isAssistantLoading = generateAssistant.isPending;
   const canRetryAssistant = !!session && !!lastUserMessage && !!assistantError && !generateAssistant.isPending;
+
+  // Auto-start: Trigger first assistant reply on empty sessions
+  useEffect(() => {
+    if (
+      session &&
+      messagesData &&
+      messages.length === 0 &&
+      session.model_id &&
+      !autoStartTriggered.current &&
+      !generateAssistant.isPending
+    ) {
+      autoStartTriggered.current = true;
+      
+      generateAssistant.mutateAsync({
+        session,
+        userMessage: "",
+        conversationHistory: [],
+      }).catch((error) => {
+        console.error('[ChatPage] Auto-start generation error:', error);
+        setAssistantError(
+          error instanceof Error ? error.message : "Failed to generate initial response"
+        );
+      });
+    }
+  }, [session, messagesData, messages.length, generateAssistant]);
 
   const handleRetryAssistant = async () => {
     if (!session || !lastUserMessage) return;
@@ -28,6 +58,7 @@ const ChatPage = () => {
       await generateAssistant.mutateAsync({
         session,
         userMessage: lastUserMessage,
+        conversationHistory: messages,
       });
     } catch (error) {
       setAssistantError(
@@ -87,6 +118,9 @@ const ChatPage = () => {
 
       <ChatBody 
         sessionId={sessionId || ""} 
+        messages={messages}
+        isLoading={messagesLoading}
+        error={messagesError}
         isAssistantLoading={isAssistantLoading}
         assistantError={assistantError}
         onRetryAssistant={canRetryAssistant ? handleRetryAssistant : undefined}
@@ -106,11 +140,12 @@ const ChatPage = () => {
           setLastUserMessage(message);
           setAssistantError(null);
           
-          // Step 3: Trigger assistant generation
+          // Step 3: Trigger assistant generation with conversation history
           try {
             await generateAssistant.mutateAsync({
               session,
               userMessage: message,
+              conversationHistory: messages,
             });
           } catch (error) {
             console.error('[ChatPage] Assistant generation error:', error);

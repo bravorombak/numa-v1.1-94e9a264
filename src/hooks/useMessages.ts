@@ -82,6 +82,7 @@ export const useAddMessage = () => {
 export interface GenerateAssistantReplyArgs {
   session: SessionWithRelations;
   userMessage: string;
+  conversationHistory?: MessageRow[];
 }
 
 export const useGenerateAssistantReply = () => {
@@ -89,7 +90,7 @@ export const useGenerateAssistantReply = () => {
   const { toast } = useToast();
 
   return useMutation<MessageRow, Error, GenerateAssistantReplyArgs>({
-    mutationFn: async ({ session, userMessage }) => {
+    mutationFn: async ({ session, userMessage, conversationHistory = [] }) => {
       // Early validation: prevent calling generate without model_id
       if (!session.model_id) {
         throw new Error(
@@ -97,9 +98,15 @@ export const useGenerateAssistantReply = () => {
         );
       }
 
-      // Step 1: Construct the generate request with chat_message variable
+      // Step 1: Construct the generate request with conversation history
       const promptTemplate = session.prompt_versions?.prompt_text || '';
       const baseVariables = (session.variable_inputs as Record<string, any>) || {};
+      
+      // Build conversation array from history
+      const conversation = conversationHistory.map(msg => ({
+        role: msg.role,
+        content: msg.content,
+      }));
       
       const generateRequest = {
         prompt: promptTemplate,
@@ -108,6 +115,7 @@ export const useGenerateAssistantReply = () => {
           chat_message: userMessage,
         },
         model_id: session.model_id,
+        conversation,
       };
 
       // Step 2: Call the generate edge function
