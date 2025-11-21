@@ -138,7 +138,7 @@ export const AboutTab = () => {
             name="category_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category</FormLabel>
+                <FormLabel>Category *</FormLabel>
                 <Select
                   value={field.value || ''}
                   onValueChange={(value) => {
@@ -169,6 +169,9 @@ export const AboutTab = () => {
                     )}
                   </SelectContent>
                 </Select>
+                <FormDescription>
+                  Category is required to save this prompt
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
