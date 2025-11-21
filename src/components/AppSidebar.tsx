@@ -158,7 +158,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <div className="px-2 pt-2 pb-2">
             <Button
-              className="w-full justify-start"
+              className="w-full justify-center"
               size="default"
               onClick={() => createPrompt.mutate()}
               disabled={createPrompt.isPending}
