@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 
 export const AppLayout = () => {
   return (
-    <SidebarProvider className="flex h-screen w-full overflow-hidden">
+    <SidebarProvider className="fixed inset-0 flex w-full overflow-hidden">
       <div className="flex h-full w-full min-h-0">
         <AppSidebar />
         <div className="flex flex-1 flex-col min-h-0">
