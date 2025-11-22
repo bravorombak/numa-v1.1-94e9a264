@@ -30,8 +30,8 @@ const VARIABLE_TYPE_OPTIONS: Array<{
   { value: 'number', label: 'Number', icon: Hash },
   { value: 'email', label: 'Email', icon: AtSign },
   { value: 'url', label: 'URL', icon: Link2 },
-  { value: 'dropdown', label: 'Dropdown', icon: ListFilter },
-  { value: 'checkboxes', label: 'Checkboxes', icon: CheckSquare },
+  { value: 'dropdown', label: 'Select', icon: ListFilter },
+  { value: 'checkboxes', label: 'Multi-select', icon: CheckSquare },
   { value: 'file', label: 'File Upload', icon: UploadCloud },
   { value: 'date', label: 'Date', icon: Calendar },
 ];
