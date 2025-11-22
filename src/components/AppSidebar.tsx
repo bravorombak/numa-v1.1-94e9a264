@@ -6,7 +6,7 @@ import { useAllUserSessions, useRenameSession, useDeleteSession } from "@/hooks/
 import { useCreatePromptDraft } from "@/hooks/usePromptDrafts";
 import type { SessionListItemWithPrompt } from "@/hooks/useSessions";
 import { formatDistanceToNow, format } from "date-fns";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { cn } from "@/lib/utils";
 import {
   Sidebar,
@@ -243,7 +243,7 @@ export function AppSidebar() {
             )}
 
             {!sessionListLoading && !sessionListError && sessionList.length > 0 && open && (
-          <ScrollArea className="mt-2 h-[calc(100vh-320px)]">
+          <div className="mt-2 h-[calc(100vh-320px)] overflow-y-auto pr-1">
             <SidebarMenu>
                   {sessionList.map((session) => {
                     const isActive = session.id === sessionId;
@@ -254,7 +254,40 @@ export function AppSidebar() {
                     return (
                       <SidebarMenuItem key={session.id}>
                         <div className="flex items-start gap-1 w-full group">
-                          {/* Main session button */}
+                          {/* Three-dot menu on the LEFT */}
+                          {open && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button
+                                  type="button"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className={cn(
+                                    "mt-1 shrink-0 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-muted transition-opacity",
+                                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                                    isActive && "opacity-100"
+                                  )}
+                                  aria-label="Session actions"
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="start">
+                                <DropdownMenuItem onClick={() => handleRenameClick(session)}>
+                                  <Edit2 className="h-4 w-4 mr-2" />
+                                  Rename
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleDeleteClick(session)}
+                                  className="text-destructive focus:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+
+                          {/* Main session button on the RIGHT */}
                           <button
                             type="button"
                             onClick={() => navigate(`/chat/${session.id}`)}
@@ -275,45 +308,12 @@ export function AppSidebar() {
                               </div>
                             )}
                           </button>
-
-                            {/* Dropdown menu for actions (visible on hover or when active) */}
-                            {open && (
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button
-                                    type="button"
-                                    onClick={(e) => e.stopPropagation()}
-                                    className={cn(
-                                      "shrink-0 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-muted transition-opacity",
-                                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                                      isActive && "opacity-100"
-                                    )}
-                                    aria-label="Session actions"
-                                  >
-                                    <MoreVertical className="h-4 w-4" />
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start">
-                                  <DropdownMenuItem onClick={() => handleRenameClick(session)}>
-                                    <Edit2 className="h-4 w-4 mr-2" />
-                                    Rename
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={() => handleDeleteClick(session)}
-                                    className="text-destructive focus:text-destructive"
-                                  >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                          )}
                         </div>
                       </SidebarMenuItem>
                     );
                   })}
                 </SidebarMenu>
-              </ScrollArea>
+              </div>
             )}
           </SidebarGroupContent>
         </SidebarGroup>
