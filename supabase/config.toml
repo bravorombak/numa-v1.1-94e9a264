@@ -12,3 +12,18 @@ verify_jwt = true
 
 [functions.storage-delete]
 verify_jwt = true
+
+[functions.guide-create]
+verify_jwt = true
+
+[functions.guide-update]
+verify_jwt = true
+
+[functions.guide-delete]
+verify_jwt = true
+
+[functions.guide-tree]
+verify_jwt = true
+
+[functions.guide-page]
+verify_jwt = true
