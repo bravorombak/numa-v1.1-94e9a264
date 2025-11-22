@@ -18,6 +18,7 @@ import PromptRunPage from "./pages/PromptRunPage";
 import ChatPage from "./pages/ChatPage";
 import GuidePage from "./pages/GuidePage";
 import GuideDetailPage from "./pages/GuideDetailPage";
+import GuideViewerPage from "./pages/GuideViewerPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,8 @@ const AppContent = () => {
           <Route path="/chat/:sessionId" element={<ChatPage />} />
           <Route path="/guide" element={<GuidePage />} />
           <Route path="/guide/:id" element={<GuideDetailPage />} />
+          <Route path="/guide-view" element={<GuideViewerPage />} />
+          <Route path="/guide-view/:id" element={<GuideViewerPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
