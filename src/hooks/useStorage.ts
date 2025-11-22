@@ -21,6 +21,37 @@ export interface ClearStorageResponse {
   range: string;
 }
 
+export interface StorageLog {
+  id: string;
+  bucket: string;
+  path: string;
+  content_type: string | null;
+  size_bytes: number | null;
+  user_id: string | null;
+  created_at: string | null;
+  deleted_at: string | null;
+}
+
+export interface StorageLogsParams {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+}
+
+export interface StorageLogsResponse {
+  logs: StorageLog[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface DeleteStorageLogResponse {
+  id: string;
+  deletedBytes: number;
+  filename: string;
+}
+
 // Get storage statistics
 export const useStorageStats = () => {
   return useQuery({
@@ -80,6 +111,85 @@ export const useClearStorage = () => {
     onError: (error) => {
       toast({
         title: 'Error clearing storage',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+// Get storage logs with pagination
+export const useStorageLogs = ({ page = 1, pageSize = 20, search = '' }: StorageLogsParams = {}) => {
+  return useQuery({
+    queryKey: ['storage', 'logs', page, pageSize, search],
+    queryFn: async () => {
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      let query = supabase
+        .from('storage_logs')
+        .select('*', { count: 'exact' })
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+
+      // Apply search filter if provided
+      if (search && search.trim()) {
+        query = query.ilike('path', `%${search.trim()}%`);
+      }
+
+      query = query.range(from, to);
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+
+      const totalCount = count || 0;
+      const totalPages = Math.ceil(totalCount / pageSize);
+
+      return {
+        logs: data || [],
+        totalCount,
+        page,
+        pageSize,
+        totalPages,
+      } as StorageLogsResponse;
+    },
+  });
+};
+
+// Delete a single storage log (admin only)
+export const useDeleteStorageLog = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<DeleteStorageLogResponse, Error, string>({
+    mutationFn: async (logId: string) => {
+      const { data, error } = await supabase.functions.invoke('storage-delete', {
+        body: { id: logId },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to delete file');
+      }
+
+      // Check for error envelope response
+      if (data?.code && data?.message) {
+        throw new Error(data.message);
+      }
+
+      return data as DeleteStorageLogResponse;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['storage', 'logs'] });
+      queryClient.invalidateQueries({ queryKey: ['storage', 'stats'] });
+      
+      toast({
+        title: 'File deleted',
+        description: `${data.filename} (${formatBytes(data.deletedBytes)})`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error deleting file',
         description: error.message,
         variant: 'destructive',
       });

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ManageTab } from '@/components/storage/ManageTab';
+import { LogsTab } from '@/components/storage/LogsTab';
 import { useAuthStore } from '@/stores/authStore';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ShieldAlert, Loader2 } from 'lucide-react';
@@ -52,17 +52,7 @@ const StoragePage = () => {
         </TabsContent>
 
         <TabsContent value="logs" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Storage Logs</CardTitle>
-              <CardDescription>Coming in Phase 10.2</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Logs tab will be implemented in the next phase.
-              </p>
-            </CardContent>
-          </Card>
+          <LogsTab />
         </TabsContent>
       </Tabs>
     </div>
