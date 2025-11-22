@@ -25,6 +25,17 @@ export async function callAnthropic(
     const systemMessage = params.messages.find(m => m.role === 'system')?.content || '';
     const userMessages = params.messages.filter(m => m.role !== 'system');
 
+    // Anthropic requires at least one non-system message.
+    // Auto-start sessions have a system message but no user message,
+    // so we add a fallback user message if needed.
+    if (userMessages.length === 0) {
+      userMessages.push({
+        role: 'user',
+        content:
+          'Please start the conversation with a helpful first response based on the system instructions.',
+      });
+    }
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
