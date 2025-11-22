@@ -243,7 +243,20 @@ export function AppSidebar() {
             )}
 
             {!sessionListLoading && !sessionListError && sessionList.length > 0 && open && (
-          <div className="mt-2 h-[calc(100vh-320px)] overflow-y-auto pr-1">
+          <div
+            className={cn(
+              "mt-2 h-[calc(100vh-320px)] overflow-y-auto pr-1",
+              // Firefox: thin scrollbar, hidden by default
+              "[scrollbar-width:thin]",
+              "[scrollbar-color:transparent_transparent]",
+              // WebKit: hide scrollbar until hover
+              "[&::-webkit-scrollbar]:w-1",
+              "[&::-webkit-scrollbar-track]:bg-transparent",
+              "[&::-webkit-scrollbar-thumb]:bg-transparent",
+              "hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/40",
+              "hover:[&::-webkit-scrollbar-thumb]:rounded-full"
+            )}
+          >
             <SidebarMenu>
                   {sessionList.map((session) => {
                     const isActive = session.id === sessionId;
