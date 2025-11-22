@@ -4,6 +4,7 @@ import { NavLink } from "@/components/NavLink";
 import { useMatch, useNavigate } from "react-router-dom";
 import { useAllUserSessions, useRenameSession, useDeleteSession } from "@/hooks/useSessions";
 import { useCreatePromptDraft } from "@/hooks/usePromptDrafts";
+import { useAuthStore } from "@/stores/authStore";
 import type { SessionListItemWithPrompt } from "@/hooks/useSessions";
 import { formatDistanceToNow, format } from "date-fns";
 
@@ -61,6 +62,8 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const match = useMatch("/chat/:sessionId");
   const sessionId = match?.params.sessionId;
+  const { hasRole } = useAuthStore();
+  const isAdmin = hasRole("admin");
   
   const createPrompt = useCreatePromptDraft();
   
@@ -199,7 +202,9 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
+              {navItems
+                .filter((item) => item.url !== "/guide" || isAdmin)
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
