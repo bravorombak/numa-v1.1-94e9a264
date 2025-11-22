@@ -93,7 +93,7 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 p-6">
+    <div className="flex flex-col flex-1 min-h-0 p-6">
       <div className="flex flex-1 flex-col min-h-0 rounded-lg border bg-background overflow-hidden">
         <ChatHeader
           promptTitle={session.prompt_versions?.title}
