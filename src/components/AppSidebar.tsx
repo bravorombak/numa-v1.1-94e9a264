@@ -83,19 +83,32 @@ export function AppSidebar() {
     if (session.title && session.title.trim().length > 0) {
       return session.title.trim();
     }
-    
+
     // Priority 2: Prompt version title
     if (session.prompt_versions?.title?.trim()) {
       return session.prompt_versions.title.trim();
     }
-    
+
     // Priority 3: Prompt draft title (via prompt_versions)
     if (session.prompt_versions?.prompt_drafts?.title?.trim()) {
       return session.prompt_versions.prompt_drafts.title.trim();
     }
-    
+
     // Fallback: Date-based title
     return `Session on ${format(new Date(session.created_at), "dd MMM, HH:mm")}`;
+  };
+
+  const getPromptIcon = (session: SessionListItemWithPrompt) => {
+    const pv = session.prompt_versions;
+    const draft = pv?.prompt_drafts;
+
+    return (
+      pv?.emoji?.trim() ||
+      pv?.image_url ||
+      draft?.emoji?.trim() ||
+      draft?.image_url ||
+      "💬"
+    );
   };
 
   const handleRenameClick = (session: SessionListItemWithPrompt) => {
@@ -230,8 +243,8 @@ export function AppSidebar() {
             )}
 
             {!sessionListLoading && !sessionListError && sessionList.length > 0 && open && (
-              <ScrollArea className="mt-2 max-h-72">
-                <SidebarMenu>
+          <ScrollArea className="mt-2 h-[calc(100vh-320px)]">
+            <SidebarMenu>
                   {sessionList.map((session) => {
                     const isActive = session.id === sessionId;
                     const relativeTime = formatDistanceToNow(new Date(session.created_at), { 
@@ -247,11 +260,14 @@ export function AppSidebar() {
                             onClick={() => navigate(`/chat/${session.id}`)}
                             className={cn(
                               "flex-1 flex items-start gap-2 rounded-md px-3 py-2.5 text-left text-sm transition-colors min-w-0",
-                              "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring",
+                              "hover:bg-muted",
+                              "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                               isActive && "bg-accent/80 text-accent-foreground font-medium border border-border"
                             )}
                           >
-                            <MessageSquare className="mt-0.5 h-4 w-4 shrink-0" />
+                            <span className="flex h-6 w-6 items-center justify-center shrink-0 text-lg">
+                              {getPromptIcon(session)}
+                            </span>
                             {open && (
                               <div className="flex flex-col gap-0.5 min-w-0">
                                 <span className="truncate font-medium">{getSessionTitle(session)}</span>
@@ -269,7 +285,7 @@ export function AppSidebar() {
                                     onClick={(e) => e.stopPropagation()}
                                     className={cn(
                                       "shrink-0 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-muted transition-opacity",
-                                      "focus:outline-none focus:ring-2 focus:ring-ring",
+                                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                                       isActive && "opacity-100"
                                     )}
                                     aria-label="Session actions"
