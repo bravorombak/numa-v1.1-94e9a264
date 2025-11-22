@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, AlertCircle, Loader2, MoreVertical, Edit2, Trash2, Plus } from "lucide-react";
+import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, MoreVertical, Edit2, Trash2, Plus } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useMatch, useNavigate } from "react-router-dom";
-import { useSession, useSessionList, useRenameSession, useDeleteSession } from "@/hooks/useSessions";
+import { useAllUserSessions, useRenameSession, useDeleteSession } from "@/hooks/useSessions";
 import { useCreatePromptDraft } from "@/hooks/usePromptDrafts";
-import type { SessionListItem } from "@/hooks/useSessions";
+import type { SessionListItemWithPrompt } from "@/hooks/useSessions";
 import { formatDistanceToNow, format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import {
   Sidebar,
@@ -68,28 +66,39 @@ export function AppSidebar() {
   
   const [renameTargetId, setRenameTargetId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
-  const [deleteTargetSession, setDeleteTargetSession] = useState<SessionListItem | null>(null);
+  const [deleteTargetSession, setDeleteTargetSession] = useState<SessionListItemWithPrompt | null>(null);
   const renameSession = useRenameSession();
   const deleteSession = useDeleteSession();
 
-  // Fetch current session and session list (only when on chat route)
-  const { data: currentSession } = useSession(sessionId);
-  const promptVersionId = currentSession?.prompt_version_id;
+  // Fetch all user sessions (always, not just on chat route)
   const { 
     data: sessionList = [], 
     isLoading: sessionListLoading, 
     isError: sessionListError 
-  } = useSessionList(promptVersionId);
+  } = useAllUserSessions();
 
-  // Helper function for session titles
-  const getSessionTitle = (session: { title: string | null; created_at: string }) => {
+  // Helper function for session titles (prioritizes prompt title)
+  const getSessionTitle = (session: SessionListItemWithPrompt) => {
+    // Priority 1: Custom session title
     if (session.title && session.title.trim().length > 0) {
       return session.title.trim();
     }
+    
+    // Priority 2: Prompt version title
+    if (session.prompt_versions?.title?.trim()) {
+      return session.prompt_versions.title.trim();
+    }
+    
+    // Priority 3: Prompt draft title (via prompt_versions)
+    if (session.prompt_versions?.prompt_drafts?.title?.trim()) {
+      return session.prompt_versions.prompt_drafts.title.trim();
+    }
+    
+    // Fallback: Date-based title
     return `Session on ${format(new Date(session.created_at), "dd MMM, HH:mm")}`;
   };
 
-  const handleRenameClick = (session: { id: string; title: string | null; created_at: string }) => {
+  const handleRenameClick = (session: SessionListItemWithPrompt) => {
     setRenameTargetId(session.id);
     setRenameValue(session.title ?? getSessionTitle(session));
   };
@@ -113,7 +122,7 @@ export function AppSidebar() {
     setRenameValue("");
   };
 
-  const handleDeleteClick = (session: SessionListItem) => {
+  const handleDeleteClick = (session: SessionListItemWithPrompt) => {
     setDeleteTargetSession(session);
   };
 
@@ -196,66 +205,60 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Sessions Group (only shown when on /chat/:sessionId) */}
-        {sessionId && (
-          <SidebarGroup className="mt-4">
-            <SidebarGroupLabel>
-              {open ? "Sessions" : <MessageSquare className="h-4 w-4" />}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              {sessionListLoading && open && (
-                <div className="space-y-2 px-2">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-12 w-full" />
-                  ))}
-                </div>
-              )}
+        {/* Sessions Group (always visible) */}
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel>
+            {open ? "Sessions" : <MessageSquare className="h-4 w-4" />}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            {sessionListLoading && (
+              <div className="px-3 py-2 text-sm text-muted-foreground">
+                Loading...
+              </div>
+            )}
 
-              {sessionListError && open && (
-                <Alert variant="destructive" className="mx-2 mt-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="text-xs">
-                    Couldn't load sessions.
-                  </AlertDescription>
-                </Alert>
-              )}
+            {sessionListError && (
+              <div className="px-3 py-2 text-sm text-destructive">
+                Failed to load sessions
+              </div>
+            )}
 
-              {!sessionListLoading && !sessionListError && sessionList.length === 0 && open && (
-                <div className="text-center py-4 text-xs text-muted-foreground">
-                  No sessions yet
-                </div>
-              )}
+            {!sessionListLoading && !sessionListError && sessionList.length === 0 && (
+              <div className="px-3 py-2 text-sm text-muted-foreground">
+                No sessions yet
+              </div>
+            )}
 
-              {!sessionListLoading && !sessionListError && sessionList.length > 0 && open && (
-                <ScrollArea className="mt-2 max-h-72">
-                  <SidebarMenu>
-                    {sessionList.map((session) => {
-                      const isActive = session.id === sessionId;
-                      const relativeTime = formatDistanceToNow(new Date(session.created_at), { 
-                        addSuffix: true 
-                      });
+            {!sessionListLoading && !sessionListError && sessionList.length > 0 && open && (
+              <ScrollArea className="mt-2 max-h-72">
+                <SidebarMenu>
+                  {sessionList.map((session) => {
+                    const isActive = session.id === sessionId;
+                    const relativeTime = formatDistanceToNow(new Date(session.created_at), { 
+                      addSuffix: true 
+                    });
 
-                      return (
-                        <SidebarMenuItem key={session.id}>
-                          <div className="flex items-start gap-1 w-full group">
-                            {/* Main session button */}
-                            <button
-                              type="button"
-                              onClick={() => navigate(`/chat/${session.id}`)}
-                              className={cn(
-                                "flex-1 flex items-start gap-2 rounded-md px-3 py-2.5 text-left text-sm transition-colors min-w-0",
-                                "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring",
-                                isActive && "bg-accent/80 text-accent-foreground font-medium border border-border"
-                              )}
-                            >
-                              <MessageSquare className="mt-0.5 h-4 w-4 shrink-0" />
-                              {open && (
-                                <div className="flex flex-col gap-0.5 min-w-0">
-                                  <span className="truncate">{getSessionTitle(session)}</span>
-                                  <span className="text-xs text-muted-foreground">{relativeTime}</span>
-                                </div>
-                              )}
-                            </button>
+                    return (
+                      <SidebarMenuItem key={session.id}>
+                        <div className="flex items-start gap-1 w-full group">
+                          {/* Main session button */}
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/chat/${session.id}`)}
+                            className={cn(
+                              "flex-1 flex items-start gap-2 rounded-md px-3 py-2.5 text-left text-sm transition-colors min-w-0",
+                              "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring",
+                              isActive && "bg-accent/80 text-accent-foreground font-medium border border-border"
+                            )}
+                          >
+                            <MessageSquare className="mt-0.5 h-4 w-4 shrink-0" />
+                            {open && (
+                              <div className="flex flex-col gap-0.5 min-w-0">
+                                <span className="truncate font-medium">{getSessionTitle(session)}</span>
+                                <span className="text-xs text-muted-foreground">{relativeTime}</span>
+                              </div>
+                            )}
+                          </button>
 
                             {/* Dropdown menu for actions (visible on hover or when active) */}
                             {open && (
@@ -288,17 +291,16 @@ export function AppSidebar() {
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
-                            )}
-                          </div>
-                        </SidebarMenuItem>
-                      );
-                    })}
-                  </SidebarMenu>
-                </ScrollArea>
-              )}
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+                          )}
+                        </div>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </ScrollArea>
+            )}
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       {/* Rename Dialog */}
