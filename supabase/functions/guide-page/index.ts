@@ -28,10 +28,24 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Parse query params
-    const url = new URL(req.url);
-    const id = url.searchParams.get('id');
-    const slug = url.searchParams.get('slug');
+    // Try to read from JSON body first (for functions.invoke calls)
+    let id: string | null = null;
+    let slug: string | null = null;
+    
+    try {
+      const body = await req.json();
+      id = body.id || null;
+      slug = body.slug || null;
+    } catch {
+      // If JSON parsing fails, fall back to query params
+    }
+    
+    // Fallback to query params if not in body
+    if (!id && !slug) {
+      const url = new URL(req.url);
+      id = url.searchParams.get('id');
+      slug = url.searchParams.get('slug');
+    }
 
     if (!id && !slug) {
       return new Response(
