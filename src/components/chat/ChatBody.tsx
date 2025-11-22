@@ -93,29 +93,28 @@ export const ChatBody = ({
 
   return (
     <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6">
         {/* Render messages */}
-        <div className="space-y-4">
-          {messages.map((message) => (
+        <div className="space-y-0">
+          {messages.map((msg) => (
             <ChatMessage
-              key={message.id}
-              role={message.role}
-              content={message.content}
-              createdAt={message.created_at}
+              key={msg.id}
+              message={msg}
             />
           ))}
         </div>
 
         {/* Show assistant loading state */}
         {isAssistantLoading && (
-          <div className="flex items-start gap-3 mt-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-sm">🤖</span>
-            </div>
-            <div className="flex-1 bg-muted/50 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Assistant is thinking...</p>
+          <div className="w-full bg-muted/60 border-b border-border/50 px-4 py-3 sm:px-6 mb-0 -mx-4 sm:-mx-6">
+            <div className="max-w-3xl mx-auto">
+              <div className="flex gap-3">
+                <div className="mt-1 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                </div>
+                <div className="flex-1 text-sm text-muted-foreground">
+                  Generating response...
+                </div>
               </div>
             </div>
           </div>
@@ -123,32 +122,31 @@ export const ChatBody = ({
 
         {/* Show assistant error state */}
         {!isAssistantLoading && assistantError && (
-          <div className="flex items-start gap-3 mt-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-sm">🤖</span>
-            </div>
-            <div className="flex-1 bg-destructive/10 rounded-lg p-4 space-y-3">
-              <div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium text-destructive">
-                    Failed to generate a response.
-                  </p>
-                  <p className="text-xs text-destructive/80 break-words">
-                    {assistantError}
-                  </p>
+          <div className="w-full bg-destructive/10 border-b border-destructive/20 px-4 py-3 sm:px-6 mb-0 -mx-4 sm:-mx-6">
+            <div className="max-w-3xl mx-auto">
+              <div className="flex gap-3">
+                <div className="mt-1 h-7 w-7 rounded-full bg-destructive/10 flex items-center justify-center text-xs font-medium shrink-0 text-destructive">
+                  !
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-destructive">Failed to generate a response.</p>
+                  {assistantError && (
+                    <p className="text-xs text-destructive/80 mt-1">
+                      {assistantError.length > 100 ? `${assistantError.slice(0, 100)}...` : assistantError}
+                    </p>
+                  )}
+                  {onRetryAssistant && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={onRetryAssistant}
+                      className="mt-2"
+                    >
+                      Retry
+                    </Button>
+                  )}
                 </div>
               </div>
-              {onRetryAssistant && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onRetryAssistant}
-                  className="w-full sm:w-auto"
-                >
-                  Retry
-                </Button>
-              )}
             </div>
           </div>
         )}
