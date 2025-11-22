@@ -206,32 +206,54 @@ serve(async (req) => {
     // 9. INTERPOLATE VARIABLES
     // ========================================
     const finalPrompt = interpolateVariables(prompt, variables);
+    const systemContent = finalPrompt.trim();
+    const chatMessage = (variables.chat_message || '').trim();
+    const conversationInput = Array.isArray(conversation) ? conversation : [];
 
     // ========================================
     // 10. BUILD NORMALIZED MESSAGES WITH CONVERSATION HISTORY
     // ========================================
-    // Start with system message containing the interpolated prompt template
-    const messages = [
-      {
-        role: 'system',
-        content: finalPrompt,
-      },
-    ];
+    const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [];
 
-    // Add conversation history (prior user/assistant messages)
-    for (const msg of conversation) {
+    // 1) System message only if there is content
+    if (systemContent.length > 0) {
       messages.push({
-        role: msg.role,
-        content: msg.content,
+        role: 'system',
+        content: systemContent,
       });
     }
 
-    // Add current user message (if not empty, e.g., for auto-start)
-    if (variables.chat_message && String(variables.chat_message).trim() !== '') {
+    // 2) Valid conversation history
+    for (const msg of conversationInput) {
+      if (!msg || typeof msg.content !== 'string') continue;
+      if (msg.role !== 'user' && msg.role !== 'assistant') continue;
+
+      const content = msg.content.trim();
+      if (content.length === 0) continue;
+
+      messages.push({
+        role: msg.role,
+        content,
+      });
+    }
+
+    // 3) Current user message (normal turns only)
+    if (chatMessage.length > 0) {
       messages.push({
         role: 'user',
-        content: String(variables.chat_message),
+        content: chatMessage,
       });
+    }
+
+    // 4) Guard: never call provider with zero usable messages
+    if (messages.length === 0) {
+      return jsonResponse(
+        createError(
+          ErrorCodes.INVALID_REQUEST,
+          'No content to send to the model. Both the prompt template and user message resulted in empty content after processing.'
+        ),
+        400
+      );
     }
 
     const maxTokens = Math.min(model.max_tokens || 2048, 2048);
