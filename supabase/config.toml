@@ -6,3 +6,6 @@ verify_jwt = true
 
 [functions.sessions-add-message]
 verify_jwt = true
+
+[functions.storage-clear]
+verify_jwt = true
