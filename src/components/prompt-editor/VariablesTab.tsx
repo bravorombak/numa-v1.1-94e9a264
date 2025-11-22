@@ -180,6 +180,9 @@ export const VariablesTab = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <p className="text-sm text-muted-foreground">
+                Choose what kind of answer users will give.
+              </p>
             </div>
 
             {/* Label */}
@@ -191,6 +194,9 @@ export const VariablesTab = () => {
                 onChange={(e) => handleVariableChange(index, { label: e.target.value })}
                 placeholder="Label to show in forms"
               />
+              <p className="text-sm text-muted-foreground">
+                This is the title/name of the variable.
+              </p>
             </div>
 
             {/* Placeholder */}
@@ -200,20 +206,26 @@ export const VariablesTab = () => {
                 id={`placeholder-${index}`}
                 value={variable.placeholder || ''}
                 onChange={(e) => handleVariableChange(index, { placeholder: e.target.value })}
-                placeholder="Optional placeholder text"
+                placeholder="Example: Red, Blue, Green"
               />
+              <p className="text-sm text-muted-foreground">
+                Gray example text inside the box to guide users.
+              </p>
             </div>
 
             {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor={`description-${index}`}>Description</Label>
+              <Label htmlFor={`description-${index}`}>Hint</Label>
               <Textarea
                 id={`description-${index}`}
                 value={variable.description || ''}
                 onChange={(e) => handleVariableChange(index, { description: e.target.value })}
-                placeholder="Optional helper text for users"
+                placeholder="Write a short note to help users"
                 className="min-h-[80px]"
               />
+              <p className="text-sm text-muted-foreground">
+                Short note under the field that helps users know what to write.
+              </p>
             </div>
 
             {/* Required */}
@@ -243,6 +255,9 @@ export const VariablesTab = () => {
                   onBlur={(e) => handleOptionsBlur(index, variable.name, e.target.value)}
                   placeholder="Blog, Landing page, Ad copy"
                 />
+                <p className="text-sm text-muted-foreground">
+                  Write choices with commas. Example: Red, Blue, Green.
+                </p>
               </div>
             )}
           </CardContent>
