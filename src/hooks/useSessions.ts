@@ -95,6 +95,19 @@ export interface SessionListItem {
   title: string | null;
 }
 
+export interface SessionListItemWithPrompt {
+  id: string;
+  created_at: string;
+  prompt_version_id: string | null;
+  title: string | null;
+  prompt_versions: {
+    title: string | null;
+    prompt_drafts: {
+      title: string | null;
+    } | null;
+  } | null;
+}
+
 export const useSessionList = (promptVersionId?: string | null) => {
   return useQuery<SessionListItem[]>({
     queryKey: ['sessions', 'byPromptVersion', promptVersionId],
@@ -112,6 +125,33 @@ export const useSessionList = (promptVersionId?: string | null) => {
       return (data as SessionListItem[]) || [];
     },
     enabled: !!promptVersionId,
+  });
+};
+
+export const useAllUserSessions = () => {
+  return useQuery<SessionListItemWithPrompt[]>({
+    queryKey: ['sessions', 'all'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select(`
+          id,
+          created_at,
+          prompt_version_id,
+          title,
+          prompt_versions (
+            title,
+            prompt_drafts (
+              title
+            )
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      return (data as SessionListItemWithPrompt[]) || [];
+    },
   });
 };
 
@@ -140,7 +180,7 @@ export const useRenameSession = () => {
         queryKey: ["session", sessionId],
       });
       queryClient.invalidateQueries({
-        queryKey: ["sessions", "byPromptVersion"],
+        queryKey: ["sessions"],
         exact: false,
       });
 
@@ -184,9 +224,9 @@ export const useDeleteSession = () => {
         queryKey: ["session", sessionId],
       });
 
-      // Invalidate all session lists (any prompt version)
+      // Invalidate all session lists
       queryClient.invalidateQueries({
-        queryKey: ["sessions", "byPromptVersion"],
+        queryKey: ["sessions"],
         exact: false,
       });
 
