@@ -44,7 +44,7 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
   // Assistant: Full-width layout with background strip
   if (isAssistant) {
     return (
-      <div className="w-full bg-background border-b border-border/50 px-4 py-3 sm:px-6 mb-0 group">
+      <div className="w-full bg-background px-4 py-6 sm:px-6 mb-0 group">
         <div className="max-w-3xl mx-auto">
           <div className="flex gap-3">
             {/* Avatar */}
