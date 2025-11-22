@@ -53,7 +53,7 @@ export const ChatBody = ({
 
   if (isLoading) {
     return (
-      <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto bg-background">
         <div className="flex items-center justify-center h-full">
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -66,7 +66,7 @@ export const ChatBody = ({
 
   if (error) {
     return (
-      <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto bg-background">
         <div className="flex items-center justify-center h-full p-4">
           <Alert variant="destructive" className="max-w-md">
             <AlertCircle className="h-4 w-4" />
@@ -81,7 +81,7 @@ export const ChatBody = ({
 
   if (messages.length === 0 && !isAssistantLoading) {
     return (
-      <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto bg-background">
         <div className="flex items-center justify-center h-full">
           <p className="text-sm text-muted-foreground">
             No messages yet. Start the conversation below.
@@ -92,8 +92,8 @@ export const ChatBody = ({
   }
 
   return (
-    <div ref={scrollRef} className="flex-1 overflow-auto bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6">
+    <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto bg-background">
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6">
         {/* Render messages */}
         <div className="space-y-0">
           {messages.map((msg) => (
@@ -106,7 +106,7 @@ export const ChatBody = ({
 
         {/* Show assistant loading state */}
         {isAssistantLoading && (
-          <div className="w-full bg-background border-b border-border/50 px-4 py-3 sm:px-6 mb-0 -mx-4 sm:-mx-6">
+          <div className="w-full bg-background px-4 py-6 sm:px-6 mb-0 -mx-4 sm:-mx-6">
             <div className="max-w-3xl mx-auto">
               <div className="flex gap-3">
                 <div className="mt-1 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
@@ -122,7 +122,7 @@ export const ChatBody = ({
 
         {/* Show assistant error state */}
         {!isAssistantLoading && assistantError && (
-          <div className="w-full bg-destructive/10 border-b border-destructive/20 px-4 py-3 sm:px-6 mb-0 -mx-4 sm:-mx-6">
+          <div className="w-full bg-destructive/10 px-4 py-6 sm:px-6 mb-0 -mx-4 sm:-mx-6">
             <div className="max-w-3xl mx-auto">
               <div className="flex gap-3">
                 <div className="mt-1 h-7 w-7 rounded-full bg-destructive/10 flex items-center justify-center text-xs font-medium shrink-0 text-destructive">

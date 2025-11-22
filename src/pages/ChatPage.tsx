@@ -93,69 +93,71 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
-      <ChatHeader
-        promptTitle={session.prompt_versions?.title}
-        promptEmoji={session.prompt_versions?.emoji}
-        promptImageUrl={session.prompt_versions?.image_url}
-        modelName={
-          session.models?.name || 
-          (session.model_id ? "Model not found" : "No model configured")
-        }
-        versionNumber={session.prompt_versions?.version_number}
-        createdAt={session.created_at}
-      />
-      
-      {/* Warning banner for missing model */}
-      {!session.model_id && (
-        <Alert variant="destructive" className="mx-4 mt-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>No AI model configured</AlertTitle>
-          <AlertDescription>
-            This session was created without an AI model. Please go back to the prompt editor, select a model in the Model tab, and run the prompt again.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <ChatBody 
-        sessionId={sessionId || ""} 
-        messages={messages}
-        isLoading={messagesLoading}
-        error={messagesError}
-        isAssistantLoading={isAssistantLoading}
-        assistantError={assistantError}
-        onRetryAssistant={canRetryAssistant ? handleRetryAssistant : undefined}
-      />
-      <ChatComposer 
-        disabled={isBusy || !session.model_id}
-        onSend={async (message) => {
-          if (!sessionId || !session || !session.model_id) return;
-          
-          // Step 1: Save the user's message
-          await addMessage.mutateAsync({
-            sessionId,
-            content: message,
-          });
-          
-          // Step 2: Track last user message for retry
-          setLastUserMessage(message);
-          setAssistantError(null);
-          
-          // Step 3: Trigger assistant generation with conversation history
-          try {
-            await generateAssistant.mutateAsync({
-              session,
-              userMessage: message,
-              conversationHistory: messages,
-            });
-          } catch (error) {
-            console.error('[ChatPage] Assistant generation error:', error);
-            setAssistantError(
-              error instanceof Error ? error.message : "Failed to generate response"
-            );
+    <div className="flex flex-col h-full min-h-0">
+      <div className="flex flex-col flex-1 min-h-0 rounded-lg border bg-background overflow-hidden">
+        <ChatHeader
+          promptTitle={session.prompt_versions?.title}
+          promptEmoji={session.prompt_versions?.emoji}
+          promptImageUrl={session.prompt_versions?.image_url}
+          modelName={
+            session.models?.name || 
+            (session.model_id ? "Model not found" : "No model configured")
           }
-        }}
-      />
+          versionNumber={session.prompt_versions?.version_number}
+          createdAt={session.created_at}
+        />
+        
+        {/* Warning banner for missing model */}
+        {!session.model_id && (
+          <Alert variant="destructive" className="mx-4 mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>No AI model configured</AlertTitle>
+            <AlertDescription>
+              This session was created without an AI model. Please go back to the prompt editor, select a model in the Model tab, and run the prompt again.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <ChatBody 
+          sessionId={sessionId || ""} 
+          messages={messages}
+          isLoading={messagesLoading}
+          error={messagesError}
+          isAssistantLoading={isAssistantLoading}
+          assistantError={assistantError}
+          onRetryAssistant={canRetryAssistant ? handleRetryAssistant : undefined}
+        />
+        <ChatComposer 
+          disabled={isBusy || !session.model_id}
+          onSend={async (message) => {
+            if (!sessionId || !session || !session.model_id) return;
+            
+            // Step 1: Save the user's message
+            await addMessage.mutateAsync({
+              sessionId,
+              content: message,
+            });
+            
+            // Step 2: Track last user message for retry
+            setLastUserMessage(message);
+            setAssistantError(null);
+            
+            // Step 3: Trigger assistant generation with conversation history
+            try {
+              await generateAssistant.mutateAsync({
+                session,
+                userMessage: message,
+                conversationHistory: messages,
+              });
+            } catch (error) {
+              console.error('[ChatPage] Assistant generation error:', error);
+              setAssistantError(
+                error instanceof Error ? error.message : "Failed to generate response"
+              );
+            }
+          }}
+        />
+      </div>
     </div>
   );
 };
