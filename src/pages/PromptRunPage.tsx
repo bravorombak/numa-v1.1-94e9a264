@@ -41,7 +41,7 @@ const PromptRunPage = () => {
   const modelName = models?.find(m => m.id === promptVersion.model_id)?.name;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="mx-auto max-w-3xl space-y-8 p-6">
       {/* Back Button */}
       <Button
         variant="ghost"

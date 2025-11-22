@@ -1,6 +1,6 @@
 const StoragePage = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="text-center">
         <h1 className="text-2xl font-medium text-foreground">
           Numa – Storage Page (placeholder)
