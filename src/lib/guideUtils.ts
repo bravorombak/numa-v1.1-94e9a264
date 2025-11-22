@@ -32,7 +32,11 @@ export function buildTreeFromFlat(pages: GuideTreeItem[]): GuideTreeItem[] {
 
   // Sort children by sort_order at each level
   const sortChildren = (items: GuideTreeItem[]) => {
-    items.sort((a, b) => a.sort_order - b.sort_order);
+    items.sort((a, b) => {
+      const aOrder = a.sort_order ?? 0;
+      const bOrder = b.sort_order ?? 0;
+      return aOrder - bOrder;
+    });
     items.forEach(item => {
       if (item.children && item.children.length > 0) {
         sortChildren(item.children);
