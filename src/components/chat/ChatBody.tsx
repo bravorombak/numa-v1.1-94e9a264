@@ -106,7 +106,7 @@ export const ChatBody = ({
 
         {/* Show assistant loading state */}
         {isAssistantLoading && (
-          <div className="w-full bg-muted/60 border-b border-border/50 px-4 py-3 sm:px-6 mb-0 -mx-4 sm:-mx-6">
+          <div className="w-full bg-background border-b border-border/50 px-4 py-3 sm:px-6 mb-0 -mx-4 sm:-mx-6">
             <div className="max-w-3xl mx-auto">
               <div className="flex gap-3">
                 <div className="mt-1 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
