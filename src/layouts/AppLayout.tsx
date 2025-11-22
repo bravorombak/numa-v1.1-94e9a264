@@ -8,7 +8,7 @@ export const AppLayout = () => {
     <SidebarProvider>
       <div className="flex h-screen w-full min-h-0">
         <AppSidebar />
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col min-h-0">
           <AppHeader />
           <main className="flex-1 p-6 min-h-0 overflow-hidden">
             <Outlet />
