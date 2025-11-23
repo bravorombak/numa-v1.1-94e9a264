@@ -164,13 +164,6 @@ serve(async (req) => {
       );
     }
 
-    // ========================================
-    // 7. OPTIONALLY MARK IN PROFILES (for UI display)
-    // ========================================
-    // Note: Supabase auth.users table doesn't have a deleted_at column we can set directly,
-    // but we track ban status through the admin API. If you want an additional soft-delete marker:
-    // await serviceSupabase.from('profiles').update({ deleted_at: new Date().toISOString() }).eq('id', targetUserId);
-
     console.log(`[admin-team-deactivate] User deactivated: ${targetUserId}`);
 
     return jsonResponse({
