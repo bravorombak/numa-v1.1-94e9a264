@@ -12,6 +12,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
 import { createError, getStatusForErrorCode, ErrorCodes } from '../_shared/errors.ts';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { resolveUserRole } from '../_shared/auth.ts';
 
 interface CreateRequest {
   email: string;
@@ -62,20 +63,13 @@ serve(async (req) => {
     // ========================================
     // 2. CHECK REQUESTER ROLE (use user_roles)
     // ========================================
-    const { data: userRoles, error: roleError } = await serviceSupabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { requesterRole, allRoles } = await resolveUserRole(user.id, serviceSupabase);
 
-    if (roleError || !userRoles || userRoles.length === 0) {
-      console.error('[admin-team-create] Role fetch error:', roleError);
-      return jsonResponse(
-        createError(ErrorCodes.FORBIDDEN, 'Unable to verify user role'),
-        403
-      );
-    }
-
-    const requesterRole = userRoles[0].role;
+    console.log('[admin-team-create] Role check:', {
+      userId: user.id,
+      allRoles,
+      resolvedRole: requesterRole,
+    });
 
     // Only admin and editor can create users
     if (requesterRole === 'user') {
