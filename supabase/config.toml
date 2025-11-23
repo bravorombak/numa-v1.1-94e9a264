@@ -27,3 +27,15 @@ verify_jwt = true
 
 [functions.guide-page]
 verify_jwt = true
+
+[functions.admin-team-list]
+verify_jwt = true
+
+[functions.admin-team-create]
+verify_jwt = true
+
+[functions.admin-team-update]
+verify_jwt = true
+
+[functions.admin-team-deactivate]
+verify_jwt = true
