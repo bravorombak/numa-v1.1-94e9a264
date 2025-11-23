@@ -171,7 +171,7 @@ export const useCreateTeamMember = () => {
         throw teamError;
       }
 
-      return data.user as TeamMember;
+      return data as TeamMember;
     },
     onSuccess: () => {
       // Invalidate all team member queries
@@ -216,7 +216,7 @@ export const useUpdateTeamMember = () => {
         throw teamError;
       }
 
-      return data.user as TeamMember;
+      return data as TeamMember;
     },
     onSuccess: () => {
       // Invalidate all team member queries
@@ -249,7 +249,7 @@ export const useUpdateTeamMember = () => {
 export const useDeactivateTeamMember = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<{ message: string }, TeamError, DeactivateTeamMemberPayload>({
+  return useMutation<{ message: string; user_id: string }, TeamError, DeactivateTeamMemberPayload>({
     mutationFn: async (payload) => {
       const { data, error } = await supabase.functions.invoke('admin-team-deactivate', {
         body: payload,
@@ -261,7 +261,7 @@ export const useDeactivateTeamMember = () => {
         throw teamError;
       }
 
-      return data as { message: string };
+      return data as { message: string; user_id: string };
     },
     onSuccess: () => {
       // Invalidate all team member queries
