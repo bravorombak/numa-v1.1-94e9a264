@@ -39,3 +39,6 @@ verify_jwt = true
 
 [functions.admin-team-deactivate]
 verify_jwt = true
+
+[functions.admin-team-reactivate]
+verify_jwt = true

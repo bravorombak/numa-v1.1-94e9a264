@@ -7,9 +7,10 @@ interface TeamMemberTableProps {
   currentRole: AppRole;
   onEdit: (member: TeamMember) => void;
   onDeactivate: (member: TeamMember) => void;
+  onReactivate: (member: TeamMember) => void;
 }
 
-export function TeamMemberTable({ members, currentRole, onEdit, onDeactivate }: TeamMemberTableProps) {
+export function TeamMemberTable({ members, currentRole, onEdit, onDeactivate, onReactivate }: TeamMemberTableProps) {
   return (
     <div className="rounded-lg border">
       <Table>
@@ -30,6 +31,7 @@ export function TeamMemberTable({ members, currentRole, onEdit, onDeactivate }: 
               currentRole={currentRole}
               onEdit={onEdit}
               onDeactivate={onDeactivate}
+              onReactivate={onReactivate}
             />
           ))}
         </TableBody>

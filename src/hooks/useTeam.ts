@@ -53,6 +53,10 @@ export interface DeactivateTeamMemberPayload {
   user_id: string;
 }
 
+export interface ReactivateTeamMemberPayload {
+  user_id: string;
+}
+
 export interface TeamError {
   code: string;
   message: string;
@@ -250,37 +254,78 @@ export const useUpdateTeamMember = () => {
 export const useDeactivateTeamMember = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<{ message: string; user_id: string }, TeamError, DeactivateTeamMemberPayload>({
+  return useMutation<
+    { message: string; user_id: string },
+    TeamError,
+    DeactivateTeamMemberPayload
+  >({
     mutationFn: async (payload) => {
       const { data, error } = await supabase.functions.invoke('admin-team-deactivate', {
         body: payload,
       });
 
-      // Parse and throw error if present
       const teamError = parseTeamError(error, data);
-      if (error || data?.code) {
+      if (error || (data as any)?.code) {
         throw teamError;
       }
 
       return data as { message: string; user_id: string };
     },
     onSuccess: () => {
-      // Invalidate all team member queries
       queryClient.invalidateQueries({
         queryKey: ['team', 'members'],
         exact: false,
       });
 
-      // Show success toast
       toast({
         title: 'Team member deactivated',
         description: 'The team member has been deactivated successfully.',
       });
     },
     onError: (error) => {
-      // Show error toast with user-friendly message
       toast({
         title: 'Failed to deactivate team member',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+export const useReactivateTeamMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { message: string; user_id: string },
+    TeamError,
+    ReactivateTeamMemberPayload
+  >({
+    mutationFn: async (payload) => {
+      const { data, error } = await supabase.functions.invoke('admin-team-reactivate', {
+        body: payload,
+      });
+
+      const teamError = parseTeamError(error, data);
+      if (error || (data as any)?.code) {
+        throw teamError;
+      }
+
+      return data as { message: string; user_id: string };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['team', 'members'],
+        exact: false,
+      });
+
+      toast({
+        title: 'Team member reactivated',
+        description: 'The team member has been reactivated successfully.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Failed to reactivate team member',
         description: getErrorMessage(error),
         variant: 'destructive',
       });
