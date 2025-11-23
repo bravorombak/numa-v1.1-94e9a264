@@ -73,7 +73,21 @@ serve(async (req) => {
       );
     }
 
-    const requesterRole = userRoles[0].role;
+    // Determine highest role (priority: admin > editor > user)
+    const hasAdmin = userRoles.some(r => r.role === 'admin');
+    const hasEditor = userRoles.some(r => r.role === 'editor');
+
+    const requesterRole = hasAdmin
+      ? 'admin'
+      : hasEditor
+      ? 'editor'
+      : 'user';
+
+    console.log('[admin-team-list] Role check:', {
+      userId: user.id,
+      allRoles: userRoles.map(r => r.role),
+      resolvedRole: requesterRole,
+    });
 
     // Only admin and editor can access team list
     if (requesterRole === 'user') {
