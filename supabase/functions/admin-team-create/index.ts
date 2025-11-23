@@ -144,19 +144,31 @@ serve(async (req) => {
     // ========================================
     // 5. INSERT INTO user_roles (authoritative)
     // ========================================
+    // Note: The handle_new_user trigger automatically creates a 'user' role.
+    // We use upsert to handle this gracefully.
     const { error: roleInsertError } = await serviceSupabase
       .from('user_roles')
-      .insert({
-        user_id: userId,
-        role: role,
-      });
+      .upsert(
+        {
+          user_id: userId,
+          role: role,
+        },
+        {
+          onConflict: 'user_id,role',
+          ignoreDuplicates: true,
+        }
+      );
 
     if (roleInsertError) {
-      console.error('[admin-team-create] user_roles insert error:', roleInsertError);
+      console.error('[admin-team-create] user_roles upsert error:', roleInsertError);
       // Cleanup: delete the auth user we just created
       await serviceSupabase.auth.admin.deleteUser(userId);
       return jsonResponse(
-        createError(ErrorCodes.INTERNAL_ERROR, 'Failed to assign role'),
+        createError(
+          ErrorCodes.INTERNAL_ERROR,
+          'Failed to assign role',
+          roleInsertError.message
+        ),
         500
       );
     }
