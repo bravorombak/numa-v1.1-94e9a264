@@ -159,7 +159,7 @@ serve(async (req) => {
     // ========================================
     const { error: banError } = await serviceSupabase.auth.admin.updateUserById(
       targetUserId,
-      { ban_duration: 'none' } // Permanent ban - can be reversed by updating ban_duration
+      { ban_duration: '876600h' } // ~100 years = effective permanent ban; reversible with 'none'
     );
 
     if (banError) {
