@@ -1,0 +1,288 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type AppRole = 'admin' | 'editor' | 'user';
+
+export interface TeamMember {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  role: AppRole;
+  created_at: string | null;
+  last_sign_in_at: string | null;
+  banned: boolean;
+}
+
+export interface TeamListResponse {
+  users: TeamMember[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface TeamListFilters {
+  role?: AppRole | 'all';
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface CreateTeamMemberPayload {
+  email: string;
+  full_name: string;
+  role: AppRole;
+  password?: string;
+}
+
+export interface UpdateTeamMemberPayload {
+  user_id: string;
+  updates: {
+    full_name?: string;
+    role?: AppRole;
+    avatar_url?: string;
+  };
+}
+
+export interface DeactivateTeamMemberPayload {
+  user_id: string;
+}
+
+export interface TeamError {
+  code: string;
+  message: string;
+  details?: any;
+  requestId?: string;
+}
+
+// ============================================================================
+// Query Key Factory
+// ============================================================================
+
+const teamQueryKeys = {
+  all: ['team'] as const,
+  members: (filters?: TeamListFilters) => ['team', 'members', filters] as const,
+};
+
+// ============================================================================
+// Error Handling Helpers
+// ============================================================================
+
+function parseTeamError(error: any, data: any): TeamError {
+  // Check for Supabase network error first
+  if (error) {
+    return {
+      code: 'NETWORK_ERROR',
+      message: error.message || 'Failed to connect to team management service',
+      details: null,
+      requestId: crypto.randomUUID(),
+    };
+  }
+
+  // Check if data contains error envelope from backend
+  if (data?.code && data?.message) {
+    return data as TeamError;
+  }
+
+  // Fallback for unexpected errors
+  return {
+    code: 'UNKNOWN_ERROR',
+    message: 'An unexpected error occurred',
+    details: null,
+    requestId: crypto.randomUUID(),
+  };
+}
+
+function getErrorMessage(error: TeamError): string {
+  // Map known error codes to user-friendly messages
+  switch (error.code) {
+    case 'NETWORK_ERROR':
+      return 'Failed to connect to the server. Please check your connection.';
+    case 'UNAUTHORIZED':
+      return 'You are not logged in. Please sign in and try again.';
+    case 'FORBIDDEN':
+      return 'You do not have permission to perform this action.';
+    case 'USER_ALREADY_EXISTS':
+      return 'A user with this email already exists.';
+    case 'INVALID_ROLE':
+      return 'Invalid role specified. Must be admin, editor, or user.';
+    case 'CANNOT_MODIFY_SELF':
+      return 'You cannot modify your own account through team management.';
+    case 'CANNOT_DELETE_SOLE_ADMIN':
+      return 'Cannot remove the last admin. At least one admin must remain.';
+    case 'USER_NOT_FOUND':
+      return 'User not found. They may have been removed.';
+    case 'INTERNAL_ERROR':
+      return error.message || 'An internal error occurred. Please try again.';
+    default:
+      return error.message || 'An error occurred. Please try again.';
+  }
+}
+
+// ============================================================================
+// Query Hook: useTeamMembers
+// ============================================================================
+
+export const useTeamMembers = (filters?: TeamListFilters) => {
+  return useQuery<TeamListResponse, TeamError>({
+    queryKey: teamQueryKeys.members(filters),
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('admin-team-list', {
+        body: {
+          role: filters?.role === 'all' ? undefined : filters?.role,
+          search: filters?.search ?? undefined,
+          page: filters?.page ?? 1,
+          limit: filters?.limit ?? 20,
+        },
+      });
+
+      // Parse and throw error if present
+      const teamError = parseTeamError(error, data);
+      if (error || data?.code) {
+        throw teamError;
+      }
+
+      return data as TeamListResponse;
+    },
+  });
+};
+
+// ============================================================================
+// Mutation Hook: useCreateTeamMember
+// ============================================================================
+
+export const useCreateTeamMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<TeamMember, TeamError, CreateTeamMemberPayload>({
+    mutationFn: async (payload) => {
+      const { data, error } = await supabase.functions.invoke('admin-team-create', {
+        body: payload,
+      });
+
+      // Parse and throw error if present
+      const teamError = parseTeamError(error, data);
+      if (error || data?.code) {
+        throw teamError;
+      }
+
+      return data.user as TeamMember;
+    },
+    onSuccess: () => {
+      // Invalidate all team member queries
+      queryClient.invalidateQueries({
+        queryKey: ['team', 'members'],
+        exact: false,
+      });
+
+      // Show success toast
+      toast({
+        title: 'Team member created',
+        description: 'The new team member has been added successfully.',
+      });
+    },
+    onError: (error) => {
+      // Show error toast with user-friendly message
+      toast({
+        title: 'Failed to create team member',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+// ============================================================================
+// Mutation Hook: useUpdateTeamMember
+// ============================================================================
+
+export const useUpdateTeamMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<TeamMember, TeamError, UpdateTeamMemberPayload>({
+    mutationFn: async (payload) => {
+      const { data, error } = await supabase.functions.invoke('admin-team-update', {
+        body: payload,
+      });
+
+      // Parse and throw error if present
+      const teamError = parseTeamError(error, data);
+      if (error || data?.code) {
+        throw teamError;
+      }
+
+      return data.user as TeamMember;
+    },
+    onSuccess: () => {
+      // Invalidate all team member queries
+      queryClient.invalidateQueries({
+        queryKey: ['team', 'members'],
+        exact: false,
+      });
+
+      // Show success toast
+      toast({
+        title: 'Team member updated',
+        description: 'The team member has been updated successfully.',
+      });
+    },
+    onError: (error) => {
+      // Show error toast with user-friendly message
+      toast({
+        title: 'Failed to update team member',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+// ============================================================================
+// Mutation Hook: useDeactivateTeamMember
+// ============================================================================
+
+export const useDeactivateTeamMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ message: string }, TeamError, DeactivateTeamMemberPayload>({
+    mutationFn: async (payload) => {
+      const { data, error } = await supabase.functions.invoke('admin-team-deactivate', {
+        body: payload,
+      });
+
+      // Parse and throw error if present
+      const teamError = parseTeamError(error, data);
+      if (error || data?.code) {
+        throw teamError;
+      }
+
+      return data as { message: string };
+    },
+    onSuccess: () => {
+      // Invalidate all team member queries
+      queryClient.invalidateQueries({
+        queryKey: ['team', 'members'],
+        exact: false,
+      });
+
+      // Show success toast
+      toast({
+        title: 'Team member deactivated',
+        description: 'The team member has been deactivated successfully.',
+      });
+    },
+    onError: (error) => {
+      // Show error toast with user-friendly message
+      toast({
+        title: 'Failed to deactivate team member',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    },
+  });
+};
