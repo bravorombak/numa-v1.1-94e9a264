@@ -1,4 +1,4 @@
-import { Edit2, MoreVertical, UserX } from 'lucide-react';
+import { Edit2, MoreVertical, UserX, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,9 +24,10 @@ interface TeamMemberRowProps {
   currentRole: AppRole;
   onEdit: (member: TeamMember) => void;
   onDeactivate: (member: TeamMember) => void;
+  onReactivate: (member: TeamMember) => void;
 }
 
-export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate }: TeamMemberRowProps) {
+export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate, onReactivate }: TeamMemberRowProps) {
   const canManage =
     currentRole === 'admin' ||
     (currentRole === 'editor' && member.role === 'user');
@@ -108,14 +109,20 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate }: Tea
                     <Edit2 className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onDeactivate(member)}
-                    disabled={member.banned}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <UserX className="h-4 w-4 mr-2" />
-                    Deactivate
-                  </DropdownMenuItem>
+                  {!member.banned ? (
+                    <DropdownMenuItem
+                      onClick={() => onDeactivate(member)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <UserX className="h-4 w-4 mr-2" />
+                      Deactivate
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem onClick={() => onReactivate(member)}>
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Reactivate
+                    </DropdownMenuItem>
+                  )}
                 </>
               ) : (
                 <Tooltip>
@@ -125,10 +132,17 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate }: Tea
                         <Edit2 className="h-4 w-4 mr-2" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="text-destructive">
-                        <UserX className="h-4 w-4 mr-2" />
-                        Deactivate
-                      </DropdownMenuItem>
+                      {!member.banned ? (
+                        <DropdownMenuItem disabled className="text-destructive">
+                          <UserX className="h-4 w-4 mr-2" />
+                          Deactivate
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem disabled>
+                          <UserCheck className="h-4 w-4 mr-2" />
+                          Reactivate
+                        </DropdownMenuItem>
+                      )}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>

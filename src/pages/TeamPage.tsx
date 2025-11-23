@@ -10,6 +10,7 @@ import { TeamMemberTable } from '@/components/team/TeamMemberTable';
 import { AddMemberDialog } from '@/components/team/AddMemberDialog';
 import { EditMemberDialog } from '@/components/team/EditMemberDialog';
 import { DeactivateMemberDialog } from '@/components/team/DeactivateMemberDialog';
+import { ReactivateMemberDialog } from '@/components/team/ReactivateMemberDialog';
 import { AlertCircle } from 'lucide-react';
 
 const TeamPage = () => {
@@ -30,6 +31,7 @@ const TeamPage = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const [reactivateOpen, setReactivateOpen] = useState(false);
 
   const { data, isLoading, isError } = useTeamMembers(filters, canAccessTeam);
 
@@ -41,6 +43,11 @@ const TeamPage = () => {
   const handleDeactivate = (member: TeamMember) => {
     setSelectedMember(member);
     setDeactivateOpen(true);
+  };
+
+  const handleReactivate = (member: TeamMember) => {
+    setSelectedMember(member);
+    setReactivateOpen(true);
   };
 
   // Access denied state
@@ -119,6 +126,7 @@ const TeamPage = () => {
           currentRole={role!}
           onEdit={handleEdit}
           onDeactivate={handleDeactivate}
+          onReactivate={handleReactivate}
         />
       )}
 
@@ -137,6 +145,11 @@ const TeamPage = () => {
       <DeactivateMemberDialog
         open={deactivateOpen}
         onOpenChange={setDeactivateOpen}
+        member={selectedMember}
+      />
+      <ReactivateMemberDialog
+        open={reactivateOpen}
+        onOpenChange={setReactivateOpen}
         member={selectedMember}
       />
     </div>
