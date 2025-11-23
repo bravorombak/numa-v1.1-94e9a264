@@ -128,7 +128,7 @@ function getErrorMessage(error: TeamError): string {
 // Query Hook: useTeamMembers
 // ============================================================================
 
-export const useTeamMembers = (filters?: TeamListFilters) => {
+export const useTeamMembers = (filters?: TeamListFilters, enabled: boolean = true) => {
   return useQuery<TeamListResponse, TeamError>({
     queryKey: teamQueryKeys.members(filters),
     queryFn: async () => {
@@ -149,6 +149,7 @@ export const useTeamMembers = (filters?: TeamListFilters) => {
 
       return data as TeamListResponse;
     },
+    enabled,
   });
 };
 

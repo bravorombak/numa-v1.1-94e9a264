@@ -31,7 +31,7 @@ const TeamPage = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [deactivateOpen, setDeactivateOpen] = useState(false);
 
-  const { data, isLoading, isError } = useTeamMembers(canAccessTeam ? filters : undefined);
+  const { data, isLoading, isError } = useTeamMembers(filters, canAccessTeam);
 
   const handleEdit = (member: TeamMember) => {
     setSelectedMember(member);

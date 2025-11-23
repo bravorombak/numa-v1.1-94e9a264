@@ -31,16 +31,22 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate }: Tea
     currentRole === 'admin' ||
     (currentRole === 'editor' && member.role === 'user');
 
-  const getInitials = (name: string | null, email: string) => {
-    if (name) {
+  const getInitials = (name: string | null, email: string | null) => {
+    if (name && name.trim().length > 0) {
       return name
         .split(' ')
+        .filter(Boolean)
         .map((n) => n[0])
         .join('')
         .toUpperCase()
         .slice(0, 2);
     }
-    return email[0].toUpperCase();
+
+    if (email && email.length > 0) {
+      return email[0].toUpperCase();
+    }
+
+    return '?';
   };
 
   const formatLastSignIn = (date: string | null) => {
