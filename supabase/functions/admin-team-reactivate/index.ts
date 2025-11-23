@@ -2,7 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
 import { createError, ErrorCodes } from '../_shared/errors.ts';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
-import { resolveUserRole } from '../_shared/auth.ts';
+import { resolveUserRole, type AppRole } from '../_shared/auth.ts';
 
 interface ReactivateRequest {
   user_id: string;
@@ -102,7 +102,18 @@ serve(async (req) => {
       );
     }
 
-    const targetRole = targetRoles[0].role;
+    // Resolve target role with priority logic (admin > editor > user)
+    const targetAllRoles = targetRoles.map((r: any) => r.role as AppRole);
+    const hasTargetAdmin = targetAllRoles.includes('admin');
+    const hasTargetEditor = targetAllRoles.includes('editor');
+    const targetRole: AppRole =
+      hasTargetAdmin ? 'admin' : hasTargetEditor ? 'editor' : 'user';
+
+    console.log('[admin-team-reactivate] Target role check:', {
+      targetUserId,
+      allRoles: targetAllRoles,
+      resolvedRole: targetRole,
+    });
 
     // Editor restriction: can only reactivate user accounts
     if (requesterRole === 'editor' && targetRole !== 'user') {
