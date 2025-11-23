@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TeamFilters } from '@/components/team/TeamFilters';
 import { TeamMemberTable } from '@/components/team/TeamMemberTable';
+import { TeamPagination } from '@/components/team/TeamPagination';
 import { AddMemberDialog } from '@/components/team/AddMemberDialog';
 import { EditMemberDialog } from '@/components/team/EditMemberDialog';
 import { DeactivateMemberDialog } from '@/components/team/DeactivateMemberDialog';
@@ -35,6 +36,22 @@ const TeamPage = () => {
   const [reactivateOpen, setReactivateOpen] = useState(false);
 
   const { data, isLoading, isError } = useTeamMembers(filters, canAccessTeam);
+
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / (filters.limit ?? 20))) : 1;
+
+  const goToNextPage = () => {
+    setFilters((prev) => ({
+      ...prev,
+      page: Math.min(prev.page + 1, totalPages),
+    }));
+  };
+
+  const goToPrevPage = () => {
+    setFilters((prev) => ({
+      ...prev,
+      page: Math.max(1, prev.page - 1),
+    }));
+  };
 
   const handleEdit = (member: TeamMember) => {
     setSelectedMember(member);
@@ -122,13 +139,22 @@ const TeamPage = () => {
       )}
 
       {!isLoading && !isError && data && data.users.length > 0 && (
-        <TeamMemberTable
-          members={data.users}
-          currentRole={role!}
-          onEdit={handleEdit}
-          onDeactivate={handleDeactivate}
-          onReactivate={handleReactivate}
-        />
+        <>
+          <TeamMemberTable
+            members={data.users}
+            currentRole={role!}
+            onEdit={handleEdit}
+            onDeactivate={handleDeactivate}
+            onReactivate={handleReactivate}
+          />
+          
+          <TeamPagination
+            page={filters.page}
+            totalPages={totalPages}
+            onPrevious={goToPrevPage}
+            onNext={goToNextPage}
+          />
+        </>
       )}
 
       {/* Dialogs */}
