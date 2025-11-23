@@ -17,6 +17,10 @@ export function TeamFilters({ filters, onChange }: TeamFiltersProps) {
     onChange({ ...filters, role: value as TeamListFilters['role'], page: 1 });
   };
 
+  const handleStatusChange = (value: string) => {
+    onChange({ ...filters, status: value as TeamListFilters['status'], page: 1 });
+  };
+
   return (
     <div className="flex items-center gap-4">
       <div className="relative flex-1 max-w-sm">
@@ -38,6 +42,17 @@ export function TeamFilters({ filters, onChange }: TeamFiltersProps) {
           <SelectItem value="admin">Admin</SelectItem>
           <SelectItem value="editor">Editor</SelectItem>
           <SelectItem value="user">User</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={filters.status ?? 'all'} onValueChange={handleStatusChange}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="All Statuses" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Statuses</SelectItem>
+          <SelectItem value="active">Active</SelectItem>
+          <SelectItem value="deactivated">Deactivated</SelectItem>
         </SelectContent>
       </Select>
     </div>

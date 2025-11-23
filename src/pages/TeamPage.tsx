@@ -25,6 +25,7 @@ const TeamPage = () => {
     search: '',
     page: 1,
     limit: 20,
+    status: 'all',
   });
 
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);

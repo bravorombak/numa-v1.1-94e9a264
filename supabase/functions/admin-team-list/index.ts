@@ -17,6 +17,7 @@ interface ListRequest {
   search?: string;
   page?: number;
   limit?: number;
+  status?: 'active' | 'deactivated';
 }
 
 serve(async (req) => {
@@ -81,7 +82,7 @@ serve(async (req) => {
     // 3. PARSE REQUEST
     // ========================================
     const body: ListRequest = req.method === 'POST' ? await req.json() : {};
-    const { role: roleFilter, search, page = 1, limit = 50 } = body;
+    const { role: roleFilter, search, page = 1, limit = 50, status: statusFilter } = body;
 
     // ========================================
     // 4. BUILD QUERY
@@ -170,7 +171,14 @@ serve(async (req) => {
         last_sign_in_at: authUser?.last_sign_in_at || null,
         banned: (authUser as any)?.banned || false,
       };
-    }).filter(Boolean); // Remove nulls from search filter
+    })
+    .filter((user): user is NonNullable<typeof user> => user !== null) // Remove nulls from search filter
+    .filter((user) => {
+      if (!statusFilter) return true;
+      if (statusFilter === 'active') return !user.banned;
+      if (statusFilter === 'deactivated') return user.banned;
+      return true;
+    });
 
     return jsonResponse({
       users,

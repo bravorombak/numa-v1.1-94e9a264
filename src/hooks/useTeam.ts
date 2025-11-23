@@ -31,6 +31,7 @@ export interface TeamListFilters {
   search?: string;
   page?: number;
   limit?: number;
+  status?: 'all' | 'active' | 'deactivated';
 }
 
 export interface CreateTeamMemberPayload {
@@ -136,14 +137,15 @@ export const useTeamMembers = (filters?: TeamListFilters, enabled: boolean = tru
   return useQuery<TeamListResponse, TeamError>({
     queryKey: teamQueryKeys.members(filters),
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('admin-team-list', {
-        body: {
-          role: filters?.role === 'all' ? undefined : filters?.role,
-          search: filters?.search ?? undefined,
-          page: filters?.page ?? 1,
-          limit: filters?.limit ?? 20,
-        },
-      });
+    const { data, error } = await supabase.functions.invoke('admin-team-list', {
+      body: {
+        role: filters?.role === 'all' ? undefined : filters?.role,
+        search: filters?.search ?? undefined,
+        page: filters?.page ?? 1,
+        limit: filters?.limit ?? 20,
+        status: filters?.status === 'all' ? undefined : filters?.status,
+      },
+    });
 
       // Parse and throw error if present
       const teamError = parseTeamError(error, data);
