@@ -10,6 +10,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
 import { createError, getStatusForErrorCode, ErrorCodes } from '../_shared/errors.ts';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { resolveUserRole } from '../_shared/auth.ts';
 
 interface ListRequest {
   role?: 'admin' | 'editor' | 'user';
@@ -60,32 +61,11 @@ serve(async (req) => {
     // ========================================
     // 2. CHECK REQUESTER ROLE (use user_roles)
     // ========================================
-    const { data: userRoles, error: roleError } = await serviceSupabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
-
-    if (roleError || !userRoles || userRoles.length === 0) {
-      console.error('[admin-team-list] Role fetch error:', roleError);
-      return jsonResponse(
-        createError(ErrorCodes.FORBIDDEN, 'Unable to verify user role'),
-        403
-      );
-    }
-
-    // Determine highest role (priority: admin > editor > user)
-    const hasAdmin = userRoles.some(r => r.role === 'admin');
-    const hasEditor = userRoles.some(r => r.role === 'editor');
-
-    const requesterRole = hasAdmin
-      ? 'admin'
-      : hasEditor
-      ? 'editor'
-      : 'user';
+    const { requesterRole, allRoles } = await resolveUserRole(user.id, serviceSupabase);
 
     console.log('[admin-team-list] Role check:', {
       userId: user.id,
-      allRoles: userRoles.map(r => r.role),
+      allRoles,
       resolvedRole: requesterRole,
     });
 
