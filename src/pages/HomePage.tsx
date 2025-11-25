@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { usePublishedPrompts } from '@/hooks/usePromptDrafts';
+import { useAuthStore } from '@/stores/authStore';
 import { CategoryFilter } from '@/components/home/CategoryFilter';
 import { ViewModeToggle } from '@/components/home/ViewModeToggle';
 import { PromptCard } from '@/components/home/PromptCard';
@@ -20,11 +21,15 @@ const STORAGE_KEY = 'numa.home.viewMode';
 
 const HomePage = () => {
   const { data: prompts, isLoading, isError, refetch } = usePublishedPrompts();
+  const { profile } = useAuthStore();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'card' | 'list'>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return (saved === 'list' ? 'list' : 'card') as 'card' | 'list';
   });
+
+  // Check if user can edit prompts
+  const canEdit = profile?.role === 'admin' || profile?.role === 'editor';
 
   // Persist view mode preference
   useEffect(() => {
@@ -126,6 +131,7 @@ const HomePage = () => {
                 category={prompt.categories}
                 version_number={prompt.version_number}
                 prompt_draft_id={prompt.prompt_draft_id}
+                showEditButton={canEdit}
               />
             ))}
           </div>
@@ -157,6 +163,7 @@ const HomePage = () => {
                     category={prompt.categories}
                     version_number={prompt.version_number}
                     prompt_draft_id={prompt.prompt_draft_id}
+                    showEditButton={canEdit}
                   />
                 ))}
               </TableBody>

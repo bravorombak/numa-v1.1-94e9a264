@@ -17,6 +17,7 @@ interface PromptListItemProps {
   } | null;
   version_number: number;
   prompt_draft_id: string;
+  showEditButton?: boolean;
 }
 
 export const PromptListItem = ({
@@ -26,6 +27,7 @@ export const PromptListItem = ({
   category,
   version_number,
   prompt_draft_id,
+  showEditButton = true,
 }: PromptListItemProps) => {
   const navigate = useNavigate();
 
@@ -67,13 +69,15 @@ export const PromptListItem = ({
         </Badge>
       </TableCell>
       <TableCell>
-        <button
-          onClick={handleEditClick}
-          className="text-muted-foreground hover:text-foreground transition-colors p-1"
-          aria-label="Edit prompt"
-        >
-          <Settings className="h-4 w-4" />
-        </button>
+        {showEditButton && (
+          <button
+            onClick={handleEditClick}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1"
+            aria-label="Edit prompt"
+          >
+            <Settings className="h-4 w-4" />
+          </button>
+        )}
       </TableCell>
     </TableRow>
   );

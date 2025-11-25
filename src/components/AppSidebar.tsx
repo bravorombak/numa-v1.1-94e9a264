@@ -179,7 +179,8 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        {/* New Prompt Button */}
+      {/* New Prompt Button - only for Admin/Editor */}
+      {(role === 'admin' || role === 'editor') && (
         <SidebarGroup>
           <div className="px-2 pt-2 pb-2">
             <Button
@@ -197,6 +198,7 @@ export function AppSidebar() {
             </Button>
           </div>
         </SidebarGroup>
+      )}
 
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
