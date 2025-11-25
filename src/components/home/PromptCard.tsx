@@ -19,6 +19,7 @@ interface PromptCardProps {
   } | null;
   version_number: number;
   prompt_draft_id: string;
+  showEditButton?: boolean;
 }
 
 export const PromptCard = ({
@@ -29,6 +30,7 @@ export const PromptCard = ({
   category,
   version_number,
   prompt_draft_id,
+  showEditButton = true,
 }: PromptCardProps) => {
   const navigate = useNavigate();
 
@@ -72,15 +74,17 @@ export const PromptCard = ({
             />
           )}
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={handleEditClick}
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
+          {showEditButton && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={handleEditClick}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </CardHeader>
 

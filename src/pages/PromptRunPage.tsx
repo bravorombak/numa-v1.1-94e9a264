@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { usePromptVersion } from "@/hooks/usePromptDrafts";
 import { useModels } from "@/hooks/useModels";
+import { useAuthStore } from '@/stores/authStore';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,6 +12,8 @@ import { formatDistanceToNow } from "date-fns";
 const PromptRunPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { profile } = useAuthStore();
+  const canEdit = profile?.role === 'admin' || profile?.role === 'editor';
   const { data: promptVersion, isLoading, error } = usePromptVersion(id!);
   const { data: models } = useModels();
 
@@ -70,15 +73,17 @@ const PromptRunPage = () => {
               <h1 className="text-3xl font-bold mb-2">{promptVersion.title}</h1>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate(`/prompts/${promptVersion.prompt_draft_id}/edit`)}
-            className="gap-2"
-          >
-            <Settings className="h-4 w-4" />
-            Edit
-          </Button>
+            {canEdit && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/prompts/${promptVersion.prompt_draft_id}/edit`)}
+                className="gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                Edit
+              </Button>
+            )}
         </div>
         
         {/* Metadata Row */}

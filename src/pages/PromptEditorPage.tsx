@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePromptDraft } from '@/hooks/usePromptDrafts';
 import { usePromptEditorStore } from '@/stores/promptEditorStore';
+import { useAuthStore } from '@/stores/authStore';
+import { AccessDenied } from '@/components/common/AccessDenied';
 import { PromptEditorHeader } from '@/components/prompt-editor/PromptEditorHeader';
 import { PromptEditorTabs } from '@/components/prompt-editor/PromptEditorTabs';
 import { AboutTab } from '@/components/prompt-editor/AboutTab';
@@ -14,8 +16,17 @@ import { extractVariables } from '@/lib/variableDetection';
 
 const PromptEditorPage = () => {
   const { id } = useParams<{ id: string }>();
+  const { profile } = useAuthStore();
   const { data: draft, isLoading, error } = usePromptDraft(id || '');
   const { setDraft, setDetectedVariables, activeTab, reset } = usePromptEditorStore();
+
+  // Role guard - only Admin and Editor can edit prompts
+  const role = profile?.role || 'user';
+  const canEdit = role === 'admin' || role === 'editor';
+
+  if (!canEdit) {
+    return <AccessDenied message="You don't have permission to edit prompts." />;
+  }
 
   useEffect(() => {
     if (draft) {
