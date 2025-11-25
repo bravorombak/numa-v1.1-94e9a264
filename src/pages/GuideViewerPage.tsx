@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useGuideTree, useGuidePage } from "@/hooks/useGuide";
 import { GuideTree } from "@/components/guide/GuideTree";
-import { MarkdownMessage } from "@/components/common/MarkdownMessage";
+import { GuideMarkdown } from "@/components/guide/GuideMarkdown";
 import { buildTreeFromFlat } from "@/lib/guideUtils";
 import type { GuideTreeItem } from "@/hooks/useGuide";
 import { Button } from "@/components/ui/button";
@@ -142,7 +142,7 @@ export default function GuideViewerPage() {
         {!pageLoading && !pageError && page && (
           <div className="max-w-4xl mx-auto p-8">
             <h1 className="text-3xl font-bold mb-6">{page.title}</h1>
-            <MarkdownMessage content={page.content_md || "*No content yet.*"} />
+            <GuideMarkdown content={page.content_md || "*No content yet.*"} />
           </div>
         )}
       </div>

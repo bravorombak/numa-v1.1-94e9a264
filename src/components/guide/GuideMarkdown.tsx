@@ -1,13 +1,14 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { cn } from "@/lib/utils";
 
-interface MarkdownMessageProps {
+interface GuideMarkdownProps {
   content: string;
   className?: string;
 }
 
-export function MarkdownMessage({ content, className }: MarkdownMessageProps) {
+export function GuideMarkdown({ content, className }: GuideMarkdownProps) {
   return (
     <div
       className={cn(
@@ -24,10 +25,7 @@ export function MarkdownMessage({ content, className }: MarkdownMessageProps) {
     >
       <ReactMarkdown 
         remarkPlugins={[remarkGfm]}
-        components={{
-          // Block raw HTML rendering for security
-          html: () => null,
-        }}
+        rehypePlugins={[rehypeRaw]}
       >
         {content}
       </ReactMarkdown>

@@ -37,7 +37,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { MarkdownMessage } from "@/components/common/MarkdownMessage";
+import { GuideMarkdown } from "@/components/guide/GuideMarkdown";
 import {
   useUpdateGuidePage,
   useDeleteGuidePage,
@@ -307,7 +307,7 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
               <Card className="p-6">
                 <h1 className="text-3xl font-bold mb-6">{form.watch("title")}</h1>
                 <div className="prose prose-sm max-w-none">
-                  <MarkdownMessage content={form.watch("content_md") || "*No content yet*"} />
+                  <GuideMarkdown content={form.watch("content_md") || "*No content yet*"} />
                 </div>
               </Card>
             </TabsContent>
