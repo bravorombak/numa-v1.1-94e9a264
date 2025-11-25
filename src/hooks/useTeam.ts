@@ -36,9 +36,8 @@ export interface TeamListFilters {
 
 export interface CreateTeamMemberPayload {
   email: string;
-  full_name: string;
+  full_name?: string;
   role: AppRole;
-  password?: string;
 }
 
 export interface UpdateTeamMemberPayload {
@@ -55,6 +54,10 @@ export interface DeactivateTeamMemberPayload {
 }
 
 export interface ReactivateTeamMemberPayload {
+  user_id: string;
+}
+
+export interface ResetPasswordPayload {
   user_id: string;
 }
 
@@ -190,7 +193,7 @@ export const useCreateTeamMember = () => {
       // Show success toast
       toast({
         title: 'Team member created',
-        description: 'The new team member has been added successfully.',
+        description: 'An email has been sent so they can set their password.',
       });
     },
     onError: (error) => {
@@ -328,6 +331,43 @@ export const useReactivateTeamMember = () => {
     onError: (error) => {
       toast({
         title: 'Failed to reactivate team member',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+/**
+ * Hook to send a password reset email to a team member
+ */
+export const useResetTeamMemberPassword = () => {
+  return useMutation<
+    { message: string; user_id: string; email: string },
+    TeamError,
+    ResetPasswordPayload
+  >({
+    mutationFn: async (payload) => {
+      const { data, error } = await supabase.functions.invoke('admin-team-reset-password', {
+        body: payload,
+      });
+
+      const teamError = parseTeamError(error, data);
+      if (error || (data as any)?.code) {
+        throw teamError;
+      }
+
+      return data as { message: string; user_id: string; email: string };
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Password reset email sent',
+        description: 'The team member will receive an email to set a new password.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Failed to send password reset email',
         description: getErrorMessage(error),
         variant: 'destructive',
       });
