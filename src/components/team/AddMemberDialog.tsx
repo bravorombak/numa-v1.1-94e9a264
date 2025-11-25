@@ -30,6 +30,7 @@ import {
 
 const addMemberSchema = z.object({
   email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   full_name: z.string().min(1, 'Name is required'),
   role: z.enum(['admin', 'editor', 'user']),
 });
@@ -49,6 +50,7 @@ export function AddMemberDialog({ open, onOpenChange, currentRole }: AddMemberDi
     resolver: zodResolver(addMemberSchema),
     defaultValues: {
       email: '',
+      password: '',
       full_name: '',
       role: 'user',
     },
@@ -58,6 +60,7 @@ export function AddMemberDialog({ open, onOpenChange, currentRole }: AddMemberDi
     try {
       await createMember.mutateAsync({
         email: data.email,
+        password: data.password,
         full_name: data.full_name,
         role: data.role,
       });
@@ -91,7 +94,7 @@ export function AddMemberDialog({ open, onOpenChange, currentRole }: AddMemberDi
         <DialogHeader>
           <DialogTitle>Add Team Member</DialogTitle>
           <DialogDescription>
-            Create a new team member account. They will receive an email to set their password.
+            Create a new team member account. They can log in immediately with the credentials you provide.
           </DialogDescription>
         </DialogHeader>
 
@@ -105,6 +108,20 @@ export function AddMemberDialog({ open, onOpenChange, currentRole }: AddMemberDi
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input placeholder="user@example.com" type="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="••••••••" type="password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
