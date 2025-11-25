@@ -62,8 +62,8 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const match = useMatch("/chat/:sessionId");
   const sessionId = match?.params.sessionId;
-  const { hasRole } = useAuthStore();
-  const isAdmin = hasRole("admin");
+  const { profile } = useAuthStore();
+  const role = profile?.role || 'user';
   
   const createPrompt = useCreatePromptDraft();
   
@@ -203,10 +203,22 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
+                // Filter nav items by role
+                const shouldShow = 
+                  item.url === "/" ? true : // Home - all roles
+                  item.url === "/team" ? (role === 'admin' || role === 'editor') :
+                  item.url === "/storage" ? role === 'admin' :
+                  item.url === "/categories/edit" ? (role === 'admin' || role === 'editor') :
+                  item.url === "/admin/api" ? role === 'admin' :
+                  item.url === "/guide" ? true : // Guide - all roles (URL routing handled below)
+                  false;
+
+                if (!shouldShow) return null;
+
                 // Route Guide item based on role
                 let targetUrl = item.url;
                 if (item.url === "/guide") {
-                  targetUrl = isAdmin ? "/guide" : "/guide-view";
+                  targetUrl = (role === 'admin' || role === 'editor') ? "/guide" : "/guide-view";
                 }
                 
                 return (

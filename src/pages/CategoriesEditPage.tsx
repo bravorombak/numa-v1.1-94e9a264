@@ -3,9 +3,18 @@ import { CategoryTable } from '@/components/categories/CategoryTable';
 import { CategoryForm } from '@/components/categories/CategoryForm';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { AccessDenied } from '@/components/common/AccessDenied';
+import { useAuthStore } from '@/stores/authStore';
 
 const CategoriesEditPage = () => {
+  const { profile } = useAuthStore();
+  const role = profile?.role || 'user';
   const [createFormOpen, setCreateFormOpen] = useState(false);
+
+  // Admin/Editor guard
+  if (role !== 'admin' && role !== 'editor') {
+    return <AccessDenied message="Only Admins and Editors can manage categories." />;
+  }
 
   return (
     <div className="container mx-auto max-w-6xl py-8 px-4">

@@ -12,22 +12,24 @@ import { buildTreeFromFlat } from "@/lib/guideUtils";
 const GuideDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { hasRole } = useAuthStore();
-  const isAdmin = hasRole("admin");
+  const { profile } = useAuthStore();
+  const role = profile?.role || 'user';
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   const { data: page, isLoading: pageLoading, error: pageError } = useGuidePage(id);
   const { data: pages, isLoading: treeLoading } = useGuideTree();
 
-  if (!isAdmin) {
+  const canEdit = role === 'admin' || role === 'editor';
+
+  if (!canEdit) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="text-center">
           <h1 className="text-2xl font-medium text-foreground mb-2">
-            Admin Access Required
+            Access Required
           </h1>
           <p className="text-muted-foreground">
-            You need admin permissions to manage the guide.
+            Only Admins and Editors can manage the guide.
           </p>
         </div>
       </div>
