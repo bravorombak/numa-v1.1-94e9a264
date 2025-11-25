@@ -13,7 +13,8 @@ export interface TeamMember {
   email: string | null;
   full_name: string | null;
   avatar_url: string | null;
-  role: AppRole;
+  roles: string[];
+  resolved_role: AppRole;
   created_at: string | null;
   last_sign_in_at: string | null;
   banned: boolean;
@@ -166,10 +167,21 @@ export const useTeamMembers = (filters?: TeamListFilters, enabled: boolean = tru
 // Mutation Hook: useCreateTeamMember
 // ============================================================================
 
+export interface CreateTeamMemberResponse {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  role: AppRole;
+  roles: string[];
+  resolved_role: AppRole;
+  invitation_sent: boolean;
+  role_added: boolean;
+}
+
 export const useCreateTeamMember = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<TeamMember, TeamError, CreateTeamMemberPayload>({
+  return useMutation<CreateTeamMemberResponse, TeamError, CreateTeamMemberPayload>({
     mutationFn: async (payload) => {
       const { data, error } = await supabase.functions.invoke('admin-team-create', {
         body: payload,
@@ -181,9 +193,9 @@ export const useCreateTeamMember = () => {
         throw teamError;
       }
 
-      return data as TeamMember;
+      return data as CreateTeamMemberResponse;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       // Invalidate all team member queries
       queryClient.invalidateQueries({
         queryKey: ['team', 'members'],
@@ -191,10 +203,17 @@ export const useCreateTeamMember = () => {
       });
 
       // Show success toast
-      toast({
-        title: 'Team member created',
-        description: 'An email has been sent so they can set their password.',
-      });
+      if (data.invitation_sent) {
+        toast({
+          title: 'Team member created',
+          description: 'An email has been sent so they can set their password.',
+        });
+      } else if (data.role_added) {
+        toast({
+          title: 'Existing team member updated',
+          description: 'The new role has been added to their account.',
+        });
+      }
     },
     onError: (error) => {
       // Show error toast with user-friendly message

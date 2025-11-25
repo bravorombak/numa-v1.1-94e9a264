@@ -33,7 +33,7 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate, onRea
   
   const canManage =
     currentRole === 'admin' ||
-    (currentRole === 'editor' && member.role === 'user');
+    (currentRole === 'editor' && member.resolved_role === 'user');
 
   const getInitials = (name: string | null, email: string | null) => {
     if (name && name.trim().length > 0) {
@@ -80,7 +80,7 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate, onRea
       </TableCell>
 
       <TableCell>
-        <RoleBadge role={member.role} />
+        <RoleBadge role={member.resolved_role} allRoles={member.roles} />
       </TableCell>
 
       <TableCell>

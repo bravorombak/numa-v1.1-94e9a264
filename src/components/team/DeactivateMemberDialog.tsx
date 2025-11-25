@@ -80,7 +80,7 @@ export function DeactivateMemberDialog({ open, onOpenChange, member }: Deactivat
               </p>
               <p className="text-sm text-muted-foreground">{member.email}</p>
             </div>
-            <RoleBadge role={member.role} />
+            <RoleBadge role={member.resolved_role} allRoles={member.roles} />
           </div>
         </div>
 

@@ -10,7 +10,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
 import { createError, getStatusForErrorCode, ErrorCodes } from '../_shared/errors.ts';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
-import { resolveUserRole } from '../_shared/auth.ts';
+import { resolveUserRole, type AppRole } from '../_shared/auth.ts';
 
 interface ListRequest {
   role?: 'admin' | 'editor' | 'user';
@@ -18,6 +18,18 @@ interface ListRequest {
   page?: number;
   limit?: number;
   status?: 'active' | 'deactivated';
+}
+
+interface MergedUser {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  roles: string[];
+  resolved_role: AppRole;
+  banned: boolean;
+  created_at: string | null;
+  last_sign_in_at: string | null;
 }
 
 serve(async (req) => {
@@ -85,26 +97,13 @@ serve(async (req) => {
     const { role: roleFilter, search, page = 1, limit = 50, status: statusFilter } = body;
 
     // ========================================
-    // 4. BUILD QUERY
+    // 4. FETCH ALL USER_ROLES (NO PAGINATION YET)
     // ========================================
     let query = serviceSupabase
       .from('user_roles')
-      .select(`
-        user_id,
-        role,
-        created_at
-      `, { count: 'exact' });
+      .select('user_id, role, created_at');
 
-    // Apply role filter if provided
-    if (roleFilter) {
-      query = query.eq('role', roleFilter);
-    }
-
-    // Pagination
-    const offset = (page - 1) * limit;
-    query = query.range(offset, offset + limit - 1).order('created_at', { ascending: false });
-
-    const { data: userRolesData, error: queryError, count } = await query;
+    const { data: userRolesData, error: queryError } = await query;
 
     if (queryError) {
       console.error('[admin-team-list] Query error:', queryError);
@@ -126,63 +125,105 @@ serve(async (req) => {
     // ========================================
     // 5. FETCH USER DETAILS FROM AUTH & PROFILES
     // ========================================
-    const userIds = userRolesData.map((ur) => ur.user_id);
+    const allUserIds = [...new Set(userRolesData.map((ur) => ur.user_id))];
 
     // Fetch auth users (email, created_at, last_sign_in_at, banned)
     const { data: authUsers } = await serviceSupabase.auth.admin.listUsers();
     const authUsersMap = new Map(
       authUsers?.users
-        ?.filter((u) => userIds.includes(u.id))
+        ?.filter((u) => allUserIds.includes(u.id))
         .map((u) => [u.id, u]) || []
     );
 
-    // Fetch profiles (full_name, avatar_url, deleted_at)
+    // Fetch profiles (full_name, avatar_url)
     const { data: profiles } = await serviceSupabase
       .from('profiles')
-      .select('id, full_name, avatar_url, created_at, updated_at')
-      .in('id', userIds);
+      .select('id, full_name, avatar_url')
+      .in('id', allUserIds);
 
     const profilesMap = new Map(profiles?.map((p) => [p.id, p]) || []);
 
     // ========================================
-    // 6. BUILD RESPONSE
+    // 6. MERGE ROLES BY USER_ID
     // ========================================
-    const users = userRolesData.map((ur) => {
-      const authUser = authUsersMap.get(ur.user_id);
-      const profile = profilesMap.get(ur.user_id);
+    const userMap = new Map<string, MergedUser>();
 
-      // Apply search filter if provided
-      if (search) {
-        const searchLower = search.toLowerCase();
-        const matchesEmail = authUser?.email?.toLowerCase().includes(searchLower);
-        const matchesName = profile?.full_name?.toLowerCase().includes(searchLower);
-        if (!matchesEmail && !matchesName) {
-          return null;
-        }
+    for (const ur of userRolesData) {
+      const userId = ur.user_id;
+      const authUser = authUsersMap.get(userId);
+      const profile = profilesMap.get(userId);
+
+      if (!userMap.has(userId)) {
+        userMap.set(userId, {
+          id: userId,
+          email: authUser?.email || null,
+          full_name: profile?.full_name || null,
+          avatar_url: profile?.avatar_url || null,
+          roles: [],
+          resolved_role: 'user',
+          banned: (authUser as any)?.banned || false,
+          created_at: authUser?.created_at || ur.created_at,
+          last_sign_in_at: authUser?.last_sign_in_at || null,
+        });
       }
 
-      return {
-        id: ur.user_id,
-        email: authUser?.email || null,
-        full_name: profile?.full_name || null,
-        avatar_url: profile?.avatar_url || null,
-        role: ur.role,
-        created_at: authUser?.created_at || ur.created_at,
-        last_sign_in_at: authUser?.last_sign_in_at || null,
-        banned: (authUser as any)?.banned || false,
-      };
-    })
-    .filter((user): user is NonNullable<typeof user> => user !== null) // Remove nulls from search filter
-    .filter((user) => {
-      if (!statusFilter) return true;
-      if (statusFilter === 'active') return !user.banned;
-      if (statusFilter === 'deactivated') return user.banned;
-      return true;
+      const user = userMap.get(userId)!;
+      user.roles.push(ur.role);
+    }
+
+    // Resolve highest priority role for each user
+    for (const user of userMap.values()) {
+      const hasAdmin = user.roles.includes('admin');
+      const hasEditor = user.roles.includes('editor');
+      user.resolved_role = hasAdmin ? 'admin' : hasEditor ? 'editor' : 'user';
+    }
+
+    // ========================================
+    // 7. APPLY FILTERS ON MERGED USERS
+    // ========================================
+    let filteredUsers = Array.from(userMap.values());
+
+    // Role filter: check if user has the requested role
+    if (roleFilter) {
+      filteredUsers = filteredUsers.filter((user) => user.roles.includes(roleFilter));
+    }
+
+    // Search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredUsers = filteredUsers.filter((user) => {
+        const matchesEmail = user.email?.toLowerCase().includes(searchLower);
+        const matchesName = user.full_name?.toLowerCase().includes(searchLower);
+        return matchesEmail || matchesName;
+      });
+    }
+
+    // Status filter
+    if (statusFilter) {
+      filteredUsers = filteredUsers.filter((user) => {
+        if (statusFilter === 'active') return !user.banned;
+        if (statusFilter === 'deactivated') return user.banned;
+        return true;
+      });
+    }
+
+    // Sort by created_at desc
+    filteredUsers.sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return dateB - dateA;
     });
 
+    // ========================================
+    // 8. APPLY PAGINATION
+    // ========================================
+    const total = filteredUsers.length;
+    const offset = (page - 1) * limit;
+    const paginatedUsers = filteredUsers.slice(offset, offset + limit);
+
     return jsonResponse({
-      users,
-      total: count || 0,
+      users: paginatedUsers,
+      total,
       page,
       limit,
     });

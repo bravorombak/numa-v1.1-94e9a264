@@ -107,7 +107,7 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 4. INVITE USER VIA EMAIL
+    // 4. INVITE USER OR HANDLE EXISTING
     // ========================================
     const { data: invitedUser, error: inviteError } = await serviceSupabase.auth.admin.inviteUserByEmail(
       email,
@@ -118,30 +118,54 @@ serve(async (req) => {
       }
     );
 
+    let newUserId: string;
+    let isExistingUser = false;
+
+    // Handle existing email case
     if (inviteError) {
-      console.error('[admin-team-create] Invite error:', inviteError);
+      const errorMessage = inviteError.message?.toLowerCase() || '';
       
-      if (inviteError.message.includes('already registered') || inviteError.message.includes('User already registered')) {
+      if (errorMessage.includes('already registered') || errorMessage.includes('already exists')) {
+        console.log('[admin-team-create] Email exists, adding role to existing user:', email);
+        
+        // Fetch existing user by email
+        const { data: existingUsers } = await serviceSupabase.auth.admin.listUsers();
+        const existingUser = existingUsers?.users?.find((u) => u.email === email);
+
+        if (!existingUser) {
+          console.error('[admin-team-create] User exists but could not be found:', email);
+          return jsonResponse(
+            createError(ErrorCodes.INTERNAL_ERROR, 'User exists but could not be retrieved'),
+            500
+          );
+        }
+
+        newUserId = existingUser.id;
+        isExistingUser = true;
+        console.log('[admin-team-create] Found existing user:', { userId: newUserId, email });
+      } else {
+        console.error('[admin-team-create] Invite error:', inviteError);
         return jsonResponse(
-          createError(ErrorCodes.USER_ALREADY_EXISTS, 'A user with this email already exists'),
-          409
+          createError(
+            ErrorCodes.INTERNAL_ERROR,
+            'Failed to send invitation email',
+            inviteError?.message
+          ),
+          500
         );
       }
-
+    } else if (!invitedUser.user) {
+      console.error('[admin-team-create] No user returned from invite');
       return jsonResponse(
-        createError(ErrorCodes.INTERNAL_ERROR, 'Failed to send invitation email', inviteError.message),
+        createError(ErrorCodes.INTERNAL_ERROR, 'Failed to create user'),
         500
       );
+    } else {
+      newUserId = invitedUser.user.id;
+      console.log('[admin-team-create] User invited:', { userId: newUserId, email, role });
     }
 
-    if (!invitedUser.user) {
-      return jsonResponse(
-        createError(ErrorCodes.INTERNAL_ERROR, 'User invitation failed'),
-        500
-      );
-    }
-
-    const userId = invitedUser.user.id;
+    const userId = newUserId;
 
     // ========================================
     // 5. INSERT INTO user_roles (authoritative)
@@ -178,31 +202,48 @@ serve(async (req) => {
     // ========================================
     // 6. UPDATE profiles (for display sync)
     // ========================================
-    const { error: profileUpdateError } = await serviceSupabase
-      .from('profiles')
-      .update({
-        full_name: full_name || null,
-        role: role, // Sync for display only
-      })
-      .eq('id', userId);
+    if (!isExistingUser) {
+      const { error: profileUpdateError } = await serviceSupabase
+        .from('profiles')
+        .update({
+          full_name: full_name || null,
+          role: role, // Sync for display only
+        })
+        .eq('id', userId);
 
-    if (profileUpdateError) {
-      console.error('[admin-team-create] profiles update error:', profileUpdateError);
-      // Not critical, continue
+      if (profileUpdateError) {
+        console.error('[admin-team-create] profiles update error:', profileUpdateError);
+        // Not critical, continue
+      }
     }
 
     // ========================================
-    // 7. RETURN SUCCESS
+    // 7. FETCH ALL ROLES FOR RESPONSE
     // ========================================
-    console.log(`[admin-team-create] User invited: ${userId} with role ${role}`);
+    const { data: allUserRoles } = await serviceSupabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId);
+
+    const roles = allUserRoles?.map((r) => r.role) || [role];
+    const hasAdmin = roles.includes('admin');
+    const hasEditor = roles.includes('editor');
+    const resolved_role = hasAdmin ? 'admin' : hasEditor ? 'editor' : 'user';
+
+    // ========================================
+    // 8. SUCCESS RESPONSE
+    // ========================================
+    console.log(`[admin-team-create] User ${isExistingUser ? 'updated' : 'invited'}: ${userId} with role ${role}`);
 
     return jsonResponse({
       id: userId,
-      email: invitedUser.user.email,
+      email,
       full_name: full_name || null,
-      role: role,
-      created_at: invitedUser.user.created_at,
-      invitation_sent: true,
+      role,
+      roles,
+      resolved_role,
+      invitation_sent: !isExistingUser,
+      role_added: isExistingUser,
     }, 201);
 
   } catch (error) {
