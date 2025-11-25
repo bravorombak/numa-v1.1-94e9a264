@@ -1,5 +1,6 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { cn } from "@/lib/utils";
 
 interface MarkdownMessageProps {
@@ -24,10 +25,7 @@ export function MarkdownMessage({ content, className }: MarkdownMessageProps) {
     >
       <ReactMarkdown 
         remarkPlugins={[remarkGfm]}
-        components={{
-          // Prevent HTML rendering (security)
-          html: () => null,
-        }}
+        rehypePlugins={[rehypeRaw]}
       >
         {content}
       </ReactMarkdown>
