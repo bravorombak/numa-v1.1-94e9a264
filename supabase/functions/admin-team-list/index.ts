@@ -154,6 +154,9 @@ serve(async (req) => {
       const profile = profilesMap.get(userId);
 
       if (!userMap.has(userId)) {
+        const bannedUntil = (authUser as any)?.banned_until ?? null;
+        const isBanned = !!(bannedUntil && new Date(bannedUntil).getTime() > Date.now());
+        
         userMap.set(userId, {
           id: userId,
           email: authUser?.email || null,
@@ -161,7 +164,7 @@ serve(async (req) => {
           avatar_url: profile?.avatar_url || null,
           roles: [],
           resolved_role: 'user',
-          banned: (authUser as any)?.banned || false,
+          banned: isBanned,
           created_at: authUser?.created_at || ur.created_at,
           last_sign_in_at: authUser?.last_sign_in_at || null,
         });
