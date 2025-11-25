@@ -61,7 +61,7 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
     if (member && open) {
       form.reset({
         full_name: member.full_name || '',
-        role: member.role,
+        role: member.resolved_role,
         avatar_url: member.avatar_url || '',
       });
     }
@@ -77,7 +77,7 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
       if (data.full_name !== member.full_name) {
         updates.full_name = data.full_name;
       }
-      if (data.role !== member.role) {
+      if (data.role !== member.resolved_role) {
         updates.role = data.role;
       }
       if (data.avatar_url !== (member.avatar_url || '')) {
