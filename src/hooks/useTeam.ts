@@ -37,6 +37,7 @@ export interface TeamListFilters {
 
 export interface CreateTeamMemberPayload {
   email: string;
+  password: string;
   full_name?: string;
   role: AppRole;
 }
@@ -174,7 +175,7 @@ export interface CreateTeamMemberResponse {
   role: AppRole;
   roles: string[];
   resolved_role: AppRole;
-  invitation_sent: boolean;
+  user_created: boolean;
   role_added: boolean;
 }
 
@@ -203,10 +204,10 @@ export const useCreateTeamMember = () => {
       });
 
       // Show success toast
-      if (data.invitation_sent) {
+      if (data.user_created) {
         toast({
           title: 'Team member created',
-          description: 'An email has been sent so they can set their password.',
+          description: 'The new team member can now log in with their credentials.',
         });
       } else if (data.role_added) {
         toast({

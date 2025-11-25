@@ -16,6 +16,7 @@ import { resolveUserRole } from '../_shared/auth.ts';
 
 interface CreateRequest {
   email: string;
+  password: string;
   full_name?: string;
   role: 'admin' | 'editor' | 'user';
 }
@@ -82,11 +83,18 @@ serve(async (req) => {
     // 3. PARSE & VALIDATE REQUEST
     // ========================================
     const body: CreateRequest = await req.json();
-    const { email, full_name, role } = body;
+    const { email, password, full_name, role } = body;
 
     if (!email || !email.includes('@')) {
       return jsonResponse(
         createError(ErrorCodes.INVALID_REQUEST, 'Valid email is required'),
+        400
+      );
+    }
+
+    if (!password || password.length < 6) {
+      return jsonResponse(
+        createError(ErrorCodes.INVALID_REQUEST, 'Password must be at least 6 characters'),
         400
       );
     }
@@ -107,23 +115,23 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 4. INVITE USER OR HANDLE EXISTING
+    // 4. CREATE USER WITH PASSWORD
     // ========================================
-    const { data: invitedUser, error: inviteError } = await serviceSupabase.auth.admin.inviteUserByEmail(
+    const { data: createdUser, error: userCreateError } = await serviceSupabase.auth.admin.createUser({
       email,
-      {
-        data: {
-          full_name: full_name || null,
-        },
-      }
-    );
+      password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: full_name || null,
+      },
+    });
 
-    let newUserId: string;
+    let userId: string;
     let isExistingUser = false;
 
     // Handle existing email case
-    if (inviteError) {
-      const errorMessage = inviteError.message?.toLowerCase() || '';
+    if (userCreateError) {
+      const errorMessage = userCreateError.message?.toLowerCase() || '';
       
       if (errorMessage.includes('already registered') || errorMessage.includes('already exists')) {
         console.log('[admin-team-create] Email exists, adding role to existing user:', email);
@@ -140,32 +148,30 @@ serve(async (req) => {
           );
         }
 
-        newUserId = existingUser.id;
+        userId = existingUser.id;
         isExistingUser = true;
-        console.log('[admin-team-create] Found existing user:', { userId: newUserId, email });
+        console.log('[admin-team-create] Found existing user:', { userId, email });
       } else {
-        console.error('[admin-team-create] Invite error:', inviteError);
+        console.error('[admin-team-create] Create user error:', userCreateError);
         return jsonResponse(
           createError(
             ErrorCodes.INTERNAL_ERROR,
-            'Failed to send invitation email',
-            inviteError?.message
+            'Failed to create user',
+            userCreateError?.message
           ),
           500
         );
       }
-    } else if (!invitedUser.user) {
-      console.error('[admin-team-create] No user returned from invite');
+    } else if (!createdUser.user) {
+      console.error('[admin-team-create] No user returned from createUser');
       return jsonResponse(
         createError(ErrorCodes.INTERNAL_ERROR, 'Failed to create user'),
         500
       );
     } else {
-      newUserId = invitedUser.user.id;
-      console.log('[admin-team-create] User invited:', { userId: newUserId, email, role });
+      userId = createdUser.user.id;
+      console.log('[admin-team-create] User created:', { userId, email, role });
     }
-
-    const userId = newUserId;
 
     // ========================================
     // 5. INSERT INTO user_roles (authoritative)
@@ -200,21 +206,30 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 6. UPDATE profiles (for display sync)
+    // 6. UPDATE profiles.role (SOURCE OF TRUTH for v1.1)
     // ========================================
-    if (!isExistingUser) {
-      const { error: profileUpdateError } = await serviceSupabase
-        .from('profiles')
-        .update({
-          full_name: full_name || null,
-          role: role, // Sync for display only
-        })
-        .eq('id', userId);
+    const { error: profileUpdateError } = await serviceSupabase
+      .from('profiles')
+      .update({
+        full_name: full_name || null,
+        role: role, // SOURCE OF TRUTH for authorization
+      })
+      .eq('id', userId);
 
-      if (profileUpdateError) {
-        console.error('[admin-team-create] profiles update error:', profileUpdateError);
-        // Not critical, continue
+    if (profileUpdateError) {
+      console.error('[admin-team-create] profiles update error:', profileUpdateError);
+      // Cleanup: delete the auth user we just created
+      if (!isExistingUser) {
+        await serviceSupabase.auth.admin.deleteUser(userId);
       }
+      return jsonResponse(
+        createError(
+          ErrorCodes.INTERNAL_ERROR,
+          'Failed to set user role',
+          profileUpdateError.message
+        ),
+        500
+      );
     }
 
     // ========================================
@@ -233,7 +248,7 @@ serve(async (req) => {
     // ========================================
     // 8. SUCCESS RESPONSE
     // ========================================
-    console.log(`[admin-team-create] User ${isExistingUser ? 'updated' : 'invited'}: ${userId} with role ${role}`);
+    console.log(`[admin-team-create] User ${isExistingUser ? 'updated' : 'created'}: ${userId} with role ${role}`);
 
     return jsonResponse({
       id: userId,
@@ -242,7 +257,7 @@ serve(async (req) => {
       role,
       roles,
       resolved_role,
-      invitation_sent: !isExistingUser,
+      user_created: !isExistingUser,
       role_added: isExistingUser,
     }, 201);
 
