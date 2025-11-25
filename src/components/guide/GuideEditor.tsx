@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Trash2, Eye } from "lucide-react";
+import { MarkdownToolbar } from "@/components/guide/MarkdownToolbar";
 import {
   Form,
   FormControl,
@@ -63,6 +64,7 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
   const updatePage = useUpdateGuidePage();
   const deletePage = useDeleteGuidePage();
   const [isDirty, setIsDirty] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -283,9 +285,14 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Content (Markdown)</FormLabel>
+                    <MarkdownToolbar
+                      textareaRef={textareaRef}
+                      onContentChange={(content) => form.setValue("content_md", content)}
+                    />
                     <FormControl>
                       <Textarea
                         {...field}
+                        ref={textareaRef}
                         className="min-h-[400px] font-mono text-sm"
                         placeholder="Write your guide content in markdown..."
                       />
