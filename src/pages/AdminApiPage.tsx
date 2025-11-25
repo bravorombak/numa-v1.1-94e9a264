@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AccessDenied } from "@/components/common/AccessDenied";
+import { useAuthStore } from "@/stores/authStore";
 import {
   Table,
   TableBody,
@@ -24,6 +26,9 @@ import { ModelStatusBadge } from "@/components/models/ModelStatusBadge";
 import { ModelDialog } from "@/components/models/ModelDialog";
 
 const AdminApiPage = () => {
+  const { profile } = useAuthStore();
+  const role = profile?.role || 'user';
+  
   const { data: models, isLoading } = useModels();
   const deleteModel = useDeleteModel();
   
@@ -31,6 +36,11 @@ const AdminApiPage = () => {
   const [editingModel, setEditingModel] = useState<Model | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
+
+  // Admin-only guard
+  if (role !== 'admin') {
+    return <AccessDenied message="Only Admins can access the Model Registry." />;
+  }
 
   const handleCreate = () => {
     setEditingModel(undefined);
