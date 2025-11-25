@@ -18,7 +18,6 @@ interface CreateRequest {
   email: string;
   full_name?: string;
   role: 'admin' | 'editor' | 'user';
-  password?: string;
 }
 
 serve(async (req) => {
@@ -83,7 +82,7 @@ serve(async (req) => {
     // 3. PARSE & VALIDATE REQUEST
     // ========================================
     const body: CreateRequest = await req.json();
-    const { email, full_name, role, password } = body;
+    const { email, full_name, role } = body;
 
     if (!email || !email.includes('@')) {
       return jsonResponse(
@@ -108,18 +107,21 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 4. CREATE AUTH USER
+    // 4. INVITE USER VIA EMAIL
     // ========================================
-    const { data: newAuthUser, error: authCreateError } = await serviceSupabase.auth.admin.createUser({
+    const { data: invitedUser, error: inviteError } = await serviceSupabase.auth.admin.inviteUserByEmail(
       email,
-      password: password || undefined, // If no password, Supabase will send magic link
-      email_confirm: true, // Auto-confirm email
-    });
+      {
+        data: {
+          full_name: full_name || null,
+        },
+      }
+    );
 
-    if (authCreateError) {
-      console.error('[admin-team-create] Auth create error:', authCreateError);
+    if (inviteError) {
+      console.error('[admin-team-create] Invite error:', inviteError);
       
-      if (authCreateError.message.includes('already registered')) {
+      if (inviteError.message.includes('already registered') || inviteError.message.includes('User already registered')) {
         return jsonResponse(
           createError(ErrorCodes.USER_ALREADY_EXISTS, 'A user with this email already exists'),
           409
@@ -127,19 +129,19 @@ serve(async (req) => {
       }
 
       return jsonResponse(
-        createError(ErrorCodes.INTERNAL_ERROR, 'Failed to create user account', authCreateError.message),
+        createError(ErrorCodes.INTERNAL_ERROR, 'Failed to send invitation email', inviteError.message),
         500
       );
     }
 
-    if (!newAuthUser.user) {
+    if (!invitedUser.user) {
       return jsonResponse(
-        createError(ErrorCodes.INTERNAL_ERROR, 'User creation failed'),
+        createError(ErrorCodes.INTERNAL_ERROR, 'User invitation failed'),
         500
       );
     }
 
-    const userId = newAuthUser.user.id;
+    const userId = invitedUser.user.id;
 
     // ========================================
     // 5. INSERT INTO user_roles (authoritative)
@@ -192,14 +194,15 @@ serve(async (req) => {
     // ========================================
     // 7. RETURN SUCCESS
     // ========================================
-    console.log(`[admin-team-create] User created: ${userId} with role ${role}`);
+    console.log(`[admin-team-create] User invited: ${userId} with role ${role}`);
 
     return jsonResponse({
       id: userId,
-      email: newAuthUser.user.email,
+      email: invitedUser.user.email,
       full_name: full_name || null,
       role: role,
-      created_at: newAuthUser.user.created_at,
+      created_at: invitedUser.user.created_at,
+      invitation_sent: true,
     }, 201);
 
   } catch (error) {

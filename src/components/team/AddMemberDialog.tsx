@@ -32,7 +32,6 @@ const addMemberSchema = z.object({
   email: z.string().email('Invalid email address'),
   full_name: z.string().min(1, 'Name is required'),
   role: z.enum(['admin', 'editor', 'user']),
-  password: z.string().optional(),
 });
 
 type AddMemberFormData = z.infer<typeof addMemberSchema>;
@@ -52,20 +51,16 @@ export function AddMemberDialog({ open, onOpenChange, currentRole }: AddMemberDi
       email: '',
       full_name: '',
       role: 'user',
-      password: '',
     },
   });
 
   const onSubmit = async (data: AddMemberFormData) => {
     try {
-      // Ensure payload matches CreateTeamMemberPayload type
-      const payload = {
+      await createMember.mutateAsync({
         email: data.email,
         full_name: data.full_name,
         role: data.role,
-        ...(data.password && { password: data.password }),
-      };
-      await createMember.mutateAsync(payload);
+      });
       onOpenChange(false);
       form.reset();
     } catch (error) {
@@ -96,7 +91,7 @@ export function AddMemberDialog({ open, onOpenChange, currentRole }: AddMemberDi
         <DialogHeader>
           <DialogTitle>Add Team Member</DialogTitle>
           <DialogDescription>
-            Create a new team member account. They will receive login credentials.
+            Create a new team member account. They will receive an email to set their password.
           </DialogDescription>
         </DialogHeader>
 
@@ -150,24 +145,6 @@ export function AddMemberDialog({ open, onOpenChange, currentRole }: AddMemberDi
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password (optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Leave empty for auto-generated"
-                      type="password"
-                      {...field}
-                    />
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

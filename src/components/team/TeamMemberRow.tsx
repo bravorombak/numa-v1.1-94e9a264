@@ -1,4 +1,4 @@
-import { Edit2, MoreVertical, UserX, UserCheck } from 'lucide-react';
+import { Edit2, MoreVertical, UserX, UserCheck, Key } from 'lucide-react';
 import { format } from 'date-fns';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/tooltip';
 import { RoleBadge } from './RoleBadge';
 import type { TeamMember, AppRole } from '@/hooks/useTeam';
+import { useResetTeamMemberPassword } from '@/hooks/useTeam';
 
 interface TeamMemberRowProps {
   member: TeamMember;
@@ -28,6 +29,8 @@ interface TeamMemberRowProps {
 }
 
 export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate, onReactivate }: TeamMemberRowProps) {
+  const resetPassword = useResetTeamMemberPassword();
+  
   const canManage =
     currentRole === 'admin' ||
     (currentRole === 'editor' && member.role === 'user');
@@ -109,6 +112,12 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate, onRea
                     <Edit2 className="h-4 w-4 mr-2" />
                     Edit
                   </DropdownMenuItem>
+                  {!member.banned && (
+                    <DropdownMenuItem onClick={() => resetPassword.mutate({ user_id: member.id })}>
+                      <Key className="h-4 w-4 mr-2" />
+                      Send password reset email
+                    </DropdownMenuItem>
+                  )}
                   {!member.banned ? (
                     <DropdownMenuItem
                       onClick={() => onDeactivate(member)}
@@ -131,6 +140,10 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate, onRea
                       <DropdownMenuItem disabled>
                         <Edit2 className="h-4 w-4 mr-2" />
                         Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem disabled>
+                        <Key className="h-4 w-4 mr-2" />
+                        Send password reset email
                       </DropdownMenuItem>
                       {!member.banned ? (
                         <DropdownMenuItem disabled className="text-destructive">
