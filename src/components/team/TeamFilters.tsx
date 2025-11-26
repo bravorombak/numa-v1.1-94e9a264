@@ -22,8 +22,8 @@ export function TeamFilters({ filters, onChange }: TeamFiltersProps) {
   };
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="relative flex-1 max-w-sm">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+      <div className="relative w-full sm:flex-1 sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search by name or email..."
@@ -34,7 +34,7 @@ export function TeamFilters({ filters, onChange }: TeamFiltersProps) {
       </div>
 
       <Select value={filters.role} onValueChange={handleRoleChange}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full sm:w-[180px]">
           <SelectValue placeholder="Filter by role" />
         </SelectTrigger>
         <SelectContent>
@@ -46,7 +46,7 @@ export function TeamFilters({ filters, onChange }: TeamFiltersProps) {
       </Select>
 
       <Select value={filters.status ?? 'all'} onValueChange={handleStatusChange}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full sm:w-[180px]">
           <SelectValue placeholder="All Statuses" />
         </SelectTrigger>
         <SelectContent>
