@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { aboutTabSchema, type AboutTabFormData } from '@/lib/promptValidation';
@@ -22,10 +22,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const AboutTab = () => {
   const { draftData, updateDraftField } = usePromptEditorStore();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
+
+  // Determine default active tab based on current data
+  const getDefaultIconTab = () => {
+    if (draftData?.image_url && draftData.image_url.trim()) return 'image';
+    return 'emoji'; // default to emoji
+  };
+
+  const [activeIconTab, setActiveIconTab] = useState(getDefaultIconTab());
 
   const form = useForm<AboutTabFormData>({
     resolver: zodResolver(aboutTabSchema),
@@ -48,6 +57,8 @@ export const AboutTab = () => {
         image_url: draftData.image_url || '',
         category_id: draftData.category_id || '',
       });
+      // Update active tab based on new data
+      setActiveIconTab(getDefaultIconTab());
     }
   }, [draftData, form]);
 
@@ -59,32 +70,7 @@ export const AboutTab = () => {
     <div className="mx-auto max-w-3xl p-6">
       <Form {...form}>
         <form className="space-y-6">
-          <FormField
-            control={form.control}
-            name="emoji"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Emoji</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value || ''}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      handleFieldChange('emoji', e.target.value);
-                    }}
-                    placeholder="😀"
-                    maxLength={10}
-                  />
-                </FormControl>
-                <FormDescription>
-                  A single emoji to represent this prompt
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+          {/* 1. Title */}
           <FormField
             control={form.control}
             name="title"
@@ -106,6 +92,7 @@ export const AboutTab = () => {
             )}
           />
 
+          {/* 2. Description */}
           <FormField
             control={form.control}
             name="description"
@@ -133,12 +120,13 @@ export const AboutTab = () => {
             )}
           />
 
+          {/* 3. Category */}
           <FormField
             control={form.control}
             name="category_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category *</FormLabel>
+                <FormLabel>Category</FormLabel>
                 <Select
                   value={field.value || ''}
                   onValueChange={(value) => {
@@ -170,38 +158,77 @@ export const AboutTab = () => {
                   </SelectContent>
                 </Select>
                 <FormDescription>
-                  Category is required to save this prompt
+                  Optional - prompts without a category will be marked as "Uncategorized"
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="image_url"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Image URL</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value || ''}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      handleFieldChange('image_url', e.target.value);
-                    }}
-                    placeholder="https://example.com/image.jpg"
-                    type="url"
-                  />
-                </FormControl>
-                <FormDescription>
-                  Optional image to display with this prompt
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* 4. Icon (Tabbed: Emoji / Image) */}
+          <div className="space-y-2">
+            <FormLabel>Icon</FormLabel>
+            <Tabs value={activeIconTab} onValueChange={setActiveIconTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 max-w-[200px]">
+                <TabsTrigger value="emoji">Emoji</TabsTrigger>
+                <TabsTrigger value="image">Image</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="emoji" className="mt-4">
+                <FormField
+                  control={form.control}
+                  name="emoji"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleFieldChange('emoji', e.target.value);
+                          }}
+                          placeholder="😀"
+                          maxLength={10}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        A single emoji to represent this prompt
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+
+              <TabsContent value="image" className="mt-4">
+                <FormField
+                  control={form.control}
+                  name="image_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleFieldChange('image_url', e.target.value);
+                          }}
+                          placeholder="https://example.com/image.jpg"
+                          type="url"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Optional image URL to display with this prompt
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
         </form>
       </Form>
     </div>
