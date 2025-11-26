@@ -108,7 +108,16 @@ export const usePromptVersion = (id: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('prompt_versions')
-        .select('*')
+        .select(`
+          *,
+          categories:category_id (
+            id,
+            name,
+            bg_color,
+            text_color,
+            border_color
+          )
+        `)
         .eq('id', id)
         .single();
 
@@ -173,6 +182,9 @@ export const usePublishPromptVersion = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ 
         queryKey: ['prompt-versions', data.prompt_draft_id] 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['published-prompts'] 
       });
       
       toast({

@@ -60,7 +60,15 @@ const PromptRunPage = () => {
       <div className="space-y-4">
         <div className="flex items-start gap-4">
           <div className="flex items-center gap-4 flex-1">
-            {promptVersion.emoji ? (
+            {promptVersion.icon_type === 'image' && promptVersion.icon_value ? (
+              <img
+                src={promptVersion.icon_value}
+                alt={promptVersion.title}
+                className="h-16 w-16 rounded-lg object-cover"
+              />
+            ) : promptVersion.icon_type === 'emoji' && promptVersion.icon_value ? (
+              <div className="text-5xl">{promptVersion.icon_value}</div>
+            ) : promptVersion.emoji ? (
               <div className="text-5xl">{promptVersion.emoji}</div>
             ) : promptVersion.image_url ? (
               <img
