@@ -76,7 +76,7 @@ export const AboutTab = () => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title *</FormLabel>
+                <FormLabel>Prompt Title *</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
