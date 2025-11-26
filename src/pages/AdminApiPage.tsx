@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ScrollableTable } from "@/components/common/ScrollableTable";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -93,7 +94,7 @@ const AdminApiPage = () => {
           </Button>
         </div>
       ) : (
-        <div className="border rounded-lg">
+        <ScrollableTable minWidth="min-w-[750px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -137,7 +138,7 @@ const AdminApiPage = () => {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </ScrollableTable>
       )}
 
       <ModelDialog

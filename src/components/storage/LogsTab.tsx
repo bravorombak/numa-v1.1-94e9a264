@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ScrollableTable } from '@/components/common/ScrollableTable';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Loader2, Search, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
@@ -87,7 +88,7 @@ export const LogsTab = () => {
           </div>
         ) : (
           <>
-            <div className="rounded-md border">
+            <ScrollableTable minWidth="min-w-[800px]">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -154,7 +155,7 @@ export const LogsTab = () => {
                   ))}
                 </TableBody>
               </Table>
-            </div>
+            </ScrollableTable>
 
             {/* Pagination */}
             <div className="flex items-center justify-between">

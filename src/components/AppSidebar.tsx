@@ -5,6 +5,7 @@ import { useMatch, useNavigate } from "react-router-dom";
 import { useAllUserSessions, useRenameSession, useDeleteSession } from "@/hooks/useSessions";
 import { useCreatePromptDraft } from "@/hooks/usePromptDrafts";
 import { useAuthStore } from "@/stores/authStore";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { SessionListItemWithPrompt } from "@/hooks/useSessions";
 import { formatDistanceToNow, format } from "date-fns";
 
@@ -64,6 +65,7 @@ export function AppSidebar() {
   const sessionId = match?.params.sessionId;
   const { profile } = useAuthStore();
   const role = profile?.role || 'user';
+  const isMobile = useIsMobile();
   
   const createPrompt = useCreatePromptDraft();
   
@@ -227,7 +229,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible={isMobile ? "offcanvas" : "icon"}>
       <SidebarContent>
       {/* New Prompt Button - only for Admin/Editor */}
       {(role === 'admin' || role === 'editor') && (

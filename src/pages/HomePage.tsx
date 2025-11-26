@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { ScrollableTable } from '@/components/common/ScrollableTable';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -145,7 +146,7 @@ const HomePage = () => {
         viewMode === 'list' &&
         filteredPrompts &&
         filteredPrompts.length > 0 && (
-          <div className="rounded-lg border">
+          <ScrollableTable minWidth="min-w-[500px]">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -172,7 +173,7 @@ const HomePage = () => {
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </ScrollableTable>
         )}
     </div>
   );
