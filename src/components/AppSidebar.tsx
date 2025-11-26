@@ -101,17 +101,67 @@ export function AppSidebar() {
     return `Session on ${format(new Date(session.created_at), "dd MMM, HH:mm")}`;
   };
 
-  const getPromptIcon = (session: SessionListItemWithPrompt) => {
+  // Helper to render prompt icon from prompt_versions or draft
+  const renderSessionIcon = (session: SessionListItemWithPrompt) => {
     const pv = session.prompt_versions;
     const draft = pv?.prompt_drafts;
 
-    return (
-      pv?.emoji?.trim() ||
-      pv?.image_url ||
-      draft?.emoji?.trim() ||
-      draft?.image_url ||
-      "💬"
-    );
+    // Priority 1: icon_type + icon_value from prompt_versions
+    if (pv?.icon_type === 'image' && pv?.icon_value) {
+      return (
+        <img
+          src={pv.icon_value}
+          alt=""
+          className="h-4 w-4 rounded-sm object-cover"
+        />
+      );
+    }
+    if (pv?.icon_type === 'emoji' && pv?.icon_value) {
+      return <span>{pv.icon_value}</span>;
+    }
+
+    // Priority 2: Fallback to legacy emoji/image_url from prompt_versions
+    if (pv?.emoji?.trim()) {
+      return <span>{pv.emoji}</span>;
+    }
+    if (pv?.image_url) {
+      return (
+        <img
+          src={pv.image_url}
+          alt=""
+          className="h-4 w-4 rounded-sm object-cover"
+        />
+      );
+    }
+
+    // Priority 3: Check draft fields (same order)
+    if (draft?.icon_type === 'image' && draft?.icon_value) {
+      return (
+        <img
+          src={draft.icon_value}
+          alt=""
+          className="h-4 w-4 rounded-sm object-cover"
+        />
+      );
+    }
+    if (draft?.icon_type === 'emoji' && draft?.icon_value) {
+      return <span>{draft.icon_value}</span>;
+    }
+    if (draft?.emoji?.trim()) {
+      return <span>{draft.emoji}</span>;
+    }
+    if (draft?.image_url) {
+      return (
+        <img
+          src={draft.image_url}
+          alt=""
+          className="h-4 w-4 rounded-sm object-cover"
+        />
+      );
+    }
+
+    // Default fallback
+    return <span>💬</span>;
   };
 
   const handleRenameClick = (session: SessionListItemWithPrompt) => {
@@ -336,9 +386,9 @@ export function AppSidebar() {
                               isActive && "bg-accent/80 text-accent-foreground font-medium border border-border"
                             )}
                           >
-                            <span className="flex h-6 w-6 items-center justify-center shrink-0 text-lg">
-                              {getPromptIcon(session)}
-                            </span>
+                  <span className="flex h-6 w-6 items-center justify-center shrink-0 text-lg">
+                    {renderSessionIcon(session)}
+                  </span>
                             {open && (
                               <div className="flex flex-col gap-0.5 min-w-0">
                                 <span className="truncate font-medium">{getSessionTitle(session)}</span>

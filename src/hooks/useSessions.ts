@@ -104,10 +104,14 @@ export interface SessionListItemWithPrompt {
     title: string | null;
     emoji: string | null;
     image_url: string | null;
+    icon_type: 'emoji' | 'image' | null;
+    icon_value: string | null;
     prompt_drafts: {
       title: string | null;
       emoji: string | null;
       image_url: string | null;
+      icon_type: 'emoji' | 'image' | null;
+      icon_value: string | null;
     } | null;
   } | null;
 }
@@ -147,10 +151,14 @@ export const useAllUserSessions = () => {
             title,
             emoji,
             image_url,
+            icon_type,
+            icon_value,
             prompt_drafts (
               title,
               emoji,
-              image_url
+              image_url,
+              icon_type,
+              icon_value
             )
           )
         `)
