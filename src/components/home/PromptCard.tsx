@@ -10,6 +10,8 @@ interface PromptCardProps {
   title: string;
   description: string | null;
   emoji: string | null;
+  icon_type: 'emoji' | 'image' | null;
+  icon_value: string | null;
   category: {
     id: string;
     name: string;
@@ -27,6 +29,8 @@ export const PromptCard = ({
   title,
   description,
   emoji,
+  icon_type,
+  icon_value,
   category,
   version_number,
   prompt_draft_id,
@@ -49,9 +53,19 @@ export const PromptCard = ({
       onClick={handleClick}
     >
       <CardHeader className="space-y-3 pb-4">
-        {/* Line 1: Emoji + Title only */}
+        {/* Line 1: Icon + Title */}
         <div className="flex items-center gap-2">
-          {emoji && <span className="text-2xl">{emoji}</span>}
+          {icon_type === 'image' && icon_value ? (
+            <img 
+              src={icon_value} 
+              alt="Prompt icon" 
+              className="h-8 w-8 rounded object-cover"
+            />
+          ) : icon_type === 'emoji' && icon_value ? (
+            <span className="text-2xl">{icon_value}</span>
+          ) : emoji ? (
+            <span className="text-2xl">{emoji}</span>
+          ) : null}
           <h3 className="line-clamp-2 text-lg font-semibold leading-tight flex-1">
             {title}
           </h3>

@@ -128,6 +128,8 @@ const HomePage = () => {
                 title={prompt.title}
                 description={prompt.description}
                 emoji={prompt.emoji}
+                icon_type={prompt.icon_type}
+                icon_value={prompt.icon_value}
                 category={prompt.categories}
                 version_number={prompt.version_number}
                 prompt_draft_id={prompt.prompt_draft_id}
@@ -160,6 +162,8 @@ const HomePage = () => {
                     id={prompt.id}
                     title={prompt.title}
                     emoji={prompt.emoji}
+                    icon_type={prompt.icon_type}
+                    icon_value={prompt.icon_value}
                     category={prompt.categories}
                     version_number={prompt.version_number}
                     prompt_draft_id={prompt.prompt_draft_id}

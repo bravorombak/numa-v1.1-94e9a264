@@ -255,6 +255,8 @@ export type Database = {
           created_at: string | null
           description: string | null
           emoji: string | null
+          icon_type: string | null
+          icon_value: string | null
           id: string
           image_url: string | null
           model_id: string | null
@@ -269,6 +271,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           emoji?: string | null
+          icon_type?: string | null
+          icon_value?: string | null
           id?: string
           image_url?: string | null
           model_id?: string | null
@@ -283,6 +287,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           emoji?: string | null
+          icon_type?: string | null
+          icon_value?: string | null
           id?: string
           image_url?: string | null
           model_id?: string | null
@@ -315,6 +321,8 @@ export type Database = {
           created_at: string | null
           description: string | null
           emoji: string | null
+          icon_type: string | null
+          icon_value: string | null
           id: string
           image_url: string | null
           model_id: string | null
@@ -331,6 +339,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           emoji?: string | null
+          icon_type?: string | null
+          icon_value?: string | null
           id?: string
           image_url?: string | null
           model_id?: string | null
@@ -347,6 +357,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           emoji?: string | null
+          icon_type?: string | null
+          icon_value?: string | null
           id?: string
           image_url?: string | null
           model_id?: string | null
