@@ -24,7 +24,7 @@ export const ChatHeader = ({
 
   return (
     <div className="border-b bg-card p-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex items-center gap-3 min-w-0">
           {promptEmoji && (
             <span className="text-2xl flex-shrink-0">{promptEmoji}</span>
@@ -36,17 +36,14 @@ export const ChatHeader = ({
               className="w-8 h-8 rounded flex-shrink-0 object-cover"
             />
           )}
-          <div className="min-w-0 flex-1">
-            <h1 className="text-lg font-semibold text-foreground truncate">
-              {promptTitle}
-            </h1>
-          </div>
+          <h1 className="text-lg font-semibold text-foreground truncate">
+            {promptTitle}
+          </h1>
         </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <Badge 
-            variant={modelName === "No model configured" ? "destructive" : "secondary"} 
-            className="text-xs flex items-center gap-1"
-          >
+        <Badge 
+          variant={modelName === "No model configured" ? "destructive" : "secondary"} 
+          className="text-xs flex items-center gap-1 w-fit"
+        >
             {versionNumber && (
               <span>v{versionNumber}</span>
             )}
@@ -63,7 +60,6 @@ export const ChatHeader = ({
               </>
             )}
           </Badge>
-        </div>
       </div>
     </div>
   );

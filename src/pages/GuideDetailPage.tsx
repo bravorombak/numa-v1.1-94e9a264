@@ -62,7 +62,7 @@ const GuideDetailPage = () => {
       <div className={cn(
         "border-r flex flex-col bg-background z-40 transition-transform duration-200",
         "w-80",
-        "absolute inset-y-0 left-0 md:relative md:translate-x-0",
+        "fixed inset-y-0 left-0 md:relative md:translate-x-0",
         isMobile && !sidebarOpen && "-translate-x-full"
       )}>
         <div className="border-b px-4 py-3 flex items-center justify-between">

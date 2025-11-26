@@ -32,7 +32,7 @@ export const ChatComposer = ({
   };
 
   return (
-    <div className="border-t bg-card p-4">
+    <div className="border-t bg-card p-3 sm:p-4">
       <div className="flex gap-2 items-end">
         <div className="flex-1 relative">
           <Textarea
