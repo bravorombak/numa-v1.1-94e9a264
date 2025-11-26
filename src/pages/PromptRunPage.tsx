@@ -44,7 +44,7 @@ const PromptRunPage = () => {
   const modelName = models?.find(m => m.id === promptVersion.model_id)?.name;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 p-6">
+    <div className="mx-auto max-w-3xl space-y-6 sm:space-y-8 p-4 sm:p-6">
       {/* Back Button */}
       <Button
         variant="ghost"
@@ -58,40 +58,40 @@ const PromptRunPage = () => {
 
       {/* Header Section */}
       <div className="space-y-4">
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
           <div className="flex items-center gap-4 flex-1">
             {promptVersion.icon_type === 'image' && promptVersion.icon_value ? (
               <img
                 src={promptVersion.icon_value}
-                alt={promptVersion.title}
-                className="h-16 w-16 rounded-lg object-cover"
+                alt=""
+                className="w-12 h-12 rounded object-cover flex-shrink-0"
               />
             ) : promptVersion.icon_type === 'emoji' && promptVersion.icon_value ? (
-              <div className="text-5xl">{promptVersion.icon_value}</div>
+              <span className="text-4xl flex-shrink-0">{promptVersion.icon_value}</span>
             ) : promptVersion.emoji ? (
-              <div className="text-5xl">{promptVersion.emoji}</div>
+              <span className="text-4xl flex-shrink-0">{promptVersion.emoji}</span>
             ) : promptVersion.image_url ? (
               <img
                 src={promptVersion.image_url}
-                alt={promptVersion.title}
-                className="h-16 w-16 rounded-lg object-cover"
+                alt=""
+                className="w-12 h-12 rounded object-cover flex-shrink-0"
               />
             ) : null}
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">{promptVersion.title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">{promptVersion.title}</h1>
             </div>
           </div>
-            {canEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/prompts/${promptVersion.prompt_draft_id}/edit`)}
-                className="gap-2"
-              >
-                <Settings className="h-4 w-4" />
-                Edit
-              </Button>
-            )}
+          {canEdit && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/prompts/${promptVersion.prompt_draft_id}/edit`)}
+              className="gap-2 w-full sm:w-auto"
+            >
+              <Settings className="h-4 w-4" />
+              Edit
+            </Button>
+          )}
         </div>
         
         {/* Metadata Row */}

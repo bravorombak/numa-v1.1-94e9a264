@@ -9,7 +9,7 @@ export const AppLayout = () => {
   
   // Guard: wait until mobile detection is complete
   if (isMobile === undefined) {
-    return <div className="w-full h-screen bg-background" />;
+    return null;
   }
   
   return (
