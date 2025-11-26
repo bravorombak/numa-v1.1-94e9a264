@@ -2,10 +2,13 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AppHeader } from "@/components/AppHeader";
 import { Outlet } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const AppLayout = () => {
+  const isMobile = useIsMobile();
+  
   return (
-    <SidebarProvider className="fixed inset-0 flex w-full overflow-hidden">
+    <SidebarProvider defaultOpen={!isMobile} className="fixed inset-0 flex w-full overflow-hidden">
       <div className="flex h-full w-full min-h-0">
         <AppSidebar />
         <div className="flex flex-1 flex-col min-h-0">

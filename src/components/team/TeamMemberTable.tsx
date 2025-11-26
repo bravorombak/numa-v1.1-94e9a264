@@ -1,5 +1,6 @@
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TeamMemberRow } from './TeamMemberRow';
+import { ScrollableTable } from '@/components/common/ScrollableTable';
 import type { TeamMember, AppRole } from '@/hooks/useTeam';
 
 interface TeamMemberTableProps {
@@ -12,7 +13,7 @@ interface TeamMemberTableProps {
 
 export function TeamMemberTable({ members, currentRole, onEdit, onDeactivate, onReactivate }: TeamMemberTableProps) {
   return (
-    <div className="rounded-lg border">
+    <ScrollableTable minWidth="min-w-[700px]">
       <Table>
         <TableHeader>
           <TableRow>
@@ -36,6 +37,6 @@ export function TeamMemberTable({ members, currentRole, onEdit, onDeactivate, on
           ))}
         </TableBody>
       </Table>
-    </div>
+    </ScrollableTable>
   );
 }
