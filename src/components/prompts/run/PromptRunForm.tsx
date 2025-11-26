@@ -226,7 +226,7 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
         return (
           <Input
             type={variable.type}
-            placeholder={variable.placeholder}
+            placeholder="Your answer"
             {...field}
           />
         );
@@ -235,7 +235,7 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
         return (
           <Input
             type="number"
-            placeholder={variable.placeholder}
+            placeholder="Your answer"
             {...field}
             onChange={(e) => field.onChange(e.target.value)}
           />
@@ -245,7 +245,7 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
         return (
           <Textarea
             rows={4}
-            placeholder={variable.placeholder}
+            placeholder="Your answer"
             {...field}
           />
         );
@@ -254,7 +254,7 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
         return (
           <Input
             type="date"
-            placeholder={variable.placeholder}
+            placeholder="Your answer"
             {...field}
           />
         );
@@ -263,7 +263,7 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
         return (
           <Select onValueChange={field.onChange} value={field.value}>
             <SelectTrigger>
-              <SelectValue placeholder={variable.placeholder || "Select an option"} />
+              <SelectValue placeholder="Your answer" />
             </SelectTrigger>
             <SelectContent>
               {(variable.options || []).map((option: string) => (
@@ -311,7 +311,7 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
         return (
           <Input
             type="text"
-            placeholder={variable.placeholder}
+            placeholder="Your answer"
             {...field}
           />
         );
@@ -383,10 +383,10 @@ export const PromptRunForm = ({ promptVersion }: PromptRunFormProps) => {
                     <span className="text-destructive ml-1">*</span>
                   )}
                 </FormLabel>
-                <FormControl>{renderInput(variable, field)}</FormControl>
                 {variable.description && (
-                  <FormDescription>{variable.description}</FormDescription>
+                  <FormDescription className="mt-1 mb-2">{variable.description}</FormDescription>
                 )}
+                <FormControl>{renderInput(variable, field)}</FormControl>
                 <FormMessage />
               </FormItem>
             )}

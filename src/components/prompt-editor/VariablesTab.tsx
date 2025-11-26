@@ -149,9 +149,9 @@ export const VariablesTab = () => {
               </p>
             </div>
 
-            {/* Type */}
+            {/* Variable Type */}
             <div className="space-y-2">
-              <Label htmlFor={`type-${index}`}>Type</Label>
+              <Label htmlFor={`type-${index}`}>Variable Type</Label>
               <Select
                 value={variable.type}
                 onValueChange={(value) => handleVariableChange(index, { type: value })}
@@ -180,42 +180,22 @@ export const VariablesTab = () => {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">
-                Choose what kind of answer users will give.
-              </p>
             </div>
 
-            {/* Label */}
+            {/* Variable Title */}
             <div className="space-y-2">
-              <Label htmlFor={`label-${index}`}>Label</Label>
+              <Label htmlFor={`label-${index}`}>Variable Title</Label>
               <Input
                 id={`label-${index}`}
                 value={variable.label || ''}
                 onChange={(e) => handleVariableChange(index, { label: e.target.value })}
                 placeholder="Label to show in forms"
               />
-              <p className="text-sm text-muted-foreground">
-                This is the title/name of the variable.
-              </p>
             </div>
 
-            {/* Placeholder */}
+            {/* Helper Text */}
             <div className="space-y-2">
-              <Label htmlFor={`placeholder-${index}`}>Placeholder</Label>
-              <Input
-                id={`placeholder-${index}`}
-                value={variable.placeholder || ''}
-                onChange={(e) => handleVariableChange(index, { placeholder: e.target.value })}
-                placeholder="Example: Red, Blue, Green"
-              />
-              <p className="text-sm text-muted-foreground">
-                Gray example text inside the box to guide users.
-              </p>
-            </div>
-
-            {/* Description */}
-            <div className="space-y-2">
-              <Label htmlFor={`description-${index}`}>Hint</Label>
+              <Label htmlFor={`description-${index}`}>Helper Text</Label>
               <Textarea
                 id={`description-${index}`}
                 value={variable.description || ''}
@@ -223,9 +203,6 @@ export const VariablesTab = () => {
                 placeholder="Write a short note to help users"
                 className="min-h-[80px]"
               />
-              <p className="text-sm text-muted-foreground">
-                Short note under the field that helps users know what to write.
-              </p>
             </div>
 
             {/* Required */}
