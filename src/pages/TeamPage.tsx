@@ -87,14 +87,14 @@ const TeamPage = () => {
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Team Management</h1>
           <p className="text-muted-foreground mt-1">
             Manage team members and their roles
           </p>
         </div>
-        <Button onClick={() => setAddOpen(true)}>
+        <Button onClick={() => setAddOpen(true)} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           Add Member
         </Button>

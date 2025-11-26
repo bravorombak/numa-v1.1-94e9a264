@@ -7,6 +7,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export const AppLayout = () => {
   const isMobile = useIsMobile();
   
+  // Guard: wait until mobile detection is complete
+  if (isMobile === undefined) {
+    return <div className="w-full h-screen bg-background" />;
+  }
+  
   return (
     <SidebarProvider defaultOpen={!isMobile} className="fixed inset-0 flex w-full overflow-hidden">
       <div className="flex h-full w-full min-h-0">

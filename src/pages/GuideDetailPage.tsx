@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GuideTree } from "@/components/guide/GuideTree";
 import { GuideEditor } from "@/components/guide/GuideEditor";
@@ -8,6 +8,8 @@ import { CreateGuideDialog } from "@/components/guide/CreateGuideDialog";
 import { useGuidePage, useGuideTree } from "@/hooks/useGuide";
 import { useAuthStore } from "@/stores/authStore";
 import { buildTreeFromFlat } from "@/lib/guideUtils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const GuideDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +17,8 @@ const GuideDetailPage = () => {
   const { profile } = useAuthStore();
   const role = profile?.role || 'user';
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const { data: page, isLoading: pageLoading, error: pageError } = useGuidePage(id);
   const { data: pages, isLoading: treeLoading } = useGuideTree();
@@ -53,18 +57,35 @@ const GuideDetailPage = () => {
   const tree = pages ? buildTreeFromFlat(pages) : [];
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden relative">
       {/* Left Sidebar - Tree Navigation */}
-      <div className="w-80 border-r flex flex-col">
+      <div className={cn(
+        "border-r flex flex-col bg-background z-40 transition-transform duration-200",
+        "w-80",
+        "absolute inset-y-0 left-0 md:relative md:translate-x-0",
+        isMobile && !sidebarOpen && "-translate-x-full"
+      )}>
         <div className="border-b px-4 py-3 flex items-center justify-between">
           <h2 className="font-semibold">Guide Pages</h2>
-          <Button
-            size="sm"
-            onClick={() => setShowCreateDialog(true)}
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            New
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={() => setShowCreateDialog(true)}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              New
+            </Button>
+            {isMobile && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setSidebarOpen(false)}
+                className="h-8 w-8"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
@@ -80,8 +101,26 @@ const GuideDetailPage = () => {
         </div>
       </div>
 
+      {/* Backdrop on mobile */}
+      {isMobile && sidebarOpen && (
+        <div 
+          className="absolute inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Right Panel - Editor */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile toggle header */}
+        {isMobile && (
+          <div className="border-b px-4 py-2 md:hidden">
+            <Button variant="outline" size="sm" onClick={() => setSidebarOpen(true)}>
+              <Menu className="h-4 w-4 mr-2" />
+              Pages
+            </Button>
+          </div>
+        )}
+        
         {pageLoading ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-muted-foreground">Loading page...</div>
