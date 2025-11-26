@@ -30,7 +30,7 @@ export async function uploadPromptIcon(file: File): Promise<UploadResult> {
   const timestamp = Date.now();
   const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
   const filename = `${timestamp}-${sanitizedName}`;
-  const path = `prompt-icons/${user.id}/${filename}`;
+  const path = `${user.id}/prompt-icons/${filename}`;
 
   // Upload to Supabase Storage
   const { data, error } = await supabase.storage
