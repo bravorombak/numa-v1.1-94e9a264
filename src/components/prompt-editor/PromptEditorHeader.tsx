@@ -21,6 +21,8 @@ export const PromptEditorHeader = () => {
         description: draftData.description,
         emoji: draftData.emoji,
         image_url: draftData.image_url,
+        icon_type: draftData.icon_type,
+        icon_value: draftData.icon_value,
         category_id: draftData.category_id,
         prompt_text: draftData.prompt_text,
         variables: draftData.variables,
