@@ -3,6 +3,7 @@ import { ChatMessage } from "./ChatMessage";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useGenerationTimer } from "@/hooks/useGenerationTimer";
 
 interface MessageRow {
   content: string;
@@ -32,6 +33,7 @@ export const ChatBody = ({
   onRetryAssistant 
 }: ChatBodyProps) => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const seconds = useGenerationTimer(isAssistantLoading ?? false);
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
@@ -113,7 +115,10 @@ export const ChatBody = ({
                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
                 </div>
                 <div className="flex-1 text-sm text-muted-foreground">
-                  Generating response...
+                  <span>Generating response...</span>
+                  <span className="ml-1 text-xs">
+                    ({seconds}s)
+                  </span>
                 </div>
               </div>
             </div>
