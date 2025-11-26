@@ -8,6 +8,8 @@ interface PromptListItemProps {
   id: string;
   title: string;
   emoji: string | null;
+  icon_type: 'emoji' | 'image' | null;
+  icon_value: string | null;
   category: {
     id: string;
     name: string;
@@ -24,6 +26,8 @@ export const PromptListItem = ({
   id,
   title,
   emoji,
+  icon_type,
+  icon_value,
   category,
   version_number,
   prompt_draft_id,
@@ -47,7 +51,17 @@ export const PromptListItem = ({
     >
       <TableCell>
         <div className="flex items-center gap-2">
-          {emoji && <span className="text-lg">{emoji}</span>}
+          {icon_type === 'image' && icon_value ? (
+            <img 
+              src={icon_value} 
+              alt="Prompt icon" 
+              className="h-6 w-6 rounded object-cover"
+            />
+          ) : icon_type === 'emoji' && icon_value ? (
+            <span className="text-lg">{icon_value}</span>
+          ) : emoji ? (
+            <span className="text-lg">{emoji}</span>
+          ) : null}
           <span className="font-medium">{title}</span>
         </div>
       </TableCell>

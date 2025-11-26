@@ -46,6 +46,8 @@ export const AboutTab = () => {
       emoji: draftData?.emoji || '',
       image_url: draftData?.image_url || '',
       category_id: draftData?.category_id || '',
+      icon_type: (draftData?.icon_type as 'emoji' | 'image' | null) || null,
+      icon_value: draftData?.icon_value || null,
     },
   });
 
@@ -58,6 +60,8 @@ export const AboutTab = () => {
         emoji: draftData.emoji || '',
         image_url: draftData.image_url || '',
         category_id: draftData.category_id || '',
+        icon_type: (draftData.icon_type as 'emoji' | 'image' | null) || null,
+        icon_value: draftData.icon_value || null,
       });
       // Update active tab based on new data
       setActiveIconTab(getDefaultIconTab());
@@ -191,6 +195,9 @@ export const AboutTab = () => {
                           onChange={(emoji) => {
                             field.onChange(emoji);
                             handleFieldChange('emoji', emoji);
+                            // Set icon_type and icon_value for "last selected wins"
+                            handleFieldChange('icon_type', emoji ? 'emoji' : null);
+                            handleFieldChange('icon_value', emoji || null);
                           }}
                         />
                       </FormControl>
@@ -212,6 +219,16 @@ export const AboutTab = () => {
                           onChange={(url) => {
                             field.onChange(url);
                             handleFieldChange('image_url', url);
+                            // Set icon_type and icon_value for "last selected wins"
+                            if (url) {
+                              handleFieldChange('icon_type', 'image');
+                              handleFieldChange('icon_value', url);
+                              // Clear emoji to keep things clean
+                              handleFieldChange('emoji', '');
+                            } else {
+                              handleFieldChange('icon_type', null);
+                              handleFieldChange('icon_value', null);
+                            }
                           }}
                         />
                       </FormControl>

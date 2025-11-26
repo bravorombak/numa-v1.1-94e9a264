@@ -10,6 +10,8 @@ export const aboutTabSchema = z.object({
   emoji: z.string().optional().nullable(),
   image_url: z.string().url('Must be a valid URL').optional().or(z.literal('')).nullable(),
   category_id: z.string().uuid().optional().nullable(),
+  icon_type: z.enum(['emoji', 'image']).optional().nullable(),
+  icon_value: z.string().optional().nullable(),
 });
 
 export type AboutTabFormData = z.infer<typeof aboutTabSchema>;
