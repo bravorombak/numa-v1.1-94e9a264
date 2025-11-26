@@ -23,6 +23,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EmojiPicker } from './EmojiPicker';
+import { PromptImageUploader } from './PromptImageUploader';
 
 export const AboutTab = () => {
   const { draftData, updateDraftField } = usePromptEditorStore();
@@ -168,6 +170,9 @@ export const AboutTab = () => {
           {/* 4. Icon (Tabbed: Emoji / Image) */}
           <div className="space-y-2">
             <FormLabel>Icon</FormLabel>
+            <FormDescription>
+              Choose an emoji or upload an image for your prompt
+            </FormDescription>
             <Tabs value={activeIconTab} onValueChange={setActiveIconTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 max-w-[200px]">
                 <TabsTrigger value="emoji">Emoji</TabsTrigger>
@@ -181,20 +186,14 @@ export const AboutTab = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input
-                          {...field}
+                        <EmojiPicker
                           value={field.value || ''}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            handleFieldChange('emoji', e.target.value);
+                          onChange={(emoji) => {
+                            field.onChange(emoji);
+                            handleFieldChange('emoji', emoji);
                           }}
-                          placeholder="😀"
-                          maxLength={10}
                         />
                       </FormControl>
-                      <FormDescription>
-                        A single emoji to represent this prompt
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -208,20 +207,14 @@ export const AboutTab = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input
-                          {...field}
+                        <PromptImageUploader
                           value={field.value || ''}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            handleFieldChange('image_url', e.target.value);
+                          onChange={(url) => {
+                            field.onChange(url);
+                            handleFieldChange('image_url', url);
                           }}
-                          placeholder="https://example.com/image.jpg"
-                          type="url"
                         />
                       </FormControl>
-                      <FormDescription>
-                        Optional image URL to display with this prompt
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
