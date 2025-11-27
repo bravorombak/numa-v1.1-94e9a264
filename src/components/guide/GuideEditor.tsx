@@ -180,129 +180,142 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
               </TabsList>
             </div>
 
-            <TabsContent value="edit" className="flex-1 overflow-y-auto px-4 py-4 sm:p-6 space-y-4 mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Slug</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="parent_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Parent Page</FormLabel>
-                      <Select
-                        onValueChange={(value) =>
-                          field.onChange(value === "none" ? null : value)
-                        }
-                        value={field.value || "none"}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">None (Root level)</SelectItem>
-                          {parentOptions.map((p) => (
-                            <SelectItem key={p.id} value={p.id}>
-                              {p.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="sort_order"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sort Order</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
+        <TabsContent value="edit" className="flex-1 overflow-y-auto mt-0">
+          <div className="w-full max-w-3xl mx-auto space-y-6 px-4 py-4 sm:px-6 sm:py-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="is_published"
+                name="title"
                 render={({ field }) => (
-                  <FormItem className="flex items-center justify-between rounded-lg border p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel>Published</FormLabel>
-                      <div className="text-sm text-muted-foreground">
-                        Make this page visible in the guide
-                      </div>
-                    </div>
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Input placeholder="Getting Started" {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
               <FormField
                 control={form.control}
-                name="content_md"
+                name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Content (Markdown)</FormLabel>
-                    <MarkdownToolbar
-                      textareaRef={textareaRef}
-                      onContentChange={(content) => form.setValue("content_md", content)}
-                    />
+                    <FormLabel>Slug</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <Input placeholder="getting-started" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="parent_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Parent Page</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="None (Top level)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">None (Top level)</SelectItem>
+                        {parentOptions.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="sort_order"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sort Order</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="0"
                         {...field}
-                        ref={textareaRef}
-                        className="min-h-[400px] font-mono text-sm"
-                        placeholder="Write your guide content in markdown..."
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(
+                            value === "" ? null : parseInt(value, 10)
+                          );
+                        }}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </TabsContent>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="is_published"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Published</FormLabel>
+                    <div className="text-sm text-muted-foreground">
+                      Make this page visible in the guide tree
+                    </div>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="content_md"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Content (Markdown)</FormLabel>
+                  <FormControl>
+                    <div className="space-y-2">
+                      <MarkdownToolbar
+                        textareaRef={textareaRef}
+                        onContentChange={(newContent) => field.onChange(newContent)}
+                      />
+                      <Textarea
+                        ref={textareaRef}
+                        placeholder="Write your guide content here using Markdown..."
+                        className="min-h-[400px] font-mono"
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </TabsContent>
 
             <TabsContent value="preview" className="flex-1 overflow-y-auto px-4 py-4 sm:p-6 mt-0">
               <Card className="p-6">
