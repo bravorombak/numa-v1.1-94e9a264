@@ -72,7 +72,7 @@ export function MarkdownToolbar({ textareaRef, onContentChange }: MarkdownToolba
 
   return (
     <TooltipProvider>
-      <div className="flex items-center gap-1 p-2 border rounded-md bg-background mb-2">
+      <div className="flex flex-wrap items-center gap-1 p-2 border rounded-md bg-background mb-2">
         {/* Header buttons */}
         <Tooltip>
           <TooltipTrigger asChild>
