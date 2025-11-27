@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ScrollableTable } from '@/components/common/ScrollableTable';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -148,14 +148,14 @@ const HomePage = () => {
         viewMode === 'list' &&
         filteredPrompts &&
         filteredPrompts.length > 0 && (
-          <ScrollableTable minWidth="min-w-[500px]">
+          <div className="rounded-lg border bg-card">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Version</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead className="hidden sm:table-cell">Version</TableHead>
+                  <TableHead className="hidden sm:table-cell text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -175,7 +175,7 @@ const HomePage = () => {
                 ))}
               </TableBody>
             </Table>
-          </ScrollableTable>
+          </div>
         )}
     </div>
   );
