@@ -7,6 +7,7 @@ import { MarkdownToolbar } from "@/components/guide/MarkdownToolbar";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -225,20 +226,26 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
                         field.onChange(value === "none" ? null : value);
                       }}
                     >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select parent page" />
-                        </SelectTrigger>
-                      </FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select parent page" />
+                      </SelectTrigger>
                       <SelectContent>
+                        {/* Top-level sentinel – MUST NOT be empty string */}
                         <SelectItem value="none">None (Top level)</SelectItem>
-                        {parentOptions.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>
-                            {p.title}
-                          </SelectItem>
-                        ))}
+
+                        {/* Defensive: never render an item with an empty id */}
+                        {parentOptions
+                          .filter((p) => p.id && p.id.trim() !== "")
+                          .map((p) => (
+                            <SelectItem key={p.id} value={p.id}>
+                              {p.title}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
+                    <FormDescription>
+                      Optional — leave as "None" to keep this page at the top level.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
