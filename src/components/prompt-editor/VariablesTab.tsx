@@ -124,7 +124,7 @@ export const VariablesTab = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-4 py-4 sm:p-6 space-y-6">
       {variables.map((variable, index) => (
         <Card key={`${variable.name}-${index}`}>
           <CardHeader>

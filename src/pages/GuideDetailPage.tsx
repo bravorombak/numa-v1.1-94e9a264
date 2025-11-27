@@ -126,7 +126,9 @@ const GuideDetailPage = () => {
             <div className="text-muted-foreground">Loading page...</div>
           </div>
         ) : page ? (
-          <GuideEditor page={page} allPages={pages || []} />
+          <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 max-w-full overflow-x-hidden">
+            <GuideEditor page={page} allPages={pages || []} />
+          </div>
         ) : null}
       </div>
 

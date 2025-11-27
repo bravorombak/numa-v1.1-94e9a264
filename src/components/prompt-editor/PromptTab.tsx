@@ -42,7 +42,7 @@ export const PromptTab = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-6">
+    <div className="flex flex-col gap-4 px-4 py-4 sm:p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-medium">Prompt</h2>
