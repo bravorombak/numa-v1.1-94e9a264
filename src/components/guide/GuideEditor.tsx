@@ -220,16 +220,18 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
                   <FormItem>
                     <FormLabel>Parent Page</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      value={field.value || ""}
+                      value={field.value ?? "none"}
+                      onValueChange={(value) => {
+                        field.onChange(value === "none" ? null : value);
+                      }}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="None (Top level)" />
+                          <SelectValue placeholder="Select parent page" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">None (Top level)</SelectItem>
+                        <SelectItem value="none">None (Top level)</SelectItem>
                         {parentOptions.map((p) => (
                           <SelectItem key={p.id} value={p.id}>
                             {p.title}
