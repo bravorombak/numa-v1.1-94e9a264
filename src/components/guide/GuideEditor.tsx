@@ -171,7 +171,7 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 overflow-hidden">
           <Tabs defaultValue="edit" className="h-full flex flex-col">
-            <div className="border-b px-6">
+            <div className="border-b px-4 sm:px-6">
               <TabsList>
                 <TabsTrigger value="edit">Edit</TabsTrigger>
                 <TabsTrigger value="preview">
