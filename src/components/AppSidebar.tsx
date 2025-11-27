@@ -242,7 +242,7 @@ export function AppSidebar() {
               disabled={createPrompt.isPending}
             >
               <Plus className="h-4 w-4" />
-              {open && (
+              {(isMobile || open) && (
                 <span className="ml-1">
                   {createPrompt.isPending ? 'Creating...' : 'New Prompt'}
                 </span>
@@ -285,7 +285,7 @@ export function AppSidebar() {
                         activeClassName="bg-accent text-accent-foreground font-medium"
                       >
                         <item.icon className="h-4 w-4" />
-                        {open && <span>{item.title}</span>}
+                        {(isMobile || open) && <span>{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -298,7 +298,7 @@ export function AppSidebar() {
         {/* Sessions Group (always visible) */}
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel>
-            {open ? "Sessions" : <MessageSquare className="h-4 w-4" />}
+            {(isMobile || open) ? "Sessions" : <MessageSquare className="h-4 w-4" />}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             {sessionListLoading && (
@@ -345,7 +345,7 @@ export function AppSidebar() {
                       <SidebarMenuItem key={session.id}>
                         <div className="flex items-start gap-1 w-full group">
                           {/* Three-dot menu on the LEFT */}
-                          {open && (
+                          {(isMobile || open) && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button
@@ -391,7 +391,7 @@ export function AppSidebar() {
                   <span className="flex h-6 w-6 items-center justify-center shrink-0 text-lg">
                     {renderSessionIcon(session)}
                   </span>
-                            {open && (
+                            {(isMobile || open) && (
                               <div className="flex flex-col gap-0.5 min-w-0">
                                 <span className="truncate font-medium">{getSessionTitle(session)}</span>
                                 <span className="text-xs text-muted-foreground">{relativeTime}</span>

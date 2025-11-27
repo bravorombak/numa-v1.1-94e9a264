@@ -7,6 +7,9 @@ import { buildTreeFromFlat } from "@/lib/guideUtils";
 import type { GuideTreeItem } from "@/hooks/useGuide";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function getFirstPageId(tree: GuideTreeItem[]): string | null {
   if (tree.length === 0) return null;
@@ -21,6 +24,8 @@ function getFirstPageId(tree: GuideTreeItem[]): string | null {
 export default function GuideViewerPage() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const { data: pages, isLoading: treeLoading, error: treeError } = useGuideTree();
   const { data: page, isLoading: pageLoading, error: pageError } = useGuidePage(id);
@@ -104,7 +109,14 @@ export default function GuideViewerPage() {
   return (
     <div className="flex h-full overflow-hidden">
       {/* Left Sidebar - Tree Navigation */}
-      <div className="w-80 border-r flex flex-col">
+      <div
+        className={cn(
+          "border-r flex flex-col bg-background z-40 transition-transform duration-200",
+          "w-80",
+          "fixed inset-y-0 left-0 md:relative md:translate-x-0",
+          isMobile && !sidebarOpen && "-translate-x-full"
+        )}
+      >
         <div className="border-b px-4 py-3">
           <h2 className="font-semibold">Guide</h2>
         </div>
@@ -115,12 +127,47 @@ export default function GuideViewerPage() {
             onPageClick={handlePageClick}
           />
         </div>
+
+        {/* Mobile close button */}
+        {isMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-2 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        )}
       </div>
 
+      {/* Mobile backdrop */}
+      {isMobile && sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Right Panel - Content Viewer */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 flex flex-col px-4 py-4 sm:px-6 sm:py-6 max-w-full overflow-x-hidden overflow-y-auto">
+        {/* Mobile pages toggle */}
+        {isMobile && (
+          <div className="mb-4 flex justify-between items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSidebarOpen(true)}
+              className="gap-2"
+            >
+              <Menu className="h-4 w-4" />
+              Pages
+            </Button>
+          </div>
+        )}
+
         {pageLoading && (
-          <div className="max-w-4xl mx-auto p-8">
+          <div className="max-w-4xl mx-auto">
             <Skeleton className="h-10 w-3/4 mb-4" />
             <Skeleton className="h-4 w-full mb-2" />
             <Skeleton className="h-4 w-full mb-2" />
@@ -140,7 +187,7 @@ export default function GuideViewerPage() {
         )}
 
         {!pageLoading && !pageError && page && (
-          <div className="max-w-4xl mx-auto p-8">
+          <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">{page.title}</h1>
             <GuideMarkdown content={page.content_md || "*No content yet.*"} />
           </div>
