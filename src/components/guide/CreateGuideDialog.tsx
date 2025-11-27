@@ -138,21 +138,24 @@ export function CreateGuideDialog({ open, onOpenChange, pages }: CreateGuideDial
                 <FormItem>
                   <FormLabel>Parent Page</FormLabel>
                   <Select
+                    value={field.value ?? "none"}
                     onValueChange={(value) => field.onChange(value === "none" ? null : value)}
-                    defaultValue={field.value || "none"}
                   >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select parent page" />
-                      </SelectTrigger>
-                    </FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select parent page" />
+                    </SelectTrigger>
                     <SelectContent>
+                      {/* Top-level sentinel – MUST NOT be empty string */}
                       <SelectItem value="none">None (Root level)</SelectItem>
-                      {pages.map((page) => (
-                        <SelectItem key={page.id} value={page.id}>
-                          {page.title}
-                        </SelectItem>
-                      ))}
+
+                      {/* Defensive: never render an item with an empty id */}
+                      {pages
+                        .filter((page) => page.id && page.id.trim() !== "")
+                        .map((page) => (
+                          <SelectItem key={page.id} value={page.id}>
+                            {page.title}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
