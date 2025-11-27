@@ -77,12 +77,12 @@ export const PromptListItem = ({
           <span className="text-sm text-muted-foreground">—</span>
         )}
       </TableCell>
-      <TableCell>
+      <TableCell className="hidden sm:table-cell">
         <Badge variant="secondary" className="text-xs px-2 py-0.5">
           v{version_number}
         </Badge>
       </TableCell>
-      <TableCell>
+      <TableCell className="hidden sm:table-cell text-right">
         {showEditButton && (
           <button
             onClick={handleEditClick}

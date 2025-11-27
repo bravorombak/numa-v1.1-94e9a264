@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ScrollableTable } from "@/components/common/ScrollableTable";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -94,16 +94,16 @@ const AdminApiPage = () => {
           </Button>
         </div>
       ) : (
-        <ScrollableTable minWidth="min-w-[750px]">
+        <div className="rounded-lg border bg-card">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Provider</TableHead>
-                <TableHead>Provider Model</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Max Tokens</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="hidden sm:table-cell">Provider Model</TableHead>
+                <TableHead className="hidden sm:table-cell">Status</TableHead>
+                <TableHead className="hidden sm:table-cell">Max Tokens</TableHead>
+                <TableHead className="hidden sm:table-cell text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -111,12 +111,12 @@ const AdminApiPage = () => {
                 <TableRow key={model.id}>
                   <TableCell className="font-medium">{model.name}</TableCell>
                   <TableCell className="capitalize">{model.provider}</TableCell>
-                  <TableCell className="font-mono text-sm">{model.provider_model}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell font-mono text-sm">{model.provider_model}</TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     <ModelStatusBadge status={model.status} />
                   </TableCell>
-                  <TableCell>{model.max_tokens || "—"}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="hidden sm:table-cell">{model.max_tokens || "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell text-right">
                     <div className="flex justify-end gap-2">
                       <Button
                         variant="ghost"
@@ -138,7 +138,7 @@ const AdminApiPage = () => {
               ))}
             </TableBody>
           </Table>
-        </ScrollableTable>
+        </div>
       )}
 
       <ModelDialog

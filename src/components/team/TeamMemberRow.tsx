@@ -79,11 +79,11 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate, onRea
         </div>
       </TableCell>
 
-      <TableCell>
+      <TableCell className="hidden md:table-cell">
         <RoleBadge role={member.resolved_role} allRoles={member.roles} />
       </TableCell>
 
-      <TableCell>
+      <TableCell className="hidden md:table-cell">
         {member.banned ? (
           <Badge variant="destructive">Deactivated</Badge>
         ) : (
@@ -93,11 +93,11 @@ export function TeamMemberRow({ member, currentRole, onEdit, onDeactivate, onRea
         )}
       </TableCell>
 
-      <TableCell className="text-muted-foreground text-sm">
+      <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
         {formatLastSignIn(member.last_sign_in_at)}
       </TableCell>
 
-      <TableCell>
+      <TableCell className="hidden md:table-cell text-right">
         <TooltipProvider>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

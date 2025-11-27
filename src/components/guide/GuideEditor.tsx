@@ -115,7 +115,7 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
   const parentOptions = allPages.filter((p) => p.id !== page.id);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col w-full max-w-4xl mx-auto">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b px-4 py-4 sm:px-6">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <h2 className="text-lg font-semibold truncate">Edit Page</h2>
