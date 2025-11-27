@@ -44,7 +44,7 @@ const HomePage = () => {
   });
 
   return (
-    <div className="container mx-auto max-w-7xl space-y-6 py-8 px-4">
+    <div className="container mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Home</h1>
@@ -121,22 +121,24 @@ const HomePage = () => {
         viewMode === 'card' &&
         filteredPrompts &&
         filteredPrompts.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredPrompts.map((prompt: any) => (
-              <PromptCard
-                key={prompt.id}
-                id={prompt.id}
-                title={prompt.title}
-                description={prompt.description}
-                emoji={prompt.emoji}
-                icon_type={prompt.icon_type}
-                icon_value={prompt.icon_value}
-                category={prompt.categories}
-                version_number={prompt.version_number}
-                prompt_draft_id={prompt.prompt_draft_id}
-                showEditButton={canEdit}
-              />
-            ))}
+          <div className="overflow-hidden">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredPrompts.map((prompt: any) => (
+                <PromptCard
+                  key={prompt.id}
+                  id={prompt.id}
+                  title={prompt.title}
+                  description={prompt.description}
+                  emoji={prompt.emoji}
+                  icon_type={prompt.icon_type}
+                  icon_value={prompt.icon_value}
+                  category={prompt.categories}
+                  version_number={prompt.version_number}
+                  prompt_draft_id={prompt.prompt_draft_id}
+                  showEditButton={canEdit}
+                />
+              ))}
+            </div>
           </div>
         )}
 

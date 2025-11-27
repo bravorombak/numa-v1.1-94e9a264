@@ -108,11 +108,11 @@ const GuidePage = () => {
         />
       )}
 
-      {/* Right Panel - Empty State */}
-      <div className="flex-1 flex flex-col">
-        {/* Mobile toggle header */}
+      {/* Main content */}
+      <div className="flex-1 flex flex-col px-4 py-4 sm:px-6 sm:py-6 max-w-full overflow-x-hidden">
+        {/* Mobile header (only shows when sidebar is closed) */}
         {isMobile && (
-          <div className="border-b px-4 py-2 md:hidden">
+          <div className="border-b pb-4 mb-4 md:hidden">
             <Button variant="outline" size="sm" onClick={() => setSidebarOpen(true)}>
               <Menu className="h-4 w-4 mr-2" />
               Pages

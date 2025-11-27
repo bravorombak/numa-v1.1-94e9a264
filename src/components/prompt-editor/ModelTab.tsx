@@ -56,7 +56,7 @@ export const ModelTab = () => {
   };
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="px-4 py-4 sm:p-6 max-w-2xl">
       <div className="space-y-2 mb-6">
         <h2 className="text-2xl font-semibold">Model</h2>
         <p className="text-sm text-muted-foreground">
