@@ -12,14 +12,21 @@ interface ChatComposerProps {
 
 const MAX_ATTACHMENTS = 5;
 
+// Auto-resize textarea to fit content
+function autoGrow(textarea: HTMLTextAreaElement) {
+  textarea.style.height = "auto";
+  textarea.style.height = textarea.scrollHeight + "px";
+}
+
 export const ChatComposer = ({ 
   disabled = false, 
   onSend,
-  maxLength = 4000 
+  maxLength = 100000 
 }: ChatComposerProps) => {
   const [message, setMessage] = useState("");
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { toast } = useToast();
 
   const handleSend = () => {
@@ -29,6 +36,11 @@ export const ChatComposer = ({
     onSend?.(trimmedMessage, pendingFiles);
     setMessage("");
     setPendingFiles([]);
+    
+    // Reset textarea height after sending
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
   };
 
   const handleAttachClick = () => {
@@ -137,21 +149,19 @@ export const ChatComposer = ({
 
           <div className="flex-1 relative">
             <Textarea
+              ref={textareaRef}
               value={message}
               onChange={(e) => {
-                if (e.target.value.length <= maxLength) {
-                  setMessage(e.target.value);
-                }
+                setMessage(e.target.value);
               }}
+              onInput={(e) => autoGrow(e.currentTarget)}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
               placeholder="Type your message..."
-              className="flex-1 min-h-[60px] max-h-[200px] resize-none pr-16"
+              className="flex-1 min-h-[60px] max-h-[200px] resize-none"
+              rows={1}
               disabled={disabled}
             />
-            <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-              {message.length} / {maxLength}
-            </div>
           </div>
 
           <Button 
