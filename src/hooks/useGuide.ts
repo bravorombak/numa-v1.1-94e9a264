@@ -50,10 +50,13 @@ export function useGuideTree() {
   return useQuery({
     queryKey: ["guide", "tree"],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("guide-tree");
+      const { data, error } = await supabase
+        .from('guide_pages')
+        .select('id, parent_id, slug, title, sort_order, is_published, created_at, updated_at')
+        .order('sort_order', { ascending: true });
       
-      if (error) throw error;
-      return data as GuideTreeItem[];
+      if (error) throw new Error("Failed to load guide pages. Please try again.");
+      return (data || []) as GuideTreeItem[];
     },
     refetchOnWindowFocus: true,
   });
@@ -65,11 +68,14 @@ export function useGuidePage(id: string | undefined) {
     queryFn: async () => {
       if (!id) throw new Error("Page ID is required");
       
-      const { data, error } = await supabase.functions.invoke("guide-page", {
-        body: { id },
-      });
+      const { data, error } = await supabase
+        .from('guide_pages')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
       
-      if (error) throw error;
+      if (error) throw new Error("Failed to load guide page. Please try again.");
+      if (!data) throw new Error("Page not found");
       return data as GuidePage;
     },
     enabled: !!id,
@@ -83,11 +89,20 @@ export function useCreateGuidePage() {
 
   return useMutation({
     mutationFn: async (input: CreateGuidePageInput) => {
-      const { data, error } = await supabase.functions.invoke("guide-create", {
-        body: input,
-      });
+      const { data, error } = await supabase
+        .from('guide_pages')
+        .insert({
+          title: input.title,
+          slug: input.slug || input.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+          content_md: input.content_md || '',
+          parent_id: input.parent_id || null,
+          sort_order: input.sort_order ?? 0,
+          is_published: input.is_published ?? true,
+        })
+        .select()
+        .single();
       
-      if (error) throw error;
+      if (error) throw new Error(error.message || "Failed to create page");
       return data as GuidePage;
     },
     onSuccess: (data) => {
@@ -114,11 +129,15 @@ export function useUpdateGuidePage() {
 
   return useMutation({
     mutationFn: async (input: UpdateGuidePageInput) => {
-      const { data, error } = await supabase.functions.invoke("guide-update", {
-        body: input,
-      });
+      const { id, ...updates } = input;
+      const { data, error } = await supabase
+        .from('guide_pages')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
       
-      if (error) throw error;
+      if (error) throw new Error(error.message || "Failed to update page");
       return data as GuidePage;
     },
     onSuccess: (data) => {
@@ -146,12 +165,12 @@ export function useDeleteGuidePage() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke("guide-delete", {
-        body: { id },
-      });
+      const { error } = await supabase
+        .from('guide_pages')
+        .delete()
+        .eq('id', id);
       
-      if (error) throw error;
-      return data;
+      if (error) throw new Error(error.message || "Failed to delete page");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["guide", "tree"] });
