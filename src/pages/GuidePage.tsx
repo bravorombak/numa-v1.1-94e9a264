@@ -86,9 +86,11 @@ const GuidePage = () => {
           {isLoading ? (
             <div className="text-sm text-muted-foreground">Loading pages...</div>
           ) : tree.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-sm text-muted-foreground mb-4">
-                No pages yet. Create your first guide page to get started.
+            <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 px-6 py-10 text-center">
+              <div className="text-3xl">📚</div>
+              <h2 className="text-sm font-medium">Belum ada halaman panduan.</h2>
+              <p className="text-xs text-muted-foreground max-w-sm">
+                Buat halaman pertama untuk memulai dokumentasi tim.
               </p>
             </div>
           ) : (

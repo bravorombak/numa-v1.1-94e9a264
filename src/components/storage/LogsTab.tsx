@@ -83,8 +83,16 @@ export const LogsTab = () => {
 
         {/* Table */}
         {logs.length === 0 ? (
-          <div className="py-12 text-center text-muted-foreground">
-            {debouncedSearch ? 'No files found matching your search.' : 'No files uploaded yet.'}
+          <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 px-6 py-10 text-center">
+            <div className="text-3xl">📁</div>
+            <h2 className="text-sm font-medium">
+              {debouncedSearch ? 'Tidak ditemukan file yang cocok.' : 'Belum ada file yang diunggah.'}
+            </h2>
+            <p className="text-xs text-muted-foreground max-w-sm">
+              {debouncedSearch 
+                ? 'Coba kata kunci lain.' 
+                : 'File akan muncul di sini setelah diunggah melalui prompt.'}
+            </p>
           </div>
         ) : (
           <>
