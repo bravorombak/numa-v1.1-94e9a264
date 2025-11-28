@@ -4,14 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useGenerationTimer } from "@/hooks/useGenerationTimer";
-
-interface MessageRow {
-  content: string;
-  created_at: string;
-  id: string;
-  role: "assistant" | "system" | "user";
-  session_id: string;
-}
+import type { MessageRow } from "@/hooks/useMessages";
 
 interface ChatBodyProps {
   sessionId: string;

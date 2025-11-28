@@ -9,6 +9,13 @@ interface AddMessageRequest {
   session_id: string;
   content: string;
   role?: 'user' | 'assistant';
+  attachments?: Array<{
+    type: 'image' | 'file';
+    url: string;
+    name: string;
+    size: number;
+    mimeType: string;
+  }>;
 }
 
 Deno.serve(async (req) => {
@@ -43,7 +50,7 @@ Deno.serve(async (req) => {
 
     // Parse request body
     const body: AddMessageRequest = await req.json();
-    const { session_id, content, role = 'user' } = body;
+    const { session_id, content, role = 'user', attachments = [] } = body;
 
     if (!session_id || !content) {
       console.error('[sessions-add-message] Missing required fields');
@@ -83,6 +90,7 @@ Deno.serve(async (req) => {
         session_id: session_id,
         role: role,
         content: content,
+        attachments: attachments,
       })
       .select()
       .single();

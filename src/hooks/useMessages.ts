@@ -3,12 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import type { SessionWithRelations } from "./useSessions";
+import type { ChatAttachment } from "@/types/chat";
 
 export type MessageRow = Tables<"messages">;
 
 export interface AddMessageArgs {
   sessionId: string;
   content: string;
+  attachments?: ChatAttachment[];
 }
 
 export const useMessages = (
@@ -46,13 +48,14 @@ export const useAddMessage = () => {
   const { toast } = useToast();
 
   return useMutation<MessageRow, Error, AddMessageArgs>({
-    mutationFn: async ({ sessionId, content }) => {
+    mutationFn: async ({ sessionId, content, attachments }) => {
       const { data, error } = await supabase.functions.invoke(
         'sessions-add-message',
         {
           body: {
             session_id: sessionId,
             content: content,
+            attachments: attachments ?? [],
           },
         }
       );

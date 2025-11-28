@@ -153,6 +153,7 @@ export type Database = {
       }
       messages: {
         Row: {
+          attachments: Json
           content: string
           created_at: string | null
           id: string
@@ -160,6 +161,7 @@ export type Database = {
           session_id: string
         }
         Insert: {
+          attachments?: Json
           content: string
           created_at?: string | null
           id?: string
@@ -167,6 +169,7 @@ export type Database = {
           session_id: string
         }
         Update: {
+          attachments?: Json
           content?: string
           created_at?: string | null
           id?: string
