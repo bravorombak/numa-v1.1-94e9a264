@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import numaLogo from '@/assets/numa-logo.png';
 import authHeroImage from '@/assets/auth-hero.jpg';
+import authFooterLogo from '@/assets/auth-footer-logo.png';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -131,29 +132,28 @@ const LoginPage = () => {
         <img
           src={authHeroImage}
           alt="Numa hero"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="h-full w-full object-cover"
         />
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-black/70 via-black/40 to-black/10" />
+        {/* Centered text overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
+          <h2 className="text-3xl lg:text-4xl font-header font-extrabold text-[#fffdf9]">
+            Be superhuman.
+          </h2>
+          <p className="mt-3 max-w-md text-sm lg:text-base text-[#fffdf9]/90">
+            Numa is the ContentOS that helps you run every creative process 10x faster,
+            powered by the industry&apos;s latest AI technology.
+          </p>
+        </div>
 
-        {/* Content container */}
-        <div className="relative h-full flex flex-col justify-between px-8 lg:px-12 py-8 lg:py-10 text-[#fffdf9]">
-          {/* Centered headline + body copy - right aligned */}
-          <div className="max-w-md ml-auto mt-8 lg:mt-16 space-y-4 text-right">
-            <h2 className="text-3xl lg:text-4xl font-header font-extrabold leading-tight">
-              Be superhuman.
-            </h2>
-            <p className="text-sm lg:text-base leading-relaxed text-[#fffdf9]/90">
-              Numa is the ContentOS that helps you run every creative process 10x faster,
-              powered by the industry&apos;s latest AI technology.
-            </p>
-          </div>
-
-          {/* Footer: Developed by */}
-          <div className="mt-8 flex justify-end text-[11px] lg:text-xs text-[#fffdf9]/80">
-            <span>Developed by Kok Bisa &amp; Tempo</span>
-          </div>
+        {/* Footer: Copyright + logo - bottom right */}
+        <div className="absolute bottom-6 right-8 flex flex-col items-end space-y-2 text-[11px] text-[#fffdf9]/80">
+          <span>© Hak Cipta 2025. Rombak Media Group. All Rights Reserved.</span>
+          <img
+            src={authFooterLogo}
+            alt="Footer logo placeholder"
+            className="h-6 w-auto opacity-90"
+          />
         </div>
       </div>
     </div>
