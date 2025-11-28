@@ -103,14 +103,15 @@ const HomePage = () => {
 
       {/* Empty State */}
       {!isLoading && !isError && filteredPrompts?.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
-          <p className="text-lg font-medium text-muted-foreground">
+        <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 px-6 py-10 text-center">
+          <div className="text-3xl">✨</div>
+          <h2 className="text-sm font-medium">
             {selectedCategoryId
-              ? 'No prompts in this category yet.'
-              : 'No published prompts yet.'}
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Publish a prompt from the Prompt Editor to see it here.
+              ? 'Belum ada prompt di kategori ini.'
+              : 'Belum ada prompt di sini.'}
+          </h2>
+          <p className="text-xs text-muted-foreground max-w-sm">
+            Mulai dengan membuat satu prompt baru untuk tim kamu.
           </p>
         </div>
       )}
