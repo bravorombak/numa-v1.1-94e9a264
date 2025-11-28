@@ -23,7 +23,7 @@ const STORAGE_KEY = 'numa.home.viewMode';
 
 const HomePage = () => {
   const { data: prompts, isLoading, isError, refetch } = usePublishedPrompts();
-  const { profile, user } = useAuthStore();
+  const { isAdmin, isEditor, profile, user } = useAuthStore();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'card' | 'list'>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -31,7 +31,7 @@ const HomePage = () => {
   });
 
   // Check if user can edit prompts
-  const canEdit = profile?.role === 'admin' || profile?.role === 'editor';
+  const canEdit = isAdmin || isEditor;
 
   // Derive display name for greeting
   const displayName =

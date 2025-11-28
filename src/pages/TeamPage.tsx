@@ -15,11 +15,9 @@ import { ReactivateMemberDialog } from '@/components/team/ReactivateMemberDialog
 import { AlertCircle } from 'lucide-react';
 
 const TeamPage = () => {
-  const { profile } = useAuthStore();
-  const role = profile?.role as AppRole | undefined;
-  const isAdmin = role === 'admin';
-  const isEditor = role === 'editor';
+  const { isAdmin, isEditor, roles } = useAuthStore();
   const canAccessTeam = isAdmin || isEditor;
+  const currentRole: AppRole = isAdmin ? 'admin' : isEditor ? 'editor' : 'user';
 
   const [filters, setFilters] = useState<TeamListFilters>({
     role: 'all',
@@ -149,7 +147,7 @@ const TeamPage = () => {
         <>
           <TeamMemberTable
             members={data.users}
-            currentRole={role!}
+            currentRole={currentRole}
             onEdit={handleEdit}
             onDeactivate={handleDeactivate}
             onReactivate={handleReactivate}
@@ -168,13 +166,13 @@ const TeamPage = () => {
       <AddMemberDialog
         open={addOpen}
         onOpenChange={setAddOpen}
-        currentRole={role!}
+        currentRole={currentRole}
       />
       <EditMemberDialog
         open={editOpen}
         onOpenChange={setEditOpen}
         member={selectedMember}
-        currentRole={role!}
+        currentRole={currentRole}
       />
       <DeactivateMemberDialog
         open={deactivateOpen}

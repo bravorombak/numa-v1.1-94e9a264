@@ -6,7 +6,7 @@ export const modelFormSchema = z.object({
     required_error: "Provider is required",
   }),
   provider_model: z.string().min(1, "Provider model is required"),
-  status: z.enum(["active", "deprecated", "disabled"], {
+  status: z.enum(["active", "inactive"], {
     required_error: "Status is required",
   }),
   max_tokens: z.number().positive().optional().nullable(),

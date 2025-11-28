@@ -14,8 +14,7 @@ import { cn } from "@/lib/utils";
 const GuideDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { profile } = useAuthStore();
-  const role = profile?.role || 'user';
+  const { isAdmin, isEditor } = useAuthStore();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -23,7 +22,7 @@ const GuideDetailPage = () => {
   const { data: page, isLoading: pageLoading, error: pageError } = useGuidePage(id);
   const { data: pages, isLoading: treeLoading } = useGuideTree();
 
-  const canEdit = role === 'admin' || role === 'editor';
+  const canEdit = isAdmin || isEditor;
 
   if (!canEdit) {
     return (

@@ -12,15 +12,14 @@ import { cn } from "@/lib/utils";
 
 const GuidePage = () => {
   const navigate = useNavigate();
-  const { profile } = useAuthStore();
-  const role = profile?.role || 'user';
+  const { isAdmin, isEditor } = useAuthStore();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const { data: pages, isLoading, error } = useGuideTree();
 
-  const canEdit = role === 'admin' || role === 'editor';
+  const canEdit = isAdmin || isEditor;
 
   if (!canEdit) {
     return (

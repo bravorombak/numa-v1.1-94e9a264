@@ -45,8 +45,8 @@ export const ModelTab = () => {
     );
   }
 
-  // Filter to show only active + deprecated (no disabled)
-  const selectableModels = models?.filter(m => m.status !== 'disabled') ?? [];
+  // Filter to show only active models (no inactive)
+  const selectableModels = models?.filter(m => m.status !== 'inactive') ?? [];
 
   // Find currently selected model
   const selectedModel = models?.find(m => m.id === draftData?.model_id) ?? null;
@@ -74,20 +74,11 @@ export const ModelTab = () => {
         </Alert>
       )}
 
-      {selectedModel?.status === 'deprecated' && (
-        <Alert variant="default" className="mb-4 border-yellow-500/50 text-yellow-900 dark:text-yellow-200">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            This model is deprecated and may be removed in the future. Consider switching to an active model.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {selectedModel?.status === 'disabled' && (
+      {selectedModel?.status === 'inactive' && (
         <Alert variant="destructive" className="mb-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            This model is disabled and cannot be used. Please select another model.
+            This model is inactive and cannot be used. Please select another model.
           </AlertDescription>
         </Alert>
       )}
@@ -108,7 +99,7 @@ export const ModelTab = () => {
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">
-          Only active and deprecated models are shown. Disabled models cannot be selected.
+          Only active models are shown. Inactive models cannot be selected.
         </p>
       </div>
 
@@ -132,8 +123,6 @@ export const ModelTab = () => {
                   variant={
                     selectedModel.status === 'active' 
                       ? 'default' 
-                      : selectedModel.status === 'deprecated'
-                      ? 'secondary'
                       : 'destructive'
                   }
                 >

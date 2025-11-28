@@ -9,7 +9,7 @@ export type Model = {
   name: string;
   provider: "openai" | "anthropic" | "google" | "perplexity";
   provider_model: string;
-  status: "active" | "deprecated" | "disabled";
+  status: "active" | "inactive";
   max_tokens: number | null;
   api_key: string | null;
   description: string | null;
