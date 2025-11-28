@@ -78,7 +78,7 @@ const PromptRunPage = () => {
               />
             ) : null}
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-header font-extrabold mb-2">{promptVersion.title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-header font-extrabold mb-2 text-foreground">{promptVersion.title}</h1>
             </div>
           </div>
           {canEdit && (

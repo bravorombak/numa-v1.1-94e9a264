@@ -47,7 +47,7 @@ const HomePage = () => {
     <div className="container mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-header font-extrabold tracking-tight">Home</h1>
+        <h1 className="text-3xl font-header font-extrabold tracking-tight text-foreground">Home</h1>
         <p className="mt-2 text-muted-foreground">
           Browse published prompts and start a session.
         </p>

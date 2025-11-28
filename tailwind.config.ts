@@ -18,6 +18,13 @@ export default {
         body: ['"Source Sans Pro"', 'sans-serif'],
       },
       colors: {
+        // Brand palette
+        brand: {
+          background: "#fffdf9",
+          sidebar: "#fffaef",
+          header: "#645f53",
+          text: "#8b867a",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
