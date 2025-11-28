@@ -23,7 +23,7 @@ const STORAGE_KEY = 'numa.home.viewMode';
 
 const HomePage = () => {
   const { data: prompts, isLoading, isError, refetch } = usePublishedPrompts();
-  const { profile } = useAuthStore();
+  const { profile, user } = useAuthStore();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'card' | 'list'>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -32,6 +32,12 @@ const HomePage = () => {
 
   // Check if user can edit prompts
   const canEdit = profile?.role === 'admin' || profile?.role === 'editor';
+
+  // Derive display name for greeting
+  const displayName =
+    profile?.full_name ||
+    user?.email?.split('@')[0] ||
+    'there';
 
   // Persist view mode preference
   useEffect(() => {
@@ -48,15 +54,10 @@ const HomePage = () => {
     <div className="container mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 space-y-6">
       {/* Full-bleed Hero Banner */}
       <div className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-8">
-        <HomeHeroBanner />
-      </div>
-
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-header font-extrabold tracking-tight text-foreground">Home</h1>
-        <p className="mt-2 text-muted-foreground">
-          Browse published prompts and start a session.
-        </p>
+        <HomeHeroBanner
+          greeting={`Hello, ${displayName}`}
+          subtitle="Browse published prompts and start a session."
+        />
       </div>
 
       {/* Category Filter + View Mode Toggle */}
