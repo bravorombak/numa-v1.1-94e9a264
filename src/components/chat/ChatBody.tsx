@@ -114,11 +114,21 @@ export const ChatBody = ({
                 <div className="mt-1 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
                 </div>
-                <div className="flex-1 text-sm text-muted-foreground">
-                  <span>Generating response...</span>
-                  <span className="ml-1 text-xs">
-                    ({seconds}s)
-                  </span>
+                <div className="flex-1">
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <span>Generating response...</span>
+                    <span className="ml-1 text-xs">({seconds}s)</span>
+                    <span className="inline-flex items-center gap-0.5 ml-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:150ms]" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:300ms]" />
+                    </span>
+                  </div>
+                  {seconds > 10 && (
+                    <p className="mt-2 text-xs text-muted-foreground animate-in fade-in duration-300">
+                      Still working on it, please wait... 😉
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

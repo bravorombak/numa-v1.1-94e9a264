@@ -388,7 +388,7 @@ export function AppSidebar() {
                               isActive && "bg-accent/80 text-accent-foreground font-semibold border border-border"
                             )}
                           >
-                  <span className="flex h-6 w-6 items-center justify-center shrink-0 text-lg transition-transform duration-150 group-hover:scale-105">
+                  <span className="flex h-6 w-6 items-center justify-center shrink-0 text-lg transition-transform duration-150 group-hover:scale-105 group-hover:translate-x-0.5">
                     {renderSessionIcon(session)}
                   </span>
                             {(isMobile || open) && (

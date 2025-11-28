@@ -46,7 +46,7 @@ export const PromptListItem = ({
 
   return (
     <TableRow
-      className="cursor-pointer transition-colors hover:bg-muted/50"
+      className="group cursor-pointer transition-colors hover:bg-muted"
       onClick={handleClick}
     >
       <TableCell>
@@ -78,7 +78,7 @@ export const PromptListItem = ({
         )}
       </TableCell>
       <TableCell className="hidden sm:table-cell">
-        <Badge variant="secondary" className="text-xs px-2 py-0.5">
+        <Badge variant="secondary" className="text-xs px-2 py-0.5 opacity-80 group-hover:opacity-100 transition-opacity">
           v{version_number}
         </Badge>
       </TableCell>

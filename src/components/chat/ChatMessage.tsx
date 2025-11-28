@@ -44,7 +44,7 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
   // Assistant: Full-width layout with background strip
   if (isAssistant) {
     return (
-      <div className="w-full bg-background px-4 py-6 sm:px-6 mb-0 group">
+      <div className="w-full bg-background px-4 py-6 sm:px-6 mb-0 group animate-in fade-in slide-in-from-bottom-1 duration-150">
         <div className="max-w-3xl mx-auto">
           <div className="flex gap-3">
             {/* Avatar */}
@@ -87,7 +87,7 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
 
   // User: Bubble on the right
   return (
-    <div className="flex justify-end mb-4">
+    <div className="flex justify-end mb-4 animate-in fade-in slide-in-from-bottom-1 duration-150">
       <div className="flex flex-col items-end max-w-[80%] gap-2 group">
         <div className="rounded-2xl bg-primary text-primary-foreground px-4 py-3">
           <MarkdownMessage 
