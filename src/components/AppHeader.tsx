@@ -2,6 +2,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
 import { LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
+import numaLogo from "@/assets/numa-logo.png";
 
 export function AppHeader() {
   const { user, profile, logout } = useAuthStore();
@@ -14,7 +16,13 @@ export function AppHeader() {
     <header className="flex h-14 items-center border-b px-4">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
-        <h1 className="text-lg font-semibold">Numa v1.1</h1>
+        <Link to="/" className="flex items-center">
+          <img 
+            src={numaLogo} 
+            alt="Numa" 
+            className="h-8 w-auto cursor-pointer transition-transform duration-200 hover:scale-105 hover:opacity-90"
+          />
+        </Link>
       </div>
       <div className="flex-1" />
       <div className="flex items-center gap-2 sm:gap-4">
