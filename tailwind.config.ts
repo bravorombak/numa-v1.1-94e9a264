@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        header: ['"Playfair Display"', 'serif'],
+        header: ['"Lora"', 'serif'],
         body: ['"Source Sans Pro"', 'sans-serif'],
       },
       colors: {
