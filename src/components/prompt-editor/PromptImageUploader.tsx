@@ -72,15 +72,15 @@ export function PromptImageUploader({ value, onChange }: PromptImageUploaderProp
 
   if (value) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 group">
         <div className="relative w-40 h-40 border rounded-lg overflow-hidden bg-muted">
           <img
             src={value}
             alt="Prompt icon"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <Button
             type="button"
             variant="outline"

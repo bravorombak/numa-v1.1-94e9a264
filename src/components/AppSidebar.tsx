@@ -281,11 +281,11 @@ export function AppSidebar() {
                       <NavLink
                         to={targetUrl}
                         end={item.url === "/"}
-                        className="flex items-center gap-3"
-                        activeClassName="bg-accent text-accent-foreground font-medium"
+                        className="group hover:bg-muted rounded-md transition-colors"
+                        activeClassName="bg-accent text-accent-foreground font-semibold"
                       >
-                        <item.icon className="h-4 w-4" />
-                        {(isMobile || open) && <span>{item.title}</span>}
+                        <item.icon className="h-4 w-4 transition-transform duration-150 group-hover:scale-105" />
+                        {(isMobile || open) && <span className="transition-opacity duration-200">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -382,17 +382,17 @@ export function AppSidebar() {
                             type="button"
                             onClick={() => navigate(`/chat/${session.id}`)}
                             className={cn(
-                              "flex-1 flex items-start gap-2 rounded-md px-3 py-2.5 text-left text-sm transition-colors min-w-0",
+                              "group flex-1 flex items-start gap-2 rounded-md px-3 py-2.5 text-left text-sm transition-colors min-w-0",
                               "hover:bg-muted",
                               "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                              isActive && "bg-accent/80 text-accent-foreground font-medium border border-border"
+                              isActive && "bg-accent/80 text-accent-foreground font-semibold border border-border"
                             )}
                           >
-                  <span className="flex h-6 w-6 items-center justify-center shrink-0 text-lg">
+                  <span className="flex h-6 w-6 items-center justify-center shrink-0 text-lg transition-transform duration-150 group-hover:scale-105">
                     {renderSessionIcon(session)}
                   </span>
                             {(isMobile || open) && (
-                              <div className="flex flex-col gap-0.5 min-w-0">
+                              <div className="flex flex-col gap-0.5 min-w-0 transition-opacity duration-200">
                                 <span className="truncate font-medium">{getSessionTitle(session)}</span>
                                 <span className="text-xs text-muted-foreground">{relativeTime}</span>
                               </div>
