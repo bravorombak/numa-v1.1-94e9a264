@@ -18,7 +18,7 @@ export const HomeHeroBanner = ({ greeting, subtitle }: HomeHeroBannerProps) => (
     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
     {/* Text overlay, bottom-left */}
-    <div className="absolute inset-x-0 bottom-0 px-4 sm:px-6 pb-4 sm:pb-5 flex flex-col gap-1">
+    <div className="absolute inset-x-0 bottom-0 px-4 sm:px-6 pb-4 sm:pb-5 flex flex-col gap-1 animate-fade-in">
       <h1 className="text-2xl sm:text-3xl font-header font-extrabold text-background">
         {greeting}
       </h1>
