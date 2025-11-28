@@ -7,12 +7,16 @@ import { ChatBody } from "@/components/chat/ChatBody";
 import { ChatComposer } from "@/components/chat/ChatComposer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, AlertCircle } from "lucide-react";
+import { uploadChatAttachment, mapUploadResultToAttachment } from "@/lib/chatAttachmentStorage";
+import { useToast } from "@/hooks/use-toast";
+import type { ChatAttachment } from "@/types/chat";
 
 const ChatPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { data: session, isLoading, error } = useSession(sessionId);
   const addMessage = useAddMessage();
   const generateAssistant = useGenerateAssistantReply();
+  const { toast } = useToast();
   
   // Fetch messages at page level to share with both ChatBody and auto-start logic
   const { data: messagesData, isLoading: messagesLoading, error: messagesError } = useMessages(sessionId || "", 0, 30);
@@ -129,31 +133,53 @@ const ChatPage = () => {
         />
         <ChatComposer 
           disabled={isBusy || !session.model_id}
-          onSend={async (message) => {
+          onSend={async (message, files) => {
             if (!sessionId || !session || !session.model_id) return;
             
-            // Step 1: Save the user's message
-            await addMessage.mutateAsync({
-              sessionId,
-              content: message,
-            });
-            
-            // Step 2: Track last user message for retry
-            setLastUserMessage(message);
-            setAssistantError(null);
-            
-            // Step 3: Trigger assistant generation with conversation history
+            let attachments: ChatAttachment[] = [];
+
             try {
+              // Step 1: Upload files if any
+              if (files.length > 0) {
+                const uploadPromises = files.map((file) =>
+                  uploadChatAttachment(file, sessionId)
+                );
+                const uploadResults = await Promise.all(uploadPromises);
+                attachments = uploadResults.map(mapUploadResultToAttachment);
+              }
+
+              // Step 2: Save the user's message with attachments
+              await addMessage.mutateAsync({
+                sessionId,
+                content: message,
+                attachments: attachments,
+              });
+              
+              // Step 3: Track last user message for retry
+              setLastUserMessage(message);
+              setAssistantError(null);
+              
+              // Step 4: Trigger assistant generation with conversation history
               await generateAssistant.mutateAsync({
                 session,
                 userMessage: message,
                 conversationHistory: messages,
               });
             } catch (error) {
-              console.error('[ChatPage] Assistant generation error:', error);
-              setAssistantError(
-                error instanceof Error ? error.message : "Failed to generate response"
-              );
+              console.error('[ChatPage] Error:', error);
+              
+              // Show specific error for upload failures
+              if (error instanceof Error && error.message.includes("Upload")) {
+                toast({
+                  title: "Upload failed",
+                  description: error.message,
+                  variant: "destructive",
+                });
+              } else {
+                setAssistantError(
+                  error instanceof Error ? error.message : "Failed to generate response"
+                );
+              }
             }
           }}
         />

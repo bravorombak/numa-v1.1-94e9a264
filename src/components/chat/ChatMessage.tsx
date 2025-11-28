@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { MarkdownMessage } from "@/components/common/MarkdownMessage";
 import type { MessageRow } from "@/hooks/useMessages";
+import type { ChatAttachment } from "@/types/chat";
 
 interface ChatMessageProps {
   message: MessageRow;
@@ -14,9 +15,12 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   
-  const { role, content, created_at } = message;
+  const { role, content, created_at, attachments } = message;
   const isUser = role === "user";
   const isAssistant = role === "assistant" || role === "system";
+  
+  // Cast attachments from Json to ChatAttachment[] (via unknown to satisfy TS)
+  const messageAttachments = (attachments as unknown as ChatAttachment[] | undefined) ?? [];
   
   const timestamp = created_at 
     ? format(new Date(created_at), "HH:mm")
@@ -56,6 +60,38 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
             <div className="flex-1 min-w-0">
               <MarkdownMessage content={content} />
               
+              {/* Render attachments */}
+              {messageAttachments.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {messageAttachments.map((att, idx) =>
+                    att.type === "image" ? (
+                      <div
+                        key={idx}
+                        className="overflow-hidden rounded-lg border bg-muted/40"
+                      >
+                        <img
+                          src={att.url}
+                          alt={att.name}
+                          className="max-h-48 w-auto object-cover hover:scale-[1.02] transition-transform cursor-pointer"
+                          onClick={() => window.open(att.url, '_blank')}
+                        />
+                      </div>
+                    ) : (
+                      <a
+                        key={idx}
+                        href={att.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-xs hover:bg-muted transition-colors"
+                      >
+                        📎
+                        <span className="truncate max-w-[180px]">{att.name}</span>
+                      </a>
+                    )
+                  )}
+                </div>
+              )}
+              
               {/* Timestamp + Copy */}
               <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
                 <span>{timestamp}</span>
@@ -94,6 +130,38 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
             content={content} 
             className="prose-invert prose-p:my-1 [&>*]:text-primary-foreground"
           />
+          
+          {/* Render attachments */}
+          {messageAttachments.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-3">
+              {messageAttachments.map((att, idx) =>
+                att.type === "image" ? (
+                  <div
+                    key={idx}
+                    className="overflow-hidden rounded-lg border border-primary-foreground/20 bg-background/10"
+                  >
+                    <img
+                      src={att.url}
+                      alt={att.name}
+                      className="max-h-48 w-auto object-cover hover:scale-[1.02] transition-transform cursor-pointer"
+                      onClick={() => window.open(att.url, '_blank')}
+                    />
+                  </div>
+                ) : (
+                  <a
+                    key={idx}
+                    href={att.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 rounded-md border border-primary-foreground/20 bg-background/10 px-3 py-2 text-xs hover:bg-background/20 transition-colors text-primary-foreground"
+                  >
+                    📎
+                    <span className="truncate max-w-[180px]">{att.name}</span>
+                  </a>
+                )
+              )}
+            </div>
+          )}
         </div>
         
         {/* Timestamp + Copy */}
