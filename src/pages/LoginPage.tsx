@@ -146,8 +146,8 @@ const LoginPage = () => {
           </p>
         </div>
 
-        {/* Footer: Copyright + logo - bottom right */}
-        <div className="absolute bottom-6 right-8 flex flex-col items-end space-y-2 text-[11px] text-[#fffdf9]/80">
+        {/* Footer: Copyright + logo - bottom center */}
+        <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center space-y-2 text-[11px] text-[#fffdf9]/80">
           <span>© Hak Cipta 2025. Rombak Media Group. All Rights Reserved.</span>
           <img
             src={authFooterLogo}
