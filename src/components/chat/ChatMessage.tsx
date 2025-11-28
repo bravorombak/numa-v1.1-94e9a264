@@ -126,11 +126,10 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
   return (
     <div className="flex justify-end mb-4 animate-in fade-in slide-in-from-bottom-1 duration-150">
       <div className="flex flex-col items-end max-w-[80%] gap-2 group">
-        <div className="rounded-2xl bg-primary text-primary-foreground px-4 py-3">
-          <MarkdownMessage 
-            content={content} 
-            className="prose-invert prose-p:my-1 [&>*]:text-[#fffdf9]"
-          />
+        <div className="rounded-2xl bg-primary px-4 py-3">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words text-[#fffdf9]">
+            {content}
+          </p>
           
           {/* Render attachments */}
           {messageAttachments.length > 0 && (
