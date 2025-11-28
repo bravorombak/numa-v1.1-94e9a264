@@ -232,7 +232,7 @@ export function AppSidebar() {
     <Sidebar collapsible={isMobile ? "offcanvas" : "icon"}>
       <SidebarContent>
       {/* New Prompt Button - only for Admin/Editor */}
-      {(role === 'admin' || role === 'editor') && (
+      {(role === 'admin' || role === 'editor') && (isMobile || open) && (
         <SidebarGroup>
           <div className="px-2 pt-2 pb-2">
             <Button
