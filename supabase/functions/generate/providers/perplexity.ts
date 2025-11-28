@@ -5,10 +5,16 @@
 import { createError, ErrorCodes } from '../errors.ts';
 import { estimateTokens } from '../interpolate.ts';
 
+type MessageContent = string | Array<{
+  type: 'text' | 'image_url';
+  text?: string;
+  image_url?: { url: string };
+}>;
+
 interface CallParams {
   apiKey: string;
   model: string;
-  messages: Array<{ role: string; content: string }>;
+  messages: Array<{ role: string; content: MessageContent }>;
   maxTokens: number;
   temperature: number;
   timeoutMs: number;
@@ -21,6 +27,14 @@ export async function callPerplexity(
   const timeoutId = setTimeout(() => controller.abort(), params.timeoutMs);
 
   try {
+    // Strip images for text-only Perplexity
+    const textOnlyMessages = params.messages.map(msg => ({
+      role: msg.role,
+      content: typeof msg.content === 'string'
+        ? msg.content
+        : msg.content.filter(b => b.type === 'text').map(b => b.text || '').join('\n'),
+    }));
+
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
@@ -29,7 +43,7 @@ export async function callPerplexity(
       },
       body: JSON.stringify({
         model: params.model,
-        messages: params.messages,
+        messages: textOnlyMessages,
         max_tokens: params.maxTokens,
         temperature: params.temperature,
       }),

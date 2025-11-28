@@ -5,10 +5,16 @@
 import { createError, ErrorCodes } from '../errors.ts';
 import { estimateTokens } from '../interpolate.ts';
 
+type MessageContent = string | Array<{
+  type: 'text' | 'image_url';
+  text?: string;
+  image_url?: { url: string };
+}>;
+
 interface CallParams {
   apiKey: string;
   model: string;
-  messages: Array<{ role: string; content: string }>;
+  messages: Array<{ role: string; content: MessageContent }>;
   maxTokens: number;
   temperature: number;
   timeoutMs: number;

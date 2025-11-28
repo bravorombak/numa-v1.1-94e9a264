@@ -24,6 +24,26 @@ function jsonResponse(data: any, status = 200) {
   });
 }
 
+/**
+ * Check if a model supports vision/image inputs
+ */
+function supportsVision(provider: string, modelName: string): boolean {
+  if (provider === 'perplexity') return false;
+  if (provider === 'google') return false; // Disabled for now - avoid base64/fileUri complexity
+  
+  // OpenAI: GPT-4o, GPT-4-vision, GPT-5 series support vision
+  if (provider === 'openai') {
+    return modelName.includes('gpt-4') || modelName.includes('gpt-5') || modelName.includes('vision');
+  }
+  
+  // Anthropic: Claude 3+ supports vision
+  if (provider === 'anthropic') {
+    return modelName.includes('claude-3') || modelName.includes('claude-4');
+  }
+  
+  return false;
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -68,6 +88,7 @@ serve(async (req) => {
       prompt_draft_id,
       model_override_id,
       conversation = [],
+      latestAttachments = [],
     } = body;
 
     let draftData: any = null;
@@ -213,7 +234,13 @@ serve(async (req) => {
     // ========================================
     // 10. BUILD NORMALIZED MESSAGES WITH CONVERSATION HISTORY
     // ========================================
-    const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [];
+    type MessageContent = string | Array<{
+      type: 'text' | 'image_url';
+      text?: string;
+      image_url?: { url: string };
+    }>;
+
+    const messages: { role: 'system' | 'user' | 'assistant'; content: MessageContent }[] = [];
 
     // 1) System message only if there is content
     if (systemContent.length > 0) {
@@ -237,12 +264,55 @@ serve(async (req) => {
       });
     }
 
-    // 3) Current user message (normal turns only)
+    // 3) Current user message with vision support
     if (chatMessage.length > 0) {
-      messages.push({
-        role: 'user',
-        content: chatMessage,
-      });
+      // Check if model supports vision
+      const hasVision = supportsVision(model.provider, model.provider_model);
+      
+      // Filter and validate image attachments
+      const imageAttachments = (Array.isArray(latestAttachments) ? latestAttachments : [])
+        .filter((att: any) => 
+          att && 
+          typeof att === 'object' && 
+          att.url && 
+          att.mimeType?.startsWith('image/')
+        )
+        .slice(0, 4); // Hard limit to 4 images
+
+      if (hasVision && imageAttachments.length > 0) {
+        // Build multimodal content
+        const contentBlocks: Array<{ type: 'text' | 'image_url'; text?: string; image_url?: { url: string } }> = [];
+        
+        if (chatMessage.trim()) {
+          contentBlocks.push({
+            type: 'text',
+            text: chatMessage,
+          });
+        }
+        
+        for (const att of imageAttachments) {
+          contentBlocks.push({
+            type: 'image_url',
+            image_url: { url: att.url },
+          });
+        }
+        
+        messages.push({
+          role: 'user',
+          content: contentBlocks,
+        });
+      } else {
+        // Text-only fallback
+        let finalContent = chatMessage;
+        if (!hasVision && imageAttachments.length > 0) {
+          // Prepend note about images not being visible
+          finalContent = `[Note: User attached ${imageAttachments.length} image(s), but this model cannot process images.]\n\n${chatMessage}`;
+        }
+        messages.push({
+          role: 'user',
+          content: finalContent,
+        });
+      }
     }
 
     // 4) Guard: never call provider with zero usable messages

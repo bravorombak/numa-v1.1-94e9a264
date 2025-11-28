@@ -86,6 +86,7 @@ export interface GenerateAssistantReplyArgs {
   session: SessionWithRelations;
   userMessage: string;
   conversationHistory?: MessageRow[];
+  latestAttachments?: ChatAttachment[];
 }
 
 export const useGenerateAssistantReply = () => {
@@ -93,7 +94,7 @@ export const useGenerateAssistantReply = () => {
   const { toast } = useToast();
 
   return useMutation<MessageRow, Error, GenerateAssistantReplyArgs>({
-    mutationFn: async ({ session, userMessage, conversationHistory = [] }) => {
+    mutationFn: async ({ session, userMessage, conversationHistory = [], latestAttachments = [] }) => {
       // Early validation: prevent calling generate without model_id
       if (!session.model_id) {
         throw new Error(
@@ -105,7 +106,7 @@ export const useGenerateAssistantReply = () => {
       const promptTemplate = session.prompt_versions?.prompt_text || '';
       const baseVariables = (session.variable_inputs as Record<string, any>) || {};
       
-      // Build conversation array from history
+      // Build conversation array from history (text-only for now)
       const conversation = conversationHistory.map(msg => ({
         role: msg.role,
         content: msg.content,
@@ -119,6 +120,7 @@ export const useGenerateAssistantReply = () => {
         },
         model_id: session.model_id,
         conversation,
+        latestAttachments,
       };
 
       // Step 2: Call the generate edge function

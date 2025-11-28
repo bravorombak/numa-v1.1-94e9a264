@@ -46,6 +46,7 @@ const ChatPage = () => {
         session,
         userMessage: "",
         conversationHistory: [],
+        latestAttachments: [],
       }).catch((error) => {
         console.error('[ChatPage] Auto-start generation error:', error);
         setAssistantError(
@@ -63,6 +64,7 @@ const ChatPage = () => {
         session,
         userMessage: lastUserMessage,
         conversationHistory: messages,
+        latestAttachments: [],
       });
     } catch (error) {
       setAssistantError(
@@ -159,11 +161,12 @@ const ChatPage = () => {
               setLastUserMessage(message);
               setAssistantError(null);
               
-              // Step 4: Trigger assistant generation with conversation history
+              // Step 4: Trigger assistant generation with conversation history and attachments
               await generateAssistant.mutateAsync({
                 session,
                 userMessage: message,
                 conversationHistory: messages,
+                latestAttachments: attachments,
               });
             } catch (error) {
               console.error('[ChatPage] Error:', error);
