@@ -5,10 +5,16 @@
 import { createError, ErrorCodes } from '../errors.ts';
 import { estimateTokens } from '../interpolate.ts';
 
+type MessageContent = string | Array<{
+  type: 'text' | 'image_url';
+  text?: string;
+  image_url?: { url: string };
+}>;
+
 interface CallParams {
   apiKey: string;
   model: string;
-  messages: Array<{ role: string; content: string }>;
+  messages: Array<{ role: string; content: MessageContent }>;
   maxTokens: number;
   temperature: number;
   timeoutMs: number;
@@ -22,7 +28,8 @@ export async function callAnthropic(
 
   try {
     // Anthropic requires system message separate from messages array
-    const systemMessage = params.messages.find(m => m.role === 'system')?.content || '';
+    const systemMsg = params.messages.find(m => m.role === 'system');
+    const systemMessage = systemMsg && typeof systemMsg.content === 'string' ? systemMsg.content : '';
     const userMessages = params.messages.filter(m => m.role !== 'system');
 
     // Anthropic requires at least one non-system message.
@@ -36,6 +43,33 @@ export async function callAnthropic(
       });
     }
 
+    // Transform multimodal content to Anthropic format
+    const transformedMessages = userMessages.map(msg => {
+      if (typeof msg.content === 'string') {
+        return msg;
+      }
+      
+      // Transform array content to Anthropic's format
+      return {
+        role: msg.role,
+        content: msg.content.map(block => {
+          if (block.type === 'text') {
+            return { type: 'text', text: block.text || '' };
+          }
+          if (block.type === 'image_url') {
+            return {
+              type: 'image',
+              source: {
+                type: 'url',
+                url: block.image_url?.url || '',
+              },
+            };
+          }
+          return { type: 'text', text: '' };
+        }),
+      };
+    });
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -46,7 +80,7 @@ export async function callAnthropic(
       body: JSON.stringify({
         model: params.model,
         system: systemMessage,
-        messages: userMessages,
+        messages: transformedMessages,
         max_tokens: params.maxTokens,
         temperature: params.temperature,
       }),

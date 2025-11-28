@@ -5,10 +5,16 @@
 import { createError, ErrorCodes } from '../errors.ts';
 import { estimateTokens } from '../interpolate.ts';
 
+type MessageContent = string | Array<{
+  type: 'text' | 'image_url';
+  text?: string;
+  image_url?: { url: string };
+}>;
+
 interface CallParams {
   apiKey: string;
   model: string;
-  messages: Array<{ role: string; content: string }>;
+  messages: Array<{ role: string; content: MessageContent }>;
   maxTokens: number;
   temperature: number;
   timeoutMs: number;
@@ -21,8 +27,14 @@ export async function callGoogle(
   const timeoutId = setTimeout(() => controller.abort(), params.timeoutMs);
 
   try {
-    // Gemini doesn't use messages array, combine into single text prompt
-    const prompt = params.messages.map(m => m.content).join('\n\n');
+    // Google: text-only for now (strip images)
+    const prompt = params.messages.map(m => {
+      if (typeof m.content === 'string') {
+        return m.content;
+      }
+      // Extract only text blocks
+      return m.content.filter(b => b.type === 'text').map(b => b.text || '').join('\n');
+    }).join('\n\n');
 
     // API key is in URL query param, not header
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${params.model}:generateContent?key=${params.apiKey}`;
