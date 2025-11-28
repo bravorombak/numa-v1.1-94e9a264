@@ -9,8 +9,8 @@ export function useGenerationTimer(isGenerating: boolean) {
     if (isGenerating) {
       setSeconds(0); // reset on start
       interval = window.setInterval(() => {
-        setSeconds((prev) => prev + 1);
-      }, 1000);
+        setSeconds((prev) => +(prev + 0.1).toFixed(1)); // Increment by 0.1s, avoid floating point drift
+      }, 100); // Update every 100ms
     } else {
       setSeconds(0); // reset when generation stops
     }

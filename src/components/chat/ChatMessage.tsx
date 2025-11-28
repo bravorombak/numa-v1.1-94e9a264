@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { MarkdownMessage } from "@/components/common/MarkdownMessage";
 import type { MessageRow } from "@/hooks/useMessages";
 import type { ChatAttachment } from "@/types/chat";
+import aiAvatar from "@/assets/ai-avatar.png";
 
 interface ChatMessageProps {
   message: MessageRow;
@@ -51,10 +52,10 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
       <div className="w-full bg-background px-4 py-6 sm:px-6 mb-0 group animate-in fade-in slide-in-from-bottom-1 duration-150">
         <div className="max-w-3xl mx-auto">
           <div className="flex gap-3">
-            {/* Avatar */}
-            <div className="mt-1 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium shrink-0 text-primary">
-              AI
-            </div>
+        {/* Avatar */}
+        <div className="mt-1 h-7 w-7 rounded-full overflow-hidden shrink-0">
+          <img src={aiAvatar} alt="Numa AI Assistant" className="h-full w-full object-cover" />
+        </div>
             
             {/* Content */}
             <div className="flex-1 min-w-0">

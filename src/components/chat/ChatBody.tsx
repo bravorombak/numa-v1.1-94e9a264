@@ -5,6 +5,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useGenerationTimer } from "@/hooks/useGenerationTimer";
 import type { MessageRow } from "@/hooks/useMessages";
+import aiAvatar from "@/assets/ai-avatar.png";
 
 interface ChatBodyProps {
   sessionId: string;
@@ -104,13 +105,16 @@ export const ChatBody = ({
           <div className="w-full bg-background px-4 py-6 sm:px-6 mb-0 -mx-4 sm:-mx-6">
             <div className="max-w-3xl mx-auto">
               <div className="flex gap-3">
-                <div className="mt-1 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <div className="relative mt-1 h-7 w-7 rounded-full overflow-hidden shrink-0">
+                  <img src={aiAvatar} alt="Numa AI Assistant" className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  </div>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center text-sm text-muted-foreground">
                     <span>Generating response...</span>
-                    <span className="ml-1 text-xs">({seconds}s)</span>
+                    <span className="ml-1 text-xs">({seconds.toFixed(1)}s)</span>
                     <span className="inline-flex items-center gap-0.5 ml-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce" />
                       <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:150ms]" />
