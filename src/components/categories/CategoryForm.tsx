@@ -132,12 +132,12 @@ export const CategoryForm = ({ open, onOpenChange, category }: CategoryFormProps
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Category' : 'Create Category'}
+            {isEditing ? 'Edit Group' : 'Create Group'}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Update the category details below.'
-              : 'Add a new category to organize your prompts.'}
+              ? 'Update the group details below.'
+              : 'Add a new group to organize your prompts.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -149,7 +149,7 @@ export const CategoryForm = ({ open, onOpenChange, category }: CategoryFormProps
                 Preview:
               </p>
               <CategoryBadge
-                name={watchedValues.name || 'Category Name'}
+                name={watchedValues.name || 'Group Name'}
                 bg_color={watchedValues.bg_color}
                 text_color={watchedValues.text_color}
                 border_color={watchedValues.border_color}
@@ -167,7 +167,7 @@ export const CategoryForm = ({ open, onOpenChange, category }: CategoryFormProps
                     <Input {...field} placeholder="e.g., Marketing, Technical, Creative" />
                   </FormControl>
                   <FormDescription>
-                    The category name (max 50 characters)
+                    The group name (max 50 characters)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -178,7 +178,7 @@ export const CategoryForm = ({ open, onOpenChange, category }: CategoryFormProps
             <FormItem>
               <FormLabel>Color *</FormLabel>
               <FormDescription className="mb-3">
-                Choose a color theme for this category
+                Choose a color theme for this group
               </FormDescription>
               <ColorSwatchSelector
                 selectedPresetId={selectedPresetId}
@@ -200,8 +200,8 @@ export const CategoryForm = ({ open, onOpenChange, category }: CategoryFormProps
                 {isPending
                   ? 'Saving...'
                   : isEditing
-                  ? 'Update Category'
-                  : 'Create Category'}
+                  ? 'Update Group'
+                  : 'Create Group'}
               </Button>
             </DialogFooter>
           </form>

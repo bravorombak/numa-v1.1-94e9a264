@@ -132,7 +132,7 @@ export const AboutTab = () => {
             name="category_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category</FormLabel>
+                <FormLabel>Group</FormLabel>
                 <Select
                   value={field.value || ''}
                   onValueChange={(value) => {
@@ -142,7 +142,7 @@ export const AboutTab = () => {
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder="Select a group" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -158,13 +158,13 @@ export const AboutTab = () => {
                       ))
                     ) : (
                       <SelectItem value="none" disabled>
-                        No categories available
+                        No groups available
                       </SelectItem>
                     )}
                   </SelectContent>
                 </Select>
                 <FormDescription>
-                  Optional - prompts without a category will be marked as "Uncategorized"
+                  Optional - prompts without a group will be marked as "Ungrouped"
                 </FormDescription>
                 <FormMessage />
               </FormItem>

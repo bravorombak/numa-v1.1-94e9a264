@@ -114,7 +114,7 @@ const HomePage = () => {
           <div className="text-3xl">✨</div>
           <h2 className="text-sm font-medium">
             {selectedCategoryId
-              ? 'Belum ada prompt di kategori ini.'
+              ? 'Belum ada prompt di grup ini.'
               : 'Belum ada prompt di sini.'}
           </h2>
           <p className="text-xs text-muted-foreground max-w-sm">
@@ -161,7 +161,7 @@ const HomePage = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
+                  <TableHead>Group</TableHead>
                   <TableHead className="hidden sm:table-cell">Version</TableHead>
                   <TableHead className="hidden sm:table-cell text-right">Actions</TableHead>
                 </TableRow>

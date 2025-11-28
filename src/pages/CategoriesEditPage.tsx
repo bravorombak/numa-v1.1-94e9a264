@@ -13,7 +13,7 @@ const CategoriesEditPage = () => {
 
   // Admin/Editor guard
   if (role !== 'admin' && role !== 'editor') {
-    return <AccessDenied message="Only Admins and Editors can manage categories." />;
+    return <AccessDenied message="Only Admins and Editors can manage groups." />;
   }
 
   return (
@@ -21,14 +21,14 @@ const CategoriesEditPage = () => {
       {/* Header */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-header font-extrabold tracking-tight text-foreground">Categories</h1>
+          <h1 className="text-3xl font-header font-extrabold tracking-tight text-foreground">Groups</h1>
           <p className="mt-2 text-muted-foreground">
             Organize your prompts with preset color themes.
           </p>
         </div>
         <Button onClick={() => setCreateFormOpen(true)} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
-          Create Category
+          Create Group
         </Button>
       </div>
 
