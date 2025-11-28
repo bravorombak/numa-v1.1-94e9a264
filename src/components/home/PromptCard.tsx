@@ -49,7 +49,7 @@ export const PromptCard = ({
 
   return (
     <Card
-      className="relative flex h-full cursor-pointer flex-col transition-shadow hover:shadow-md"
+      className="group relative flex h-full cursor-pointer flex-col transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
       onClick={handleClick}
     >
       <CardHeader className="space-y-3 pb-4">
@@ -59,12 +59,12 @@ export const PromptCard = ({
             <img 
               src={icon_value} 
               alt="Prompt icon" 
-              className="h-8 w-8 rounded object-cover"
+              className="h-8 w-8 rounded object-cover transition-transform duration-200 group-hover:scale-105"
             />
           ) : icon_type === 'emoji' && icon_value ? (
-            <span className="text-2xl">{icon_value}</span>
+            <span className="text-2xl transition-transform duration-200 group-hover:scale-105">{icon_value}</span>
           ) : emoji ? (
-            <span className="text-2xl">{emoji}</span>
+            <span className="text-2xl transition-transform duration-200 group-hover:scale-105">{emoji}</span>
           ) : null}
           <h3 className="line-clamp-2 text-lg font-semibold leading-tight flex-1">
             {title}
