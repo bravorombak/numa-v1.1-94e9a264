@@ -253,7 +253,7 @@ export function AppSidebar() {
       )}
 
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="uppercase tracking-wider">Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
@@ -297,7 +297,7 @@ export function AppSidebar() {
 
         {/* Sessions Group (always visible) */}
         <SidebarGroup className="mt-4">
-          <SidebarGroupLabel>
+          <SidebarGroupLabel className="uppercase tracking-wider">
             {(isMobile || open) ? "Sessions" : <MessageSquare className="h-4 w-4" />}
           </SidebarGroupLabel>
           <SidebarGroupContent>
