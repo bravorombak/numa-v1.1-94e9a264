@@ -66,7 +66,7 @@ export const PromptCard = ({
           ) : emoji ? (
             <span className="text-2xl transition-transform duration-200 group-hover:scale-105">{emoji}</span>
           ) : null}
-          <h3 className="line-clamp-2 text-lg font-header font-extrabold leading-tight flex-1">
+          <h3 className="line-clamp-2 text-lg font-header font-extrabold leading-tight flex-1 text-foreground">
             {title}
           </h3>
         </div>

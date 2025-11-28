@@ -53,7 +53,7 @@ export default function GuideViewerPage() {
       <div className="flex h-full">
         <div className="w-80 border-r flex flex-col">
           <div className="border-b px-4 py-3">
-            <h2 className="font-header font-extrabold">Guide</h2>
+            <h2 className="font-header font-extrabold text-foreground">Guide</h2>
           </div>
           <div className="flex-1 overflow-y-auto p-4">
             <Skeleton className="h-8 w-full mb-2" />
@@ -118,7 +118,7 @@ export default function GuideViewerPage() {
         )}
       >
         <div className="border-b px-4 py-3">
-          <h2 className="font-header font-extrabold">Guide</h2>
+          <h2 className="font-header font-extrabold text-foreground">Guide</h2>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           <GuideTree
