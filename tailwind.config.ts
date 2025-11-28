@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        header: ['"Work Sans"', 'sans-serif'],
+        header: ['"Open Sans"', 'sans-serif'],
         body: ['"Source Sans Pro"', 'sans-serif'],
       },
       colors: {
