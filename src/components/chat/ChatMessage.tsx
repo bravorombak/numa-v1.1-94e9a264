@@ -129,7 +129,7 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
         <div className="rounded-2xl bg-primary text-primary-foreground px-4 py-3">
           <MarkdownMessage 
             content={content} 
-            className="prose-invert prose-p:my-1 [&>*]:text-primary-foreground"
+            className="prose-invert prose-p:my-1 [&>*]:text-[#fffdf9]"
           />
           
           {/* Render attachments */}
