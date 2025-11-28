@@ -10,21 +10,21 @@ All colors MUST be HSL.
   :root {
     /* Core backgrounds - warm cream */
     --background: 40 100% 99%;        /* #fffdf9 */
-    --foreground: 42 10% 36%;         /* #645f53 */
+    --foreground: 42 10% 28%;         /* #504b40 */
 
     /* Card/popover inherit background */
     --card: 40 100% 99%;
-    --card-foreground: 42 10% 36%;
+    --card-foreground: 42 10% 28%;
     --popover: 40 100% 99%;
-    --popover-foreground: 42 10% 36%;
+    --popover-foreground: 42 10% 28%;
 
     /* Primary = header color for buttons */
-    --primary: 42 10% 36%;            /* #645f53 */
+    --primary: 42 10% 28%;            /* #504b40 */
     --primary-foreground: 40 100% 99%;
 
     /* Secondary - slightly darker */
     --secondary: 40 33% 93%;
-    --secondary-foreground: 42 10% 36%;
+    --secondary-foreground: 42 10% 28%;
 
     /* Muted for subtle backgrounds and body text */
     --muted: 40 33% 93%;              /* #f5f1e8 */
@@ -32,7 +32,7 @@ All colors MUST be HSL.
 
     /* Accent = sidebar color */
     --accent: 42 100% 97%;            /* #fffaef */
-    --accent-foreground: 42 10% 36%;
+    --accent-foreground: 42 10% 28%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 40 100% 99%;
@@ -40,19 +40,31 @@ All colors MUST be HSL.
     /* Border/input */
     --border: 40 20% 88%;
     --input: 40 20% 88%;
-    --ring: 42 10% 36%;
+    --ring: 42 10% 28%;
 
     --radius: 0.5rem;
 
     /* Sidebar specific */
     --sidebar-background: 42 100% 97%; /* #fffaef */
     --sidebar-foreground: 42 9% 51%;   /* #8b867a */
-    --sidebar-primary: 42 10% 36%;
+    --sidebar-primary: 42 10% 28%;
     --sidebar-primary-foreground: 40 100% 99%;
     --sidebar-accent: 40 33% 93%;
-    --sidebar-accent-foreground: 42 10% 36%;
+    --sidebar-accent-foreground: 42 10% 28%;
     --sidebar-border: 40 20% 88%;
-    --sidebar-ring: 42 10% 36%;
+    --sidebar-ring: 42 10% 28%;
+  }
+
+  /* Override Typography plugin defaults with brand colors */
+  .prose {
+    --tw-prose-body: hsl(var(--muted-foreground));
+    --tw-prose-headings: hsl(var(--foreground));
+    --tw-prose-bold: hsl(var(--foreground));
+    --tw-prose-lead: hsl(var(--foreground));
+    --tw-prose-links: hsl(var(--foreground));
+    --tw-prose-code: hsl(var(--foreground));
+    --tw-prose-bullets: hsl(var(--muted-foreground));
+    --tw-prose-counters: hsl(var(--muted-foreground));
   }
 
   .dark {
