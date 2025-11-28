@@ -5,6 +5,7 @@ import { CategoryFilter } from '@/components/home/CategoryFilter';
 import { ViewModeToggle } from '@/components/home/ViewModeToggle';
 import { PromptCard } from '@/components/home/PromptCard';
 import { PromptListItem } from '@/components/home/PromptListItem';
+import { HomeHeroBanner } from '@/components/home/HomeHeroBanner';
 import {
   Table,
   TableBody,
@@ -45,6 +46,9 @@ const HomePage = () => {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 space-y-6">
+      {/* Hero Banner */}
+      <HomeHeroBanner />
+
       {/* Header */}
       <div>
         <h1 className="text-3xl font-header font-extrabold tracking-tight text-foreground">Home</h1>
