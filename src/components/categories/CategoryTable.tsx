@@ -72,7 +72,7 @@ export const CategoryTable = () => {
     return (
       <div className="flex items-center justify-center gap-2 rounded-lg border border-destructive bg-destructive/10 p-6 text-destructive">
         <AlertCircle className="h-5 w-5" />
-        <p>Failed to load categories. Please try again.</p>
+        <p>Failed to load groups. Please try again.</p>
       </div>
     );
   }
@@ -81,7 +81,7 @@ export const CategoryTable = () => {
     return (
       <div className="rounded-lg border border-dashed border-muted-foreground/25 py-12 text-center">
         <p className="text-muted-foreground">
-          No categories yet. Create your first category to get started.
+          No groups yet. Create your first group to get started.
         </p>
       </div>
     );
@@ -93,7 +93,7 @@ export const CategoryTable = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Category</TableHead>
+              <TableHead>Group</TableHead>
               <TableHead className="w-16"></TableHead>
             </TableRow>
           </TableHeader>
@@ -152,10 +152,10 @@ export const CategoryTable = () => {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this category?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this group?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the category and set all associated prompts to
-              "Uncategorized". This action cannot be undone.
+              This will permanently delete the group and set all associated prompts to
+              "Ungrouped". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
 

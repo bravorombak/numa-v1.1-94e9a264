@@ -49,14 +49,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-const navItems = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Team", url: "/team", icon: Users },
-  { title: "Storage", url: "/storage", icon: HardDrive },
-  { title: "Categories", url: "/categories/edit", icon: FolderTree },
-  { title: "Model Registry", url: "/admin/api", icon: Settings },
-  { title: "Guide", url: "/guide", icon: BookOpen },
-];
+  const navItems = [
+    { title: "Home", url: "/", icon: Home },
+    { title: "Team", url: "/team", icon: Users },
+    { title: "Storage", url: "/storage", icon: HardDrive },
+    { title: "Groups", url: "/categories/edit", icon: FolderTree },
+    { title: "Model Registry", url: "/admin/api", icon: Settings },
+    { title: "Guide", url: "/guide", icon: BookOpen },
+  ];
 
 export function AppSidebar() {
   const { open } = useSidebar();

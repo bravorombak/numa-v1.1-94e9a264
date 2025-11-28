@@ -49,14 +49,14 @@ export const useCreateCategory = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast({
-        title: 'Category created',
-        description: 'The category has been created successfully.',
+        title: 'Group created',
+        description: 'The group has been created successfully.',
       });
     },
     onError: (error: any) => {
       console.error('Create category error:', error);
       toast({
-        title: 'Failed to create category',
+        title: 'Failed to create group',
         description: error.message ?? 'An unexpected error occurred.',
         variant: 'destructive',
       });
@@ -101,14 +101,14 @@ export const useUpdateCategory = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast({
-        title: 'Category updated',
-        description: 'The category has been updated successfully.',
+        title: 'Group updated',
+        description: 'The group has been updated successfully.',
       });
     },
     onError: (error: any) => {
       console.error('Update category error:', error);
       toast({
-        title: 'Failed to update category',
+        title: 'Failed to update group',
         description: error.message ?? 'An unexpected error occurred.',
         variant: 'destructive',
       });
@@ -150,14 +150,14 @@ export const useDeleteCategory = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast({
-        title: 'Category deleted',
-        description: 'Category deleted and prompts set to uncategorized.',
+        title: 'Group deleted',
+        description: 'Group deleted and prompts set to ungrouped.',
       });
     },
     onError: (error: any) => {
       console.error('Delete category error:', error);
       toast({
-        title: 'Failed to delete category',
+        title: 'Failed to delete group',
         description: error.message ?? 'An unexpected error occurred.',
         variant: 'destructive',
       });
