@@ -12,6 +12,15 @@ export function AppHeader() {
     await logout();
   };
 
+  const getInitials = () => {
+    const name = profile?.full_name || user?.email || "U";
+    return name
+      .split(/[\s.@]+/)
+      .map(part => part[0]?.toUpperCase())
+      .slice(0, 2)
+      .join('');
+  };
+
   return (
     <header className="flex h-14 items-center border-b px-4">
       <div className="flex items-center gap-4">
@@ -25,21 +34,20 @@ export function AppHeader() {
         </Link>
       </div>
       <div className="flex-1" />
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex items-center gap-3">
         {user && (
           <>
-            <span className="hidden sm:inline text-sm text-muted-foreground">
-              {profile?.full_name || user.email}
-            </span>
-            {/* Icon-only button for mobile */}
-            <Button variant="ghost" size="icon" className="sm:hidden" onClick={handleLogout} aria-label="Logout">
-              <LogOut className="h-4 w-4" />
-            </Button>
-            {/* Button with text for desktop */}
-            <Button variant="ghost" size="sm" className="hidden sm:flex" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-foreground">
+              {getInitials()}
+            </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-md hover:bg-muted transition-colors"
+              title="Logout"
+              aria-label="Logout"
+            >
+              <LogOut className="w-5 h-5 text-foreground" />
+            </button>
           </>
         )}
       </div>
