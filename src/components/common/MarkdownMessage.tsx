@@ -12,6 +12,13 @@ export function MarkdownMessage({ content, className }: MarkdownMessageProps) {
     <div
       className={cn(
         "prose prose-sm dark:prose-invert max-w-none",
+        // Brand color overrides
+        "prose-headings:text-foreground",
+        "prose-p:text-muted-foreground",
+        "prose-strong:text-foreground",
+        "prose-li:text-muted-foreground",
+        "prose-ul:text-muted-foreground",
+        "prose-ol:text-muted-foreground",
         // Remove top margin from first element, bottom from last
         "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         // Ensure links are styled properly

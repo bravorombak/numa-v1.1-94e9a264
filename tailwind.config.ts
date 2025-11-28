@@ -22,7 +22,7 @@ export default {
         brand: {
           background: "#fffdf9",
           sidebar: "#fffaef",
-          header: "#645f53",
+          header: "#504b40",
           text: "#8b867a",
         },
         border: "hsl(var(--border))",
