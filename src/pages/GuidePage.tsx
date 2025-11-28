@@ -26,7 +26,7 @@ const GuidePage = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="text-center">
-          <h1 className="text-2xl font-medium text-foreground mb-2">
+          <h1 className="text-2xl font-header font-extrabold text-foreground mb-2">
             Access Required
           </h1>
           <p className="text-muted-foreground">
@@ -41,7 +41,7 @@ const GuidePage = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="text-center">
-          <h1 className="text-2xl font-medium text-foreground mb-2">Error</h1>
+          <h1 className="text-2xl font-header font-extrabold text-foreground mb-2">Error</h1>
           <p className="text-muted-foreground">Failed to load guide pages.</p>
         </div>
       </div>
@@ -60,7 +60,7 @@ const GuidePage = () => {
         isMobile && !sidebarOpen && "-translate-x-full"
       )}>
         <div className="border-b px-4 py-3 flex items-center justify-between">
-          <h2 className="font-semibold">Guide Pages</h2>
+          <h2 className="font-header font-extrabold">Guide Pages</h2>
           <div className="flex items-center gap-2">
             <Button
               size="sm"
@@ -124,7 +124,7 @@ const GuidePage = () => {
         
         <div className="flex-1 flex items-center justify-center bg-muted/10">
           <div className="text-center max-w-md px-6">
-            <h2 className="text-2xl font-semibold mb-2">Guide Editor</h2>
+            <h2 className="text-2xl font-header font-extrabold mb-2">Guide Editor</h2>
             <p className="text-muted-foreground mb-6">
               Select a page from the sidebar to edit, or create a new one to get started.
             </p>

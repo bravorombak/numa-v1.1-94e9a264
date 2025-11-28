@@ -48,7 +48,7 @@ export const PromptEditorHeader = () => {
   return (
     <div className="flex items-center justify-between border-b bg-background px-6 py-4">
       <div className="flex items-center gap-3">
-        <h1 className="text-xl font-semibold">
+        <h1 className="text-xl font-header font-extrabold">
           {draftData?.title || 'Untitled prompt'}
         </h1>
         {isDirty && (

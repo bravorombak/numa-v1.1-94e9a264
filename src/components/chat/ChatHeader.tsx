@@ -36,7 +36,7 @@ export const ChatHeader = ({
               className="w-8 h-8 rounded flex-shrink-0 object-cover"
             />
           )}
-          <h1 className="text-lg font-semibold text-foreground truncate">
+          <h1 className="text-lg font-header font-extrabold text-foreground truncate">
             {promptTitle}
           </h1>
         </div>
