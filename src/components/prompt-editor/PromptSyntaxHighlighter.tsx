@@ -71,23 +71,35 @@ export const PromptSyntaxHighlighter: React.FC<PromptSyntaxHighlighterProps> = (
       {/* Backdrop with highlighted text */}
       <pre
         ref={backdropRef}
-        className="absolute inset-0 pointer-events-none overflow-hidden font-mono text-sm px-3 py-2 whitespace-pre-wrap break-words"
-        dangerouslySetInnerHTML={{ __html: highlightedHtml }}
         aria-hidden="true"
-      />
+        className={cn(
+          'pointer-events-none absolute inset-0',
+          'whitespace-pre-wrap break-words overflow-hidden',
+          'font-mono text-sm px-3 py-2',
+          'text-muted-foreground'
+        )}
+      >
+        <code
+          className="block"
+          dangerouslySetInnerHTML={{ __html: highlightedHtml || '&nbsp;' }}
+        />
+      </pre>
 
       {/* Actual textarea for editing */}
       <textarea
         ref={textareaRef}
         value={value}
         onChange={handleChange}
+        onScroll={handleScroll}
         placeholder={placeholder}
         spellCheck={false}
         className={cn(
-          'relative w-full bg-transparent text-sm font-mono px-3 py-2',
+          'relative z-10 w-full h-full bg-transparent text-sm font-mono px-3 py-2',
           'border-0 shadow-none outline-none',
           'focus-visible:ring-0 focus-visible:ring-offset-0',
-          'resize-none caret-foreground',
+          'resize-none',
+          'text-transparent caret-[hsl(var(--foreground))]',
+          'selection:bg-primary/20',
           'placeholder:text-muted-foreground'
         )}
       />
