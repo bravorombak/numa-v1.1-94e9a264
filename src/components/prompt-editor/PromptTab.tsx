@@ -1,7 +1,7 @@
 import { usePromptEditorStore } from '@/stores/promptEditorStore';
 import { extractVariables, syncVariablesFromDetected, type PromptVariable } from '@/lib/variableDetection';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { PromptSyntaxHighlighter } from './PromptSyntaxHighlighter';
 
 export const PromptTab = () => {
   const { draftData, detectedVariables, updateDraftField, setDetectedVariables, setDirty } = usePromptEditorStore();
@@ -60,13 +60,12 @@ export const PromptTab = () => {
           ))}
         </div>
 
-        {/* Actual prompt textarea */}
-        <Textarea
+        {/* Actual prompt textarea with syntax highlighting */}
+        <PromptSyntaxHighlighter
           value={promptText}
-          onChange={(e) => handlePromptChange(e.target.value)}
+          onChange={handlePromptChange}
           placeholder="Enter your prompt text here. Use {{variable_name}} to insert variables."
-          className="flex-1 border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-h-[280px] resize-none"
-          spellCheck={false}
+          className="flex-1 min-h-[280px]"
         />
       </div>
 
