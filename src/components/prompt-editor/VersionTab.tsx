@@ -57,7 +57,7 @@ export const VersionTab = () => {
   return (
     <div className="px-4 py-4 sm:p-6 max-w-7xl mx-auto space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold">Version & Publish</h2>
+        <h2 className="text-2xl font-header font-extrabold">Version & Publish</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Compare the current draft with the last published version and publish a new version when ready.
         </p>

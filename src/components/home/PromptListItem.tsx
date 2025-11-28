@@ -62,7 +62,7 @@ export const PromptListItem = ({
           ) : emoji ? (
             <span className="text-lg">{emoji}</span>
           ) : null}
-          <span className="font-medium">{title}</span>
+          <span className="font-header font-extrabold">{title}</span>
         </div>
       </TableCell>
       <TableCell>
