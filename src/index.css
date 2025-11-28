@@ -141,3 +141,11 @@ All colors MUST be HSL.
     @apply text-foreground;
   }
 }
+
+@layer components {
+  .prompt-hl {
+    background-color: #f5e9d3;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+}
