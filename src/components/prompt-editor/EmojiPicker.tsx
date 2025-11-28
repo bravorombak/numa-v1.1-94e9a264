@@ -74,7 +74,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
                       key={idx}
                       type="button"
                       onClick={() => handleSelect(emoji)}
-                      className="text-2xl hover:bg-accent rounded p-1 transition-colors"
+                      className="text-2xl hover:bg-accent hover:scale-110 rounded p-1 transition-all duration-150"
                     >
                       {emoji}
                     </button>
@@ -92,7 +92,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
                           key={idx}
                           type="button"
                           onClick={() => handleSelect(emoji)}
-                          className="text-2xl hover:bg-accent rounded p-1 transition-colors"
+                          className="text-2xl hover:bg-accent hover:scale-110 rounded p-1 transition-all duration-150"
                         >
                           {emoji}
                         </button>
