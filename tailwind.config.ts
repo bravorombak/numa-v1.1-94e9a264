@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        header: ['"Lora"', 'serif'],
+        header: ['"Work Sans"', 'sans-serif'],
         body: ['"Source Sans Pro"', 'sans-serif'],
       },
       colors: {
