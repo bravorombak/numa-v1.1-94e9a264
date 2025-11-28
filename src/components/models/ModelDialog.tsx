@@ -141,8 +141,7 @@ export const ModelDialog = ({ open, onOpenChange, model }: ModelDialogProps) => 
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="deprecated">Deprecated</SelectItem>
-                      <SelectItem value="disabled">Disabled</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

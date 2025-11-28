@@ -12,8 +12,8 @@ import { formatDistanceToNow } from "date-fns";
 const PromptRunPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { profile } = useAuthStore();
-  const canEdit = profile?.role === 'admin' || profile?.role === 'editor';
+  const { isAdmin, isEditor } = useAuthStore();
+  const canEdit = isAdmin || isEditor;
   const { data: promptVersion, isLoading, error } = usePromptVersion(id!);
   const { data: models } = useModels();
 

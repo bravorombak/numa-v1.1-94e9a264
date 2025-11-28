@@ -6,7 +6,6 @@ interface Profile {
   id: string;
   full_name: string | null;
   avatar_url: string | null;
-  role: 'admin' | 'editor' | 'user' | null;
 }
 
 interface AuthStore {
@@ -14,6 +13,8 @@ interface AuthStore {
   user: User | null;
   profile: Profile | null;
   roles: string[];
+  isAdmin: boolean;
+  isEditor: boolean;
   loading: boolean;
   initialized: boolean;
   
@@ -30,6 +31,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   profile: null,
   roles: [],
+  isAdmin: false,
+  isEditor: false,
   loading: true,
   initialized: false,
 
@@ -46,17 +49,26 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
               // Fetch profile
               const { data: profileData } = await supabase
                 .from('profiles')
-                .select('id, full_name, avatar_url, role')
+                .select('id, full_name, avatar_url')
                 .eq('id', session.user.id)
                 .maybeSingle();
               
-              // Temporary debug logging
-              console.log('Auth profile role', profileData?.role);
+              // Fetch roles from user_roles table
+              const { data: rolesData } = await supabase
+                .from('user_roles')
+                .select('role')
+                .eq('user_id', session.user.id);
+              
+              const roles = rolesData ? rolesData.map(r => r.role) : [];
+              const isAdmin = roles.includes('admin');
+              const isEditor = roles.includes('editor');
               
               if (profileData) {
                 set({ 
                   profile: profileData as Profile,
-                  roles: profileData.role ? [profileData.role] : []
+                  roles,
+                  isAdmin,
+                  isEditor,
                 });
               }
             } catch (error) {
@@ -69,7 +81,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           fetchUserData();
         }, 0);
       } else {
-        set({ profile: null, roles: [], loading: false });
+        set({ profile: null, roles: [], isAdmin: false, isEditor: false, loading: false });
       }
     });
 
@@ -83,17 +95,26 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             try {
               const { data: profileData } = await supabase
                 .from('profiles')
-                .select('id, full_name, avatar_url, role')
+                .select('id, full_name, avatar_url')
                 .eq('id', session.user.id)
                 .maybeSingle();
               
-              // Temporary debug logging
-              console.log('Auth profile role', profileData?.role);
+              // Fetch roles from user_roles table
+              const { data: rolesData } = await supabase
+                .from('user_roles')
+                .select('role')
+                .eq('user_id', session.user.id);
+              
+              const roles = rolesData ? rolesData.map(r => r.role) : [];
+              const isAdmin = roles.includes('admin');
+              const isEditor = roles.includes('editor');
               
               if (profileData) {
                 set({ 
                   profile: profileData as Profile,
-                  roles: profileData.role ? [profileData.role] : []
+                  roles,
+                  isAdmin,
+                  isEditor,
                 });
               }
             } catch (error) {
@@ -123,14 +144,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       session: null, 
       user: null, 
       profile: null, 
-      roles: [], 
+      roles: [],
+      isAdmin: false,
+      isEditor: false,
       loading: false 
     });
   },
   
   hasRole: (role: 'admin' | 'editor' | 'user') => {
-    const currentRole = get().profile?.role;
-    if (!currentRole) return false;
-    return currentRole === role;
+    return get().roles.includes(role);
   },
 }));

@@ -1,14 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 
 type ModelStatusBadgeProps = {
-  status: "active" | "deprecated" | "disabled";
+  status: "active" | "inactive";
 };
 
 export const ModelStatusBadge = ({ status }: ModelStatusBadgeProps) => {
   const variants = {
     active: "default",
-    deprecated: "secondary",
-    disabled: "destructive",
+    inactive: "secondary",
   } as const;
 
   return (

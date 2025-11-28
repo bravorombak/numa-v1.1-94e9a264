@@ -27,8 +27,7 @@ import { ModelStatusBadge } from "@/components/models/ModelStatusBadge";
 import { ModelDialog } from "@/components/models/ModelDialog";
 
 const AdminApiPage = () => {
-  const { profile } = useAuthStore();
-  const role = profile?.role || 'user';
+  const { isAdmin } = useAuthStore();
   
   const { data: models, isLoading } = useModels();
   const deleteModel = useDeleteModel();
@@ -39,7 +38,7 @@ const AdminApiPage = () => {
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
 
   // Admin-only guard
-  if (role !== 'admin') {
+  if (!isAdmin) {
     return <AccessDenied message="Only Admins can access the Model Registry." />;
   }
 

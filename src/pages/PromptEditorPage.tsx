@@ -16,13 +16,12 @@ import { extractVariables } from '@/lib/variableDetection';
 
 const PromptEditorPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { profile } = useAuthStore();
+  const { isAdmin, isEditor } = useAuthStore();
   const { data: draft, isLoading, error } = usePromptDraft(id || '');
   const { setDraft, setDetectedVariables, activeTab, reset } = usePromptEditorStore();
 
   // Role guard - only Admin and Editor can edit prompts
-  const role = profile?.role || 'user';
-  const canEdit = role === 'admin' || role === 'editor';
+  const canEdit = isAdmin || isEditor;
 
   if (!canEdit) {
     return <AccessDenied message="You don't have permission to edit prompts." />;

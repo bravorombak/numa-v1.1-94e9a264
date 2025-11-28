@@ -7,12 +7,11 @@ import { AccessDenied } from '@/components/common/AccessDenied';
 import { useAuthStore } from '@/stores/authStore';
 
 const CategoriesEditPage = () => {
-  const { profile } = useAuthStore();
-  const role = profile?.role || 'user';
+  const { isAdmin, isEditor } = useAuthStore();
   const [createFormOpen, setCreateFormOpen] = useState(false);
 
   // Admin/Editor guard
-  if (role !== 'admin' && role !== 'editor') {
+  if (!isAdmin && !isEditor) {
     return <AccessDenied message="Only Admins and Editors can manage groups." />;
   }
 

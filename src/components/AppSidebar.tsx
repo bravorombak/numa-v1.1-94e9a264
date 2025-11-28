@@ -63,8 +63,8 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const match = useMatch("/chat/:sessionId");
   const sessionId = match?.params.sessionId;
-  const { profile } = useAuthStore();
-  const role = profile?.role || 'user';
+  const { isAdmin, isEditor } = useAuthStore();
+  const canEdit = isAdmin || isEditor;
   const isMobile = useIsMobile();
   
   const createPrompt = useCreatePromptDraft();
@@ -232,7 +232,7 @@ export function AppSidebar() {
     <Sidebar collapsible={isMobile ? "offcanvas" : "icon"}>
       <SidebarContent>
       {/* New Prompt Button - only for Admin/Editor */}
-      {(role === 'admin' || role === 'editor') && (isMobile || open) && (
+      {canEdit && (isMobile || open) && (
         <SidebarGroup>
           <div className="px-2 pt-2 pb-2">
             <Button
@@ -260,10 +260,10 @@ export function AppSidebar() {
                 // Filter nav items by role
                 const shouldShow = 
                   item.url === "/" ? true : // Home - all roles
-                  item.url === "/team" ? (role === 'admin' || role === 'editor') :
-                  item.url === "/storage" ? role === 'admin' :
-                  item.url === "/categories/edit" ? (role === 'admin' || role === 'editor') :
-                  item.url === "/admin/api" ? role === 'admin' :
+                  item.url === "/team" ? canEdit :
+                  item.url === "/storage" ? isAdmin :
+                  item.url === "/categories/edit" ? canEdit :
+                  item.url === "/admin/api" ? isAdmin :
                   item.url === "/guide" ? true : // Guide - all roles (URL routing handled below)
                   false;
 
@@ -272,7 +272,7 @@ export function AppSidebar() {
                 // Route Guide item based on role
                 let targetUrl = item.url;
                 if (item.url === "/guide") {
-                  targetUrl = (role === 'admin' || role === 'editor') ? "/guide" : "/guide-view";
+                  targetUrl = canEdit ? "/guide" : "/guide-view";
                 }
                 
                 return (

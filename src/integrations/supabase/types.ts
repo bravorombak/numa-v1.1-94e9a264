@@ -231,7 +231,6 @@ export type Database = {
           created_at: string | null
           full_name: string | null
           id: string
-          role: string
           updated_at: string | null
         }
         Insert: {
@@ -239,7 +238,6 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id: string
-          role?: string
           updated_at?: string | null
         }
         Update: {
@@ -247,7 +245,6 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id?: string
-          role?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -511,9 +508,15 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor" | "user"
-      message_role: "user" | "assistant" | "system"
-      model_provider: "openai" | "anthropic" | "google" | "perplexity"
-      model_status: "active" | "deprecated" | "disabled"
+      message_role: "system" | "user" | "assistant" | "tool"
+      model_provider:
+        | "openai"
+        | "azure_openai"
+        | "anthropic"
+        | "google"
+        | "perplexity"
+        | "other"
+      model_status: "active" | "inactive"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -642,9 +645,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor", "user"],
-      message_role: ["user", "assistant", "system"],
-      model_provider: ["openai", "anthropic", "google", "perplexity"],
-      model_status: ["active", "deprecated", "disabled"],
+      message_role: ["system", "user", "assistant", "tool"],
+      model_provider: [
+        "openai",
+        "azure_openai",
+        "anthropic",
+        "google",
+        "perplexity",
+        "other",
+      ],
+      model_status: ["active", "inactive"],
     },
   },
 } as const
