@@ -133,9 +133,9 @@ const TeamPage = () => {
       {!isLoading && !isError && data?.users.length === 0 && (
         <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 px-6 py-10 text-center">
           <div className="text-3xl">👥</div>
-          <h2 className="text-sm font-medium">Belum ada anggota tim.</h2>
+          <h2 className="text-sm font-medium">No team members yet.</h2>
           <p className="text-xs text-muted-foreground max-w-sm">
-            Tambahkan anggota tim pertama untuk mulai kolaborasi.
+            Add your first team member to start collaborating.
           </p>
           <Button size="sm" className="mt-2" onClick={() => setAddOpen(true)}>
             + Add Member

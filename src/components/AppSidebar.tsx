@@ -316,9 +316,9 @@ export function AppSidebar() {
             {!sessionListLoading && !sessionListError && sessionList.length === 0 && (
               <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 px-3 py-6 text-center mx-2">
                 <div className="text-2xl">💬</div>
-                <p className="text-xs font-medium">Belum ada sesi chat.</p>
+                <p className="text-xs font-medium">No chat sessions yet.</p>
                 <p className="text-xs text-muted-foreground">
-                  Jalankan prompt pertama kamu untuk mulai percakapan.
+                  Run your first prompt to start a conversation.
                 </p>
               </div>
             )}

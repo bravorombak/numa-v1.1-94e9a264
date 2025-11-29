@@ -114,11 +114,11 @@ const HomePage = () => {
           <div className="text-3xl">✨</div>
           <h2 className="text-sm font-medium">
             {selectedCategoryId
-              ? 'Belum ada prompt di grup ini.'
-              : 'Belum ada prompt di sini.'}
+              ? 'No prompts in this group yet.'
+              : 'No prompts here yet.'}
           </h2>
           <p className="text-xs text-muted-foreground max-w-sm">
-            Mulai dengan membuat satu prompt baru untuk tim kamu.
+            Start by creating a new prompt for your team.
           </p>
         </div>
       )}
