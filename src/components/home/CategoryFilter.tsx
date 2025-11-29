@@ -16,7 +16,7 @@ export const CategoryFilter = ({
 
   if (isLoading) {
     return (
-      <div className="overflow-x-auto pb-2 no-scrollbar">
+      <div className="overflow-x-auto pb-2 no-scrollbar max-w-full">
         <div className="flex gap-2 whitespace-nowrap">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-8 w-24 shrink-0 rounded-full" />
@@ -27,7 +27,7 @@ export const CategoryFilter = ({
   }
 
   return (
-    <div className="overflow-x-auto pb-2 no-scrollbar">
+    <div className="overflow-x-auto pb-2 no-scrollbar max-w-full">
       <div className="flex gap-2 whitespace-nowrap">
         {/* All button */}
         <Button
