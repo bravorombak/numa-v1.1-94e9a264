@@ -13,6 +13,7 @@ import TeamPage from "./pages/TeamPage";
 import StoragePage from "./pages/StoragePage";
 import CategoriesEditPage from "./pages/CategoriesEditPage";
 import AdminApiPage from "./pages/AdminApiPage";
+import AdminProvidersPage from "./pages/AdminProvidersPage";
 import PromptEditorPage from "./pages/PromptEditorPage";
 import PromptRunPage from "./pages/PromptRunPage";
 import ChatPage from "./pages/ChatPage";
@@ -39,7 +40,8 @@ const AppContent = () => {
           <Route path="/team" element={<TeamPage />} />
           <Route path="/storage" element={<StoragePage />} />
           <Route path="/categories/edit" element={<CategoriesEditPage />} />
-          <Route path="/admin/api" element={<AdminApiPage />} />
+              <Route path="/admin/api" element={<AdminApiPage />} />
+              <Route path="/admin/providers" element={<AdminProvidersPage />} />
           <Route path="/prompts/:id/edit" element={<PromptEditorPage />} />
           <Route path="/prompts/:id/run" element={<PromptRunPage />} />
           <Route path="/chat/:sessionId" element={<ChatPage />} />

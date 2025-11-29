@@ -162,7 +162,7 @@ serve(async (req) => {
     // ========================================
     // 6. LOAD MODEL (using service role to bypass RLS)
     // ========================================
-    // Create service role client for secure access to model api_key
+    // Create service role client for secure access to provider credentials
     const serviceSupabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -198,18 +198,40 @@ serve(async (req) => {
       console.warn(`Using deprecated model: ${model.name}`);
     }
 
-    if (!model.api_key) {
+    // ========================================
+    // 8. LOAD PROVIDER API CREDENTIAL
+    // ========================================
+    if (!model.provider) {
       return jsonResponse(
         createError(
-          ErrorCodes.MODEL_AUTH_ERROR,
-          `Model \"${model.name}\" has no API key configured`
+          ErrorCodes.INTERNAL_ERROR,
+          `Model \"${model.name}\" has no provider configured`
         ),
         400
       );
     }
 
+    const { data: providerRow, error: providerError } = await serviceSupabase
+      .from('ai_providers')
+      .select('api_credential')
+      .eq('provider', model.provider)
+      .single();
+
+    if (providerError || !providerRow) {
+      console.error('[generate] Missing provider credential for', model.provider, providerError);
+      return jsonResponse(
+        createError(
+          ErrorCodes.MODEL_AUTH_ERROR,
+          `Missing API credentials for provider: ${model.provider}`
+        ),
+        500
+      );
+    }
+
+    const apiKey = providerRow.api_credential;
+
     // ========================================
-    // 8. VALIDATE VARIABLES
+    // 9. VALIDATE VARIABLES
     // ========================================
     if (draftData) {
       const variableSchema = (draftData.variables || []) as Array<{
@@ -230,7 +252,7 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 9. INTERPOLATE VARIABLES
+    // 10. INTERPOLATE VARIABLES
     // ========================================
     const finalPrompt = interpolateVariables(prompt, variables);
     const systemContent = finalPrompt.trim();
@@ -238,7 +260,7 @@ serve(async (req) => {
     const conversationInput = Array.isArray(conversation) ? conversation : [];
 
     // ========================================
-    // 10. BUILD NORMALIZED MESSAGES WITH CONVERSATION HISTORY
+    // 11. BUILD NORMALIZED MESSAGES WITH CONVERSATION HISTORY
     // ========================================
     type MessageContent = string | Array<{
       type: 'text' | 'image_url';
@@ -337,7 +359,7 @@ serve(async (req) => {
     const timeoutMs = 60000; // 60 seconds
 
     // ========================================
-    // 11. ROUTE TO PROVIDER
+    // 12. ROUTE TO PROVIDER
     // ========================================
     let result: { output: string; tokens: number };
 
@@ -345,7 +367,7 @@ serve(async (req) => {
       switch (model.provider) {
         case 'openai':
           result = await callOpenAI({
-            apiKey: model.api_key,
+            apiKey,
             model: model.provider_model,
             messages,
             maxTokens,
@@ -356,7 +378,7 @@ serve(async (req) => {
 
         case 'anthropic':
           result = await callAnthropic({
-            apiKey: model.api_key,
+            apiKey,
             model: model.provider_model,
             messages,
             maxTokens,
@@ -367,7 +389,7 @@ serve(async (req) => {
 
         case 'google':
           result = await callGoogle({
-            apiKey: model.api_key,
+            apiKey,
             model: model.provider_model,
             messages,
             maxTokens,
@@ -378,7 +400,7 @@ serve(async (req) => {
 
         case 'perplexity':
           result = await callPerplexity({
-            apiKey: model.api_key,
+            apiKey,
             model: model.provider_model,
             messages,
             maxTokens,
@@ -405,7 +427,7 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 12. LOG GENERATION (non-blocking)
+    // 13. LOG GENERATION (non-blocking)
     // ========================================
     try {
       await supabase.from('generation_logs').insert({
@@ -422,7 +444,7 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 13. RETURN SUCCESS RESPONSE
+    // 14. RETURN SUCCESS RESPONSE
     // ========================================
     return jsonResponse({
       output: result.output,

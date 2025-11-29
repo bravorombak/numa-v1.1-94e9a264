@@ -10,7 +10,6 @@ export const modelFormSchema = z.object({
     required_error: "Status is required",
   }),
   max_tokens: z.number().positive().optional().nullable(),
-  api_key: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
 });
 
