@@ -149,3 +149,15 @@ All colors MUST be HSL.
     padding: 0 2px;
   }
 }
+
+/* Guide markdown: wrap code blocks instead of horizontal overflow */
+.guide-markdown pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: visible;
+}
+
+.guide-markdown code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
