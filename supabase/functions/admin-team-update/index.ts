@@ -181,12 +181,11 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 6. UPDATE PROFILE
+    // 6. UPDATE PROFILE (display info only - role handled by user_roles)
     // ========================================
     const profileUpdates: any = {};
     if (updates.full_name !== undefined) profileUpdates.full_name = updates.full_name;
     if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
-    if (updates.role !== undefined) profileUpdates.role = updates.role; // Sync for display
 
     if (Object.keys(profileUpdates).length > 0) {
       const { error: profileError } = await serviceSupabase
@@ -223,7 +222,7 @@ serve(async (req) => {
     // ========================================
     const { data: updatedProfile } = await serviceSupabase
       .from('profiles')
-      .select('id, full_name, avatar_url, role')
+      .select('id, full_name, avatar_url')
       .eq('id', targetUserId)
       .single();
 

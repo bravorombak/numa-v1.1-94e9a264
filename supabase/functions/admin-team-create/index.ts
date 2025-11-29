@@ -174,7 +174,7 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 5. INSERT INTO user_roles (authoritative)
+    // 5. INSERT INTO user_roles (SOURCE OF TRUTH for authorization)
     // ========================================
     // Note: The handle_new_user trigger automatically creates a 'user' role.
     // We use upsert to handle this gracefully.
@@ -206,30 +206,20 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 6. UPDATE profiles.role (SOURCE OF TRUTH for v1.1)
+    // 6. UPDATE profiles.full_name (display only)
     // ========================================
-    const { error: profileUpdateError } = await serviceSupabase
-      .from('profiles')
-      .update({
-        full_name: full_name || null,
-        role: role, // SOURCE OF TRUTH for authorization
-      })
-      .eq('id', userId);
+    // Note: user_roles is the source of truth for authorization.
+    // profiles only stores display information.
+    if (full_name) {
+      const { error: profileUpdateError } = await serviceSupabase
+        .from('profiles')
+        .update({ full_name })
+        .eq('id', userId);
 
-    if (profileUpdateError) {
-      console.error('[admin-team-create] profiles update error:', profileUpdateError);
-      // Cleanup: delete the auth user we just created
-      if (!isExistingUser) {
-        await serviceSupabase.auth.admin.deleteUser(userId);
+      if (profileUpdateError) {
+        console.warn('[admin-team-create] profiles.full_name update warning:', profileUpdateError);
+        // Not critical - continue (role is already set in user_roles)
       }
-      return jsonResponse(
-        createError(
-          ErrorCodes.INTERNAL_ERROR,
-          'Failed to set user role',
-          profileUpdateError.message
-        ),
-        500
-      );
     }
 
     // ========================================
