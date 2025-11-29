@@ -32,7 +32,6 @@ import {
 const editMemberSchema = z.object({
   full_name: z.string().min(1, 'Name is required'),
   role: z.enum(['admin', 'editor', 'user']),
-  avatar_url: z.string().url().optional().or(z.literal('')),
 });
 
 type EditMemberFormData = z.infer<typeof editMemberSchema>;
@@ -52,7 +51,6 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
     defaultValues: {
       full_name: '',
       role: 'user',
-      avatar_url: '',
     },
   });
 
@@ -62,7 +60,6 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
       form.reset({
         full_name: member.full_name || '',
         role: member.resolved_role,
-        avatar_url: member.avatar_url || '',
       });
     }
   }, [member, open, form]);
@@ -79,9 +76,6 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
       }
       if (data.role !== member.resolved_role) {
         updates.role = data.role;
-      }
-      if (data.avatar_url !== (member.avatar_url || '')) {
-        updates.avatar_url = data.avatar_url || null;
       }
 
       // Only update if there are changes
@@ -161,20 +155,6 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="avatar_url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Avatar URL (optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://example.com/avatar.jpg" {...field} />
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
