@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Home, Users, HardDrive, FolderTree, Settings, BookOpen, MessageSquare, MoreVertical, Edit2, Trash2, Plus } from "lucide-react";
+import { Home, Users, HardDrive, FolderTree, Bot, BookOpen, MessageSquare, MoreVertical, Edit2, Trash2, Plus } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useMatch, useNavigate } from "react-router-dom";
 import { useAllUserSessions, useRenameSession, useDeleteSession } from "@/hooks/useSessions";
@@ -54,7 +54,7 @@ import { Button } from "@/components/ui/button";
     { title: "Team", url: "/team", icon: Users },
     { title: "Storage", url: "/storage", icon: HardDrive },
     { title: "Groups", url: "/categories/edit", icon: FolderTree },
-    { title: "Model Registry", url: "/admin/api", icon: Settings },
+    { title: "Model", url: "/admin/api", icon: Bot },
     { title: "Guide", url: "/guide", icon: BookOpen },
   ];
 
