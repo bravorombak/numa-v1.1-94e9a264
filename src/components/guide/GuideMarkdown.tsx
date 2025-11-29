@@ -12,7 +12,7 @@ export function GuideMarkdown({ content, className }: GuideMarkdownProps) {
   return (
     <div
       className={cn(
-        "prose prose-sm dark:prose-invert max-w-none",
+        "prose prose-sm dark:prose-invert max-w-none guide-markdown",
         // Brand color overrides
         "prose-headings:text-foreground",
         "prose-p:text-muted-foreground",
