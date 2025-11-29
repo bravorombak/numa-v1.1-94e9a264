@@ -206,20 +206,25 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 6. UPDATE profiles.full_name (display only)
+    // 6. UPSERT profiles.full_name (display only)
     // ========================================
     // Note: user_roles is the source of truth for authorization.
     // profiles only stores display information.
-    if (full_name) {
-      const { error: profileUpdateError } = await serviceSupabase
-        .from('profiles')
-        .update({ full_name })
-        .eq('id', userId);
+    const { error: profileUpdateError } = await serviceSupabase
+      .from('profiles')
+      .upsert(
+        {
+          id: userId,
+          full_name: full_name || null,
+        },
+        {
+          onConflict: 'id',
+        }
+      );
 
-      if (profileUpdateError) {
-        console.warn('[admin-team-create] profiles.full_name update warning:', profileUpdateError);
-        // Not critical - continue (role is already set in user_roles)
-      }
+    if (profileUpdateError) {
+      console.warn('[admin-team-create] profiles upsert warning:', profileUpdateError);
+      // Not critical - continue (role is already set in user_roles)
     }
 
     // ========================================
