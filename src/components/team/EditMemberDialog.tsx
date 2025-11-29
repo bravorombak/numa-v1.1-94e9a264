@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -28,11 +28,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Lock } from 'lucide-react';
 
 const editMemberSchema = z.object({
   full_name: z.string().min(1, 'Name is required'),
   role: z.enum(['admin', 'editor', 'user']),
-});
+  newPassword: z.string().optional(),
+  confirmPassword: z.string().optional(),
+})
+.refine(
+  (data) => {
+    // If newPassword is provided, it must be at least 6 characters
+    if (data.newPassword && data.newPassword.length > 0) {
+      return data.newPassword.length >= 6;
+    }
+    return true;
+  },
+  {
+    message: 'Password must be at least 6 characters',
+    path: ['newPassword'],
+  }
+)
+.refine(
+  (data) => {
+    // If newPassword is provided, confirmPassword must match
+    if (data.newPassword && data.newPassword.length > 0) {
+      return data.confirmPassword === data.newPassword;
+    }
+    return true;
+  },
+  {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  }
+);
 
 type EditMemberFormData = z.infer<typeof editMemberSchema>;
 
@@ -45,12 +75,15 @@ interface EditMemberDialogProps {
 
 export function EditMemberDialog({ open, onOpenChange, member, currentRole }: EditMemberDialogProps) {
   const updateMember = useUpdateTeamMember();
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
 
   const form = useForm<EditMemberFormData>({
     resolver: zodResolver(editMemberSchema),
     defaultValues: {
       full_name: '',
       role: 'user',
+      newPassword: '',
+      confirmPassword: '',
     },
   });
 
@@ -60,7 +93,10 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
       form.reset({
         full_name: member.full_name || '',
         role: member.resolved_role,
+        newPassword: '',
+        confirmPassword: '',
       });
+      setShowPasswordFields(false);
     }
   }, [member, open, form]);
 
@@ -69,13 +105,17 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
 
     try {
       // Build updates object with only changed fields
-      const updates: Partial<EditMemberFormData> = {};
+      const updates: any = {};
       
       if (data.full_name !== member.full_name) {
         updates.full_name = data.full_name;
       }
       if (data.role !== member.resolved_role) {
         updates.role = data.role;
+      }
+      // Include password if provided
+      if (data.newPassword && data.newPassword.trim().length > 0) {
+        updates.password = data.newPassword;
       }
 
       // Only update if there are changes
@@ -159,6 +199,63 @@ export function EditMemberDialog({ open, onOpenChange, member, currentRole }: Ed
                 </FormItem>
               )}
             />
+
+            {/* Password Section */}
+            <div className="space-y-3 pt-2 border-t">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Lock className="h-4 w-4" />
+                <span>Current password: ******** (hidden for security)</span>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="change-password"
+                  checked={showPasswordFields}
+                  onCheckedChange={(checked) => {
+                    setShowPasswordFields(!!checked);
+                    if (!checked) {
+                      form.setValue('newPassword', '');
+                      form.setValue('confirmPassword', '');
+                    }
+                  }}
+                />
+                <label htmlFor="change-password" className="text-sm font-medium cursor-pointer">
+                  Set a new password
+                </label>
+              </div>
+
+              {showPasswordFields && (
+                <div className="space-y-4 pt-2">
+                  <FormField
+                    control={form.control}
+                    name="newPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>New Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Enter new password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm New Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Confirm new password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+            </div>
 
             <DialogFooter>
               <Button

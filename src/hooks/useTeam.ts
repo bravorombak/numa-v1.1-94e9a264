@@ -48,6 +48,7 @@ export interface UpdateTeamMemberPayload {
     full_name?: string;
     role?: AppRole;
     avatar_url?: string;
+    password?: string;
   };
 }
 
@@ -248,17 +249,21 @@ export const useUpdateTeamMember = () => {
 
       return data as TeamMember;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       // Invalidate all team member queries
       queryClient.invalidateQueries({
         queryKey: ['team', 'members'],
         exact: false,
       });
 
+      const passwordChanged = !!variables.updates.password;
+
       // Show success toast
       toast({
         title: 'Team member updated',
-        description: 'The team member has been updated successfully.',
+        description: passwordChanged
+          ? 'The team member details and password have been updated successfully.'
+          : 'The team member has been updated successfully.',
       });
     },
     onError: (error) => {
