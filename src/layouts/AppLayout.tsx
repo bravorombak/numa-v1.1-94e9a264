@@ -18,7 +18,7 @@ export const AppLayout = () => {
     <SidebarProvider defaultOpen={!isMobile} key={user?.id ?? 'no-user'} className="fixed inset-0 flex w-full overflow-hidden">
       <div className="flex h-full w-full min-h-0">
         <AppSidebar />
-        <div className="flex flex-1 flex-col min-h-0">
+        <div className="flex flex-1 flex-col min-h-0 min-w-0">
           <AppHeader />
           <main className="flex flex-col flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
             <Outlet />
