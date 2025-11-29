@@ -22,8 +22,9 @@ export const useModels = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ["models"],
     queryFn: async () => {
+      // Use models_public view for read operations (excludes api_key for editors)
       const { data, error } = await supabase
-        .from("models")
+        .from("models_public")
         .select("*")
         .order("created_at", { ascending: false });
 

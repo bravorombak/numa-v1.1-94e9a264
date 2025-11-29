@@ -99,6 +99,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "generation_logs_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "generation_logs_prompt_draft_id_fkey"
             columns: ["prompt_draft_id"]
             isOneToOne: false
@@ -313,6 +320,13 @@ export type Database = {
             referencedRelation: "models"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "prompt_drafts_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       prompt_versions: {
@@ -386,6 +400,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "prompt_versions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "prompt_versions_prompt_draft_id_fkey"
             columns: ["prompt_draft_id"]
             isOneToOne: false
@@ -428,6 +449,13 @@ export type Database = {
             columns: ["model_id"]
             isOneToOne: false
             referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models_public"
             referencedColumns: ["id"]
           },
           {
@@ -495,7 +523,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      models_public: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          max_tokens: number | null
+          name: string | null
+          provider: Database["public"]["Enums"]["model_provider"] | null
+          provider_model: string | null
+          status: Database["public"]["Enums"]["model_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          max_tokens?: number | null
+          name?: string | null
+          provider?: Database["public"]["Enums"]["model_provider"] | null
+          provider_model?: string | null
+          status?: Database["public"]["Enums"]["model_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          max_tokens?: number | null
+          name?: string | null
+          provider?: Database["public"]["Enums"]["model_provider"] | null
+          provider_model?: string | null
+          status?: Database["public"]["Enums"]["model_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
