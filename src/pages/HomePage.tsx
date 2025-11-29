@@ -51,7 +51,7 @@ const HomePage = () => {
   });
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="min-h-full w-full">
       {/* Full-bleed Hero Banner */}
       <HomeHeroBanner
         greeting={`Hello, ${displayName}`}
@@ -59,7 +59,7 @@ const HomePage = () => {
       />
 
       {/* Content container with padding */}
-      <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 space-y-6">
+      <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
         {/* Category Filter + View Mode Toggle */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1">
