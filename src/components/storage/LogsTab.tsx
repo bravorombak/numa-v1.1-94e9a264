@@ -86,12 +86,12 @@ export const LogsTab = () => {
           <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 px-6 py-10 text-center">
             <div className="text-3xl">📁</div>
             <h2 className="text-sm font-medium">
-              {debouncedSearch ? 'Tidak ditemukan file yang cocok.' : 'Belum ada file yang diunggah.'}
+              {debouncedSearch ? 'No matching files found.' : 'No files uploaded yet.'}
             </h2>
             <p className="text-xs text-muted-foreground max-w-sm">
               {debouncedSearch 
-                ? 'Coba kata kunci lain.' 
-                : 'File akan muncul di sini setelah diunggah melalui prompt.'}
+                ? 'Try a different keyword.' 
+                : 'Files will appear here after being uploaded via prompts.'}
             </p>
           </div>
         ) : (

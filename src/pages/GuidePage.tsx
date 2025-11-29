@@ -87,9 +87,9 @@ const GuidePage = () => {
           ) : tree.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 px-6 py-10 text-center">
               <div className="text-3xl">📚</div>
-              <h2 className="text-sm font-medium">Belum ada halaman panduan.</h2>
+              <h2 className="text-sm font-medium">No guide pages yet.</h2>
               <p className="text-xs text-muted-foreground max-w-sm">
-                Buat halaman pertama untuk memulai dokumentasi tim.
+                Create your first page to start your team's documentation.
               </p>
             </div>
           ) : (
