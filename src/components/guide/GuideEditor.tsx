@@ -311,11 +311,16 @@ export function GuideEditor({ page, allPages }: GuideEditorProps) {
                         onContentChange={(newContent) => field.onChange(newContent)}
                       />
                       <Textarea
-                        ref={textareaRef}
+                        {...field}
+                        ref={(el) => {
+                          // Let react-hook-form manage its ref
+                          field.ref(el);
+                          // Also expose the same element to the markdown toolbar
+                          (textareaRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el;
+                        }}
+                        value={field.value || ""}
                         placeholder="Write your guide content here using Markdown..."
                         className="min-h-[400px] font-mono"
-                        {...field}
-                        value={field.value || ""}
                       />
                     </div>
                   </FormControl>
