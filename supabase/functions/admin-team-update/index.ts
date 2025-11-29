@@ -183,19 +183,25 @@ serve(async (req) => {
     // ========================================
     // 6. UPDATE PROFILE (display info only - role handled by user_roles)
     // ========================================
-    const profileUpdates: any = {};
-    if (updates.full_name !== undefined) profileUpdates.full_name = updates.full_name;
-    if (updates.avatar_url !== undefined) profileUpdates.avatar_url = updates.avatar_url;
+    const profileUpdates: any = {
+      id: targetUserId, // Always include id for upsert
+    };
 
-    if (Object.keys(profileUpdates).length > 0) {
+    if (updates.full_name !== undefined) {
+      profileUpdates.full_name = updates.full_name;
+    }
+    if (updates.avatar_url !== undefined) {
+      profileUpdates.avatar_url = updates.avatar_url;
+    }
+
+    if (Object.keys(profileUpdates).length > 1) { // more than just id
       const { error: profileError } = await serviceSupabase
         .from('profiles')
-        .update(profileUpdates)
-        .eq('id', targetUserId);
+        .upsert(profileUpdates, { onConflict: 'id' });
 
       if (profileError) {
-        console.error('[admin-team-update] Profile update error:', profileError);
-        // Not critical, continue
+        console.error('[admin-team-update] Profile upsert error:', profileError);
+        // Not critical - continue, since roles are already correct
       }
     }
 
