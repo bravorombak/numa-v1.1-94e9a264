@@ -24,6 +24,7 @@ interface UpdateRequest {
     full_name?: string;
     role?: 'admin' | 'editor' | 'user';
     avatar_url?: string;
+    password?: string;
   };
 }
 
@@ -224,6 +225,31 @@ serve(async (req) => {
     }
 
     // ========================================
+    // 7.5. UPDATE PASSWORD (if provided)
+    // ========================================
+    let passwordChanged = false;
+    if (updates.password && updates.password.trim().length > 0) {
+      const { error: passwordError } = await serviceSupabase.auth.admin.updateUserById(
+        targetUserId,
+        { password: updates.password }
+      );
+
+      if (passwordError) {
+        console.error('[admin-team-update] Password update error:', passwordError);
+        return jsonResponse(
+          createError(
+            ErrorCodes.INTERNAL_ERROR,
+            'Failed to change password',
+            passwordError.message
+          ),
+          500
+        );
+      }
+      passwordChanged = true;
+      console.log(`[admin-team-update] Password updated for user: ${targetUserId}`);
+    }
+
+    // ========================================
     // 8. FETCH UPDATED USER
     // ========================================
     const { data: updatedProfile } = await serviceSupabase
@@ -245,6 +271,7 @@ serve(async (req) => {
       full_name: updatedProfile?.full_name || null,
       avatar_url: updatedProfile?.avatar_url || null,
       role: updatedRole?.role || targetRole,
+      password_changed: passwordChanged,
     });
 
   } catch (error) {
