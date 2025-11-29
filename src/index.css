@@ -111,16 +111,15 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  html,
-  body,
-  #root {
-    height: 100%;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-  }
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
 
   body {
     @apply bg-background text-muted-foreground font-body;
