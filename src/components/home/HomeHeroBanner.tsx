@@ -5,22 +5,22 @@ interface HomeHeroBannerProps {
   subtitle: string;
 }
 
-export const HomeHeroBanner = ({ greeting, subtitle }: HomeHeroBannerProps) => (
-  <section className="w-full border-b bg-card">
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
-      <div className="relative overflow-hidden rounded-lg">
-        {/* Hero Image */}
+export const HomeHeroBanner = ({ greeting, subtitle }: HomeHeroBannerProps) => {
+  return (
+    <section className="w-full border-b bg-card">
+      <div className="relative w-full h-[160px] sm:h-[180px] md:h-[200px] overflow-hidden">
+        {/* Background image */}
         <img
           src={homeHeroImage}
           alt="Numa home hero"
-          className="h-32 w-full object-cover sm:h-40 md:h-52"
+          className="w-full h-full object-cover"
         />
-        
-        {/* Dark gradient overlay for contrast */}
+
+        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-        
-        {/* Text overlay, bottom-left */}
-        <div className="absolute inset-x-0 bottom-0 px-4 pb-4 flex flex-col gap-1 animate-fade-in">
+
+        {/* Text overlay */}
+        <div className="absolute inset-x-0 bottom-0 px-4 pb-4 sm:px-6 sm:pb-5 flex flex-col gap-1 animate-fade-in">
           <h1 className="text-2xl sm:text-3xl font-header font-extrabold text-background">
             {greeting}
           </h1>
@@ -29,6 +29,6 @@ export const HomeHeroBanner = ({ greeting, subtitle }: HomeHeroBannerProps) => (
           </p>
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
