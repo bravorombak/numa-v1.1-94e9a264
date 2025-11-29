@@ -51,7 +51,7 @@ const HomePage = () => {
   });
 
   return (
-    <div className="flex flex-col min-h-0 w-full">
+    <div className="min-h-full w-full overflow-x-hidden bg-background">
       {/* Full-bleed Hero Banner */}
       <HomeHeroBanner
         greeting={`Hello, ${displayName}`}
@@ -59,17 +59,17 @@ const HomePage = () => {
       />
 
       {/* Content container with padding */}
-      <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
         {/* Category Filter + View Mode Toggle */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <CategoryFilter
-            selectedCategoryId={selectedCategoryId}
-            onSelectCategory={setSelectedCategoryId}
-          />
+        <div className="flex items-center justify-between gap-4">
+          <div className="w-full overflow-hidden">
+            <CategoryFilter
+              selectedCategoryId={selectedCategoryId}
+              onSelectCategory={setSelectedCategoryId}
+            />
+          </div>
+          <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
         </div>
-        <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-      </div>
 
       {/* Loading State */}
       {isLoading && (
