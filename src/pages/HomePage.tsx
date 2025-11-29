@@ -51,8 +51,9 @@ const HomePage = () => {
   });
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 space-y-6">
-      {/* Full-bleed Hero Banner */}
+    <div className="overflow-x-hidden">
+      <div className="container mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 space-y-6">
+        {/* Full-bleed Hero Banner */}
       <div className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-8">
         <HomeHeroBanner
           greeting={`Hello, ${displayName}`}
@@ -185,6 +186,7 @@ const HomePage = () => {
             </Table>
           </div>
         )}
+      </div>
     </div>
   );
 };

@@ -161,3 +161,13 @@ All colors MUST be HSL.
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
