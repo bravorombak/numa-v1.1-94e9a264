@@ -11,7 +11,6 @@ export type Model = {
   provider_model: string;
   status: "active" | "inactive";
   max_tokens: number | null;
-  api_key: string | null;
   description: string | null;
 };
 
@@ -22,9 +21,8 @@ export const useModels = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ["models"],
     queryFn: async () => {
-      // Use models_public view for read operations (excludes api_key for editors)
       const { data, error } = await supabase
-        .from("models_public")
+        .from("models")
         .select("*")
         .order("created_at", { ascending: false });
 

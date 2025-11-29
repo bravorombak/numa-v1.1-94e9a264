@@ -46,7 +46,6 @@ export const ModelDialog = ({ open, onOpenChange, model }: ModelDialogProps) => 
       provider_model: model?.provider_model || "",
       status: model?.status || "active",
       max_tokens: model?.max_tokens || null,
-      api_key: model?.api_key || "",
       description: model?.description || "",
     },
   });
@@ -164,24 +163,6 @@ export const ModelDialog = ({ open, onOpenChange, model }: ModelDialogProps) => 
                       onChange={(e) =>
                         field.onChange(e.target.value ? parseInt(e.target.value) : null)
                       }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="api_key"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>API Key (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Enter API key..."
-                      {...field}
-                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
