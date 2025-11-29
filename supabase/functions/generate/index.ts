@@ -160,9 +160,15 @@ serve(async (req) => {
     }
 
     // ========================================
-    // 6. LOAD MODEL
+    // 6. LOAD MODEL (using service role to bypass RLS)
     // ========================================
-    const { data: model, error: modelError } = await supabase
+    // Create service role client for secure access to model api_key
+    const serviceSupabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { data: model, error: modelError } = await serviceSupabase
       .from('models')
       .select('*')
       .eq('id', model_id)

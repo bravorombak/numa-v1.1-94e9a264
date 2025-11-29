@@ -14,8 +14,9 @@ const PromptRunPage = () => {
   const navigate = useNavigate();
   const { isAdmin, isEditor } = useAuthStore();
   const canEdit = isAdmin || isEditor;
+  const canViewModels = isAdmin || isEditor;
   const { data: promptVersion, isLoading, error } = usePromptVersion(id!);
-  const { data: models } = useModels();
+  const { data: models } = useModels({ enabled: canViewModels });
 
   if (isLoading) {
     return (
@@ -41,7 +42,9 @@ const PromptRunPage = () => {
     );
   }
 
-  const modelName = models?.find(m => m.id === promptVersion.model_id)?.name;
+  const modelName = canViewModels 
+    ? models?.find(m => m.id === promptVersion.model_id)?.name 
+    : null;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 sm:space-y-8 p-4 sm:p-6">

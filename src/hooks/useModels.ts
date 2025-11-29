@@ -18,7 +18,7 @@ export type Model = {
 export type ModelInsert = Omit<Model, "id" | "created_at" | "updated_at">;
 export type ModelUpdate = Partial<ModelInsert>;
 
-export const useModels = () => {
+export const useModels = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ["models"],
     queryFn: async () => {
@@ -30,6 +30,7 @@ export const useModels = () => {
       if (error) throw error;
       return data as Model[];
     },
+    enabled: options?.enabled ?? true,
   });
 };
 
