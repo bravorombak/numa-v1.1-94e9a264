@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { MarkdownMessage } from "@/components/common/MarkdownMessage";
 import type { MessageRow } from "@/hooks/useMessages";
 import type { ChatAttachment } from "@/types/chat";
-import aiAvatar from "@/assets/ai-avatar.png";
+import aiAvatar from "@/assets/numa-ai-avatar.png";
 
 interface ChatMessageProps {
   message: MessageRow;
