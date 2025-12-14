@@ -1,11 +1,23 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePromptEditorStore } from '@/stores/promptEditorStore';
 
-export const PromptEditorTabs = () => {
+type TabType = 'about' | 'prompt' | 'variables' | 'model' | 'test' | 'version';
+
+interface PromptEditorTabsProps {
+  onTabChange?: (tab: TabType) => void;
+}
+
+export const PromptEditorTabs = ({ onTabChange }: PromptEditorTabsProps) => {
   const { activeTab, setActiveTab } = usePromptEditorStore();
 
+  const handleChange = (value: string) => {
+    const tab = value as TabType;
+    setActiveTab(tab);
+    onTabChange?.(tab);
+  };
+
   return (
-    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+    <Tabs value={activeTab} onValueChange={handleChange}>
       <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0 overflow-x-auto flex-nowrap">
         <TabsTrigger 
           value="about" 

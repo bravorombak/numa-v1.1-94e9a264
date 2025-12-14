@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { usePromptDraft } from '@/hooks/usePromptDrafts';
 import { usePromptEditorStore } from '@/stores/promptEditorStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -14,11 +14,15 @@ import { TestTab } from '@/components/prompt-editor/TestTab';
 import { VersionTab } from '@/components/prompt-editor/VersionTab';
 import { extractVariables } from '@/lib/variableDetection';
 
+type TabType = 'about' | 'prompt' | 'variables' | 'model' | 'test' | 'version';
+const ALLOWED_TABS: TabType[] = ['about', 'prompt', 'variables', 'model', 'test', 'version'];
+
 const PromptEditorPage = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { isAdmin, isEditor } = useAuthStore();
   const { data: draft, isLoading, error } = usePromptDraft(id || '');
-  const { setDraft, setDetectedVariables, activeTab, reset } = usePromptEditorStore();
+  const { setDraft, setDetectedVariables, activeTab, setActiveTab, reset } = usePromptEditorStore();
 
   // Role guard - only Admin and Editor can edit prompts
   const canEdit = isAdmin || isEditor;
@@ -27,17 +31,37 @@ const PromptEditorPage = () => {
     return <AccessDenied message="You don't have permission to edit prompts." />;
   }
 
+  // Effect A: Sync URL tab param to store state
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && ALLOWED_TABS.includes(tabFromUrl as TabType)) {
+      setActiveTab(tabFromUrl as TabType);
+    }
+  }, [searchParams, setActiveTab]);
+
+  // Effect B: Initialize draft data when loaded
   useEffect(() => {
     if (draft) {
       setDraft(draft);
-      // Initialize detected variables from the loaded prompt
       const detected = extractVariables(draft.prompt_text || '');
       setDetectedVariables(detected);
     }
+  }, [draft, setDraft, setDetectedVariables]);
+
+  // Effect C: Cleanup only on unmount
+  useEffect(() => {
     return () => {
       reset();
     };
-  }, [draft, setDraft, setDetectedVariables, reset]);
+  }, [reset]);
+
+  // Handle tab change with URL sync
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', tab);
+    setSearchParams(next, { replace: true });
+  };
 
   if (isLoading) {
     return (
@@ -63,7 +87,7 @@ const PromptEditorPage = () => {
   return (
     <div className="flex h-full flex-col">
       <PromptEditorHeader />
-      <PromptEditorTabs />
+      <PromptEditorTabs onTabChange={handleTabChange} />
       <div className="flex-1 overflow-auto">
         {activeTab === 'about' && <AboutTab />}
         {activeTab === 'prompt' && <PromptTab />}
