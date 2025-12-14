@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const modelFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  provider: z.enum(["openai", "anthropic", "google", "perplexity"], {
+  provider: z.enum(["openai", "anthropic", "google", "perplexity", "grok"], {
     required_error: "Provider is required",
   }),
   provider_model: z.string().min(1, "Provider model is required"),

@@ -18,6 +18,7 @@ const providerNames: Record<Model['provider'], string> = {
   anthropic: 'Anthropic',
   google: 'Google',
   perplexity: 'Perplexity',
+  grok: 'Grok',
 };
 
 export const ModelTab = () => {
