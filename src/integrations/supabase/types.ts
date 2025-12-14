@@ -537,6 +537,7 @@ export type Database = {
         | "google"
         | "perplexity"
         | "other"
+        | "grok"
       model_status: "active" | "inactive"
     }
     CompositeTypes: {
@@ -674,6 +675,7 @@ export const Constants = {
         "google",
         "perplexity",
         "other",
+        "grok",
       ],
       model_status: ["active", "inactive"],
     },

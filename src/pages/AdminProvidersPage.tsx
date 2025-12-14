@@ -20,6 +20,7 @@ const SUPPORTED_PROVIDERS = [
   { id: "anthropic", name: "Anthropic", description: "Claude models (claude-4, etc.)" },
   { id: "google", name: "Google", description: "Gemini models (gemini-2.5-pro, etc.)" },
   { id: "perplexity", name: "Perplexity", description: "Perplexity AI models" },
+  { id: "grok", name: "Grok", description: "xAI Grok models" },
 ];
 
 const AdminProvidersPage = () => {

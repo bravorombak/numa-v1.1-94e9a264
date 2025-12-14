@@ -7,7 +7,7 @@ export type Model = {
   created_at: string;
   updated_at: string;
   name: string;
-  provider: "openai" | "anthropic" | "google" | "perplexity";
+  provider: "openai" | "anthropic" | "google" | "perplexity" | "grok";
   provider_model: string;
   status: "active" | "inactive";
   max_tokens: number | null;

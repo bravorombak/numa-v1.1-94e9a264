@@ -105,6 +105,7 @@ export const ModelDialog = ({ open, onOpenChange, model }: ModelDialogProps) => 
                       <SelectItem value="anthropic">Anthropic</SelectItem>
                       <SelectItem value="google">Google</SelectItem>
                       <SelectItem value="perplexity">Perplexity</SelectItem>
+                      <SelectItem value="grok">Grok</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
