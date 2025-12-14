@@ -11,6 +11,7 @@ import { callOpenAI } from './providers/openai.ts';
 import { callAnthropic } from './providers/anthropic.ts';
 import { callGoogle } from './providers/google.ts';
 import { callPerplexity } from './providers/perplexity.ts';
+import { callGrok } from './providers/grok.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -400,6 +401,17 @@ serve(async (req) => {
 
         case 'perplexity':
           result = await callPerplexity({
+            apiKey,
+            model: model.provider_model,
+            messages,
+            maxTokens,
+            temperature,
+            timeoutMs,
+          });
+          break;
+
+        case 'grok':
+          result = await callGrok({
             apiKey,
             model: model.provider_model,
             messages,
