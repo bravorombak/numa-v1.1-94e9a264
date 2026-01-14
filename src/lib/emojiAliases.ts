@@ -67,7 +67,7 @@ export const EMOJI_ALIASES: Record<string, string[]> = {
   'flex': ['💪'],
   
   // === OBJECTS / CONCEPTS ===
-  'fire': ['🔥', '🧯', '🔥'],
+  'fire': ['🔥', '🧯'],
   'hot': ['🔥', '🥵', '🌡️', '♨️'],
   'cold': ['🥶', '❄️', '🧊', '⛄'],
   'trash': ['🗑️', '♻️', '🚮'],
