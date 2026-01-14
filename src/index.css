@@ -173,3 +173,14 @@ All colors MUST be HSL.
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;     /* Firefox */
 }
+
+/* emoji-mart picker styling */
+.emoji-mart-wrapper em-emoji-picker {
+  --em-rgb-background: var(--background);
+  --em-rgb-input: var(--input);
+  --em-rgb-color: var(--foreground);
+  width: 100% !important;
+  max-height: 300px;
+  border: none !important;
+  border-radius: 0 !important;
+}
